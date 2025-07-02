@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: eurekaserver
+  config:
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8071}
+  profiles:
+    active: dev
