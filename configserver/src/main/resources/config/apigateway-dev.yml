@@ -1,0 +1,97 @@
+spring:
+  zipkin:
+    enabled: true
+    baseUrl: ${SPRING_ZIPKIN_BASE_URL:http://localhost:9411/api/v2/spans}
+    cloud:
+      config:
+        enabled: false
+      gateway:
+        httpclient:
+          connect-timeout: 5000
+          response-timeout: 10s
+        discovery:
+          locator:
+            lower-case-service-id: true
+        globalcors:
+          corsConfigurations:
+            '[/**]':
+              allowedOrigins: ${SPRING_CQRS_URL:http://localhost:5173}
+              allowedMethods: "*"
+              allowedHeaders: "*"
+              allowCredentials: true
+resilience4j.circuitbreaker:
+  instances:
+    proxySupport:
+      sliding-window-size: 50
+      failure-rate-threshold: 80
+      slow-call-rate-threshold: 90
+      slow-call-duration-threshold: 5000
+      wait-duration-in-open-state: 5s
+resilience4j.ratelimiter:
+  configs:
+    default:
+      timeoutDuration: 2000
+      limitRefreshPeriod: 3000
+      limitForPeriod: 100
+
+resilience4j.retry:
+  configs:
+    default:
+      max-attempts: 3
+      wait-duration: 2000
+      enableExponentialBackoff: true
+      exponentialBackoffMultiplier: 2
+      ignoreExceptions:
+        - java.lang.NullPointerException
+      retryExceptions:
+        - java.util.concurrent.TimeoutException
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8070/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${SPRING_ZIPKIN_BASE_URL:http://localhost:9411/api/v2/spans}
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+    circuitbreakers:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: "Api gateway service"
+    description: "Using fetch about Api gateway"
+    version: "1.0.0"
+server:
+  port: 6380
+logging:
+  pattern:
+    level: DEBUG
+
+pattern:
+  level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"

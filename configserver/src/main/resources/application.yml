@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: configserver
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: "classpath:/config"
+  zipkin:
+    enabled: true
+# cau hinh theo doi suc khoe actuator
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoint:
+    web:
+      exposure:
+        include: "*"
+    health:
+      probes:
+        enabled: true
+  zipkin:
+    tracing:
+      endpoint: ${SPRING_ZIPKIN_BASE_URL:http://localhost:9411/api/v2/spans}
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+#  viet theo doi cua zipkin
+pattern:
+  level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+# cau hinh port
+server:
+  port: 8071
