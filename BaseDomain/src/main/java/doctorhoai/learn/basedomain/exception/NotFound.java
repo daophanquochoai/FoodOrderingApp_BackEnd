@@ -1,4 +1,4 @@
-package doctorhoai.learn.userservice.exception.exception;
+package doctorhoai.learn.basedomain.exception;
 
 public class NotFound extends RuntimeException {
     public NotFound(String message) {
