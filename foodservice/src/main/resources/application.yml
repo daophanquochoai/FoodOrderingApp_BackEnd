@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: foodservice
+  config:
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8071}
+  profiles:
+    active: dev
+server:
+  port: 9002
+
+logging:
+  level:
+    root: INFO
+    doctorhoai.learn: DEBUG

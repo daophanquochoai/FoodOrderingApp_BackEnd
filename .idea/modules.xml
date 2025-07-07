@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Backend.iml" filepath="$PROJECT_DIR$/.idea/Backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/foodservice/foodservice.iml" filepath="$PROJECT_DIR$/foodservice/foodservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/inventoryservice/inventoryservice.iml" filepath="$PROJECT_DIR$/inventoryservice/inventoryservice.iml" />
     </modules>
   </component>
 </project>

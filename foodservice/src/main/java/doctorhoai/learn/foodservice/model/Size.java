@@ -21,6 +21,7 @@ public class Size extends BaseModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @Column(name = "create_by")

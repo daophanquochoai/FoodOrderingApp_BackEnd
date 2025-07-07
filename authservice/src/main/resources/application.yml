@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: authservice
+  config:
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8071}
+  profiles:
+    active: dev
+server:
+  port: 9001
+
+logging:
+  level:
+    org.springframework.security : DEBUG

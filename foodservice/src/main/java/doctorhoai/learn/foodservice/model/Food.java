@@ -21,9 +21,13 @@ public class Food extends BaseModel implements Serializable {
     private Integer id;
     private String name;
     private String image;
+    @Column(name = "`desc`")
     private String desc;
     @Enumerated(EnumType.STRING)
     private EStatusFood status;
 
+    @JoinColumn(name = "category_id")
+    @ManyToOne
+    private Category category;
     private String createBy;
 }

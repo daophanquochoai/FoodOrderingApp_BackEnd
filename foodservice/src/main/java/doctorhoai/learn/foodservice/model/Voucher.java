@@ -22,6 +22,7 @@ public class Voucher extends BaseModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String code;
+    @Column(name = "`desc`")
     private String desc;
 
     @Column(name = "discount_type")
@@ -56,4 +57,7 @@ public class Voucher extends BaseModel implements Serializable {
 
     @OneToMany(mappedBy = "voucher")
     private List<VoucherCategory> voucherCategories;
+
+    @OneToMany(mappedBy = "voucher")
+    private List<VoucherUser> voucherUsers;
 }

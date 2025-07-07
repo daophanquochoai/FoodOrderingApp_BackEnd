@@ -3,12 +3,10 @@ package doctorhoai.learn.foodservice.model;
 import doctorhoai.learn.foodservice.model.audit.BaseModel;
 import doctorhoai.learn.foodservice.model.enums.EStatusCategory;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -16,14 +14,17 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Category extends BaseModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     private String name;
     private String image;
+    @Column(name = "`desc`")
     private String desc;
     @Enumerated(EnumType.STRING)
     private EStatusCategory status;
@@ -34,4 +35,8 @@ public class Category extends BaseModel implements Serializable {
 
     @Column(name = "create_by")
     private String createBy;
+
+    //list
+    @OneToMany(mappedBy = "category")
+    private List<Food> foods;
 }
