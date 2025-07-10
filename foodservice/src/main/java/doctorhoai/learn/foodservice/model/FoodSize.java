@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "size")
+@Table(name = "food_size")
 @Builder
 public class FoodSize extends BaseModel implements Serializable {
 
@@ -20,7 +20,7 @@ public class FoodSize extends BaseModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer discount;
+    private Float discount;
 
     @Column(name = "ready_in_minutes")
     private Float readyInMinutes;

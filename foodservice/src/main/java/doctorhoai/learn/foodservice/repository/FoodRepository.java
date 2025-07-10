@@ -50,8 +50,10 @@ public interface FoodRepository extends JpaRepository<Food, Integer> {
     @Query(
             value = """
             SELECT food FROM Food food WHERE
-            (:ids IS NULL OR food.id IN :ids) 
+            (:ids IS NULL OR food.id IN :ids) AND 
+            (:status IS NULL OR food.status = :status)
             """
     )
-    List<Food> checkFood(List<Integer> ids);
+    List<Food> checkFood(List<Integer> ids, EStatusFood status);
+
 }

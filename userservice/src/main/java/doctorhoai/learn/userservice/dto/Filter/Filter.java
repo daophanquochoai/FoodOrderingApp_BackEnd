@@ -17,4 +17,11 @@ public class Filter {
     private Boolean isLogin;
     private LocalDate startDate;
     private LocalDate endDate;
+
+    private String sort;
+    private String order;
+    private Integer pageNo;
+    private Integer pageSize;
+    private Integer userId;
+
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -30,4 +31,7 @@ public class Food extends BaseModel implements Serializable {
     @ManyToOne
     private Category category;
     private String createBy;
+
+    @OneToMany(mappedBy = "food")
+    private List<FoodSize> foodSizes;
 }

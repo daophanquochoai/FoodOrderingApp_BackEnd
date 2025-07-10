@@ -9,6 +9,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -53,11 +54,11 @@ public class Voucher extends BaseModel implements Serializable {
 
     // list
     @OneToMany(mappedBy = "voucher")
-    private List<VoucherFood> voucherFoods;
+    private Set<VoucherFood> voucherFoods;
 
     @OneToMany(mappedBy = "voucher")
-    private List<VoucherCategory> voucherCategories;
+    private Set<VoucherCategory> voucherCategories;
 
     @OneToMany(mappedBy = "voucher")
-    private List<VoucherUser> voucherUsers;
+    private Set<VoucherUser> voucherUsers;
 }

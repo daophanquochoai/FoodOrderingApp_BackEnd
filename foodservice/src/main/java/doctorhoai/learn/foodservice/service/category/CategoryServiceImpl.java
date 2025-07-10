@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -40,10 +39,10 @@ public class CategoryServiceImpl implements CategoryService {
                 pageable
         );
         if( filter.getDeep() == 0 ){
-            return categories.stream().map(mapper::covertToCategoryDto).toList();
+            return categories.stream().map(mapper::covertToCategoryDto_Stack).toList();
         }else{
             return categories.stream().map( c-> {
-                CategoryDto categoryDto = mapper.covertToCategoryDto(c);
+                CategoryDto categoryDto = mapper.covertToCategoryDto_Stack(c);
                 if( c.getFoods() != null && !c.getFoods().isEmpty()){
                     List<FoodDto> foods = c.getFoods().stream().map(mapper::covertToFoodDto).toList();
                     categoryDto.setFoods(foods);
@@ -62,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
             category.setParentId(parent);
         }
         category = categoryRepository.save(category);
-        return mapper.covertToCategoryDto(category);
+        return mapper.covertToCategoryDto_Stack(category);
     }
 
     @Override
@@ -79,6 +78,6 @@ public class CategoryServiceImpl implements CategoryService {
             category.setParentId(parent);
         }
         category = categoryRepository.save(category);
-        return mapper.covertToCategoryDto(category);
+        return mapper.covertToCategoryDto_Stack(category);
     }
 }

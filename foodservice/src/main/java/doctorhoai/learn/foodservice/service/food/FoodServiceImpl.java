@@ -1,13 +1,18 @@
 package doctorhoai.learn.foodservice.service.food;
 
 import doctorhoai.learn.foodservice.dto.FoodDto;
+import doctorhoai.learn.foodservice.dto.FoodSizeDto;
+import doctorhoai.learn.foodservice.dto.SizeDto;
 import doctorhoai.learn.foodservice.dto.filter.Filter;
 import doctorhoai.learn.foodservice.exception.CategoryNotFoundException;
 import doctorhoai.learn.foodservice.exception.FoodNotFoundException;
 import doctorhoai.learn.foodservice.model.Category;
 import doctorhoai.learn.foodservice.model.Food;
+import doctorhoai.learn.foodservice.model.FoodSize;
+import doctorhoai.learn.foodservice.model.enums.EStatusFood;
 import doctorhoai.learn.foodservice.repository.CategoryRepository;
 import doctorhoai.learn.foodservice.repository.FoodRepository;
+import doctorhoai.learn.foodservice.repository.FoodSizeRepository;
 import doctorhoai.learn.foodservice.utils.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,6 +31,7 @@ public class FoodServiceImpl implements FoodService {
     private final FoodRepository foodRepository;
     private final CategoryRepository categoryRepository;
     private final Mapper mapper;
+    private final FoodSizeRepository foodSizeRepository;
 
 
     @Override
@@ -49,6 +56,17 @@ public class FoodServiceImpl implements FoodService {
                     FoodDto foodDto = mapper.covertToFoodDto(f);
                     if( f.getCategory() != null){
                         foodDto.setCategory(mapper.covertToCategoryDto(f.getCategory()));
+                    }
+                    if( f.getFoodSizes() != null && !f.getFoodSizes().isEmpty()){
+                        foodDto.setFoodSizes(
+                                f.getFoodSizes().stream().map( fs -> {
+                                    FoodSizeDto foodSizeDto = mapper.convertToFoodSizeDto(fs);
+                                    if( fs.getSize() != null){
+                                        foodSizeDto.setSizeId(mapper.convertToSizeDto(fs.getSize()));
+                                    }
+                                    return foodSizeDto;
+                                }).toList()
+                        );
                     }
                     return foodDto;
                 }
@@ -82,15 +100,38 @@ public class FoodServiceImpl implements FoodService {
     @Override
     public FoodDto getFoodById(Integer id) {
         Food food = foodRepository.getFoodById(id).orElseThrow(FoodNotFoundException::new);
+        if( food.getStatus() == EStatusFood.DELETE) {
+            throw new FoodNotFoundException();
+        }
         return mapper.covertToFoodDto(food);
     }
 
     @Override
     public void checkFood(List<Integer> ids) {
-        List<Food> foods = foodRepository.checkFood(ids);
+        List<Food> foods = foodRepository.checkFood(ids, null);
         if( ids.size() != foods.size()){
             throw new FoodNotFoundException();
         }
+    }
+
+    @Override
+    public List<FoodDto> getAllIdsFood(List<Integer> ids) {
+        List<Food> foods = foodRepository.checkFood(ids, EStatusFood.ACTIVE);
+        return foods.stream().map(mapper::covertToFoodDto).toList();
+    }
+
+
+    private List<FoodSizeDto> convertListFoodSize(List<FoodSize> foodSizes){
+        List<FoodSizeDto> foodSizeDtos = new ArrayList<>();
+        for( FoodSize fs : foodSizes){
+            FoodSizeDto foodSizeDto = mapper.convertToFoodSizeDto(fs);
+            if( fs.getSize() != null && fs.getSize().getId() != null){
+                SizeDto sizeDto = mapper.convertToSizeDto(fs.getSize());
+                foodSizeDto.setSizeId(sizeDto);
+            }
+            foodSizeDtos.add(foodSizeDto);
+        }
+        return foodSizeDtos;
     }
 
 }

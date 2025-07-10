@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
-@Component
+@Component("authUser")
 @RequiredArgsConstructor
 public class UserFeignFallBack implements FallbackFactory<UserFeign> {
 

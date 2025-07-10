@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
-@Component
+@Component("authEmployee")
 @RequiredArgsConstructor
 public class EmployeeFeignFallBack implements FallbackFactory<EmployeeFeign> {
 

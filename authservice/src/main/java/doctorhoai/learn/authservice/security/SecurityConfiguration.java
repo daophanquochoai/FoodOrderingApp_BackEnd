@@ -24,7 +24,7 @@ public class SecurityConfiguration {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests( auth -> auth
-                        .requestMatchers("/auth/login", "/healthcheck").permitAll()
+                        .requestMatchers("/auth/login", "/healthcheck", "/user/add").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling( exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint)

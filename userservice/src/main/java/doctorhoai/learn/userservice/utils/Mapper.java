@@ -1,8 +1,10 @@
 package doctorhoai.learn.userservice.utils;
 
+import doctorhoai.learn.userservice.dto.AddressDto;
 import doctorhoai.learn.userservice.dto.EmployeeDto;
 import doctorhoai.learn.userservice.dto.RoleDto;
 import doctorhoai.learn.userservice.dto.UserDto;
+import doctorhoai.learn.userservice.model.Address;
 import doctorhoai.learn.userservice.model.Employee;
 import doctorhoai.learn.userservice.model.Role;
 import doctorhoai.learn.userservice.model.User;
@@ -75,6 +77,31 @@ public class Mapper {
                 .name(employeeDto.getName())
                 .cccd(employeeDto.getCccd())
                 .isActive(employeeDto.getIsActive())
+                .build();
+    }
+
+    public AddressDto convertToAddressDto(Address address) {
+        return AddressDto.builder()
+                .id(address.getId())
+                .province(address.getProvince())
+                .commune(address.getCommune())
+                .address(address.getAddress())
+                .isDefault(address.getIsDefault())
+                .isActive(address.getIsActive())
+                .phoneNumber(address.getPhoneNumber())
+                .name(address.getName())
+                .build();
+    }
+
+    public Address convertToAddress(AddressDto addressDto) {
+        return Address.builder()
+                .phoneNumber(addressDto.getPhoneNumber())
+                .name(addressDto.getName())
+                .province(addressDto.getProvince())
+                .commune(addressDto.getCommune())
+                .address(addressDto.getAddress())
+                .isDefault(addressDto.getIsDefault())
+                .isActive(addressDto.getIsActive())
                 .build();
     }
 }

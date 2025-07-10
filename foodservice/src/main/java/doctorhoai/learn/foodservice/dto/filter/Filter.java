@@ -32,9 +32,23 @@ public class Filter {
     private Boolean max;
     private Boolean forFood;
     private Boolean forCategory;
+    private List<Integer> categoryIds;
 
     //food
     private List<EStatusFood> statusFoods;
 
     private List<EStatusCategory> statusCategories;
+
+    //size
+    private Boolean isActive;
+
+    // foodSize
+    private Float minDiscount;
+    private Float maxDiscount;
+    private Float minPrice;
+    private Float maxPrice;
+    private Float minReady;
+    private Float maxReady;
+    private List<Integer> foodIds;
+    private List<Integer> sizeIds;
 }

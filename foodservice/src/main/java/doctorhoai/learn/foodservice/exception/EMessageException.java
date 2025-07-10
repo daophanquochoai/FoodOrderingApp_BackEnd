@@ -6,6 +6,9 @@ public enum EMessageException {
     CATEGORY_NOT_FOUND("Category not found"),
     FOOD_NOT_FOUND("Food not found"),
     USER_NOT_FOUND("User not found"),
+    SIZE_NOT_FOUND("Size not found"),
+
+    NAME_SIZE_DUPLICATE("Name size duplicate"),
     ;
 
     private String message;

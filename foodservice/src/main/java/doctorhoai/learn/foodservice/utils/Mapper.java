@@ -1,11 +1,7 @@
 package doctorhoai.learn.foodservice.utils;
 
-import doctorhoai.learn.foodservice.dto.CategoryDto;
-import doctorhoai.learn.foodservice.dto.FoodDto;
-import doctorhoai.learn.foodservice.dto.VoucherDto;
-import doctorhoai.learn.foodservice.model.Category;
-import doctorhoai.learn.foodservice.model.Food;
-import doctorhoai.learn.foodservice.model.Voucher;
+import doctorhoai.learn.foodservice.dto.*;
+import doctorhoai.learn.foodservice.model.*;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -55,6 +51,17 @@ public class Mapper {
                 .build();
     }
 
+    public CategoryDto covertToCategoryDto_Stack(Category category) {
+        return CategoryDto.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .image(category.getImage())
+                .desc(category.getDesc())
+                .status(category.getStatus())
+                .parent(category.getParentId() != null ? covertToCategoryDto_Stack(category.getParentId()) : null)
+                .build();
+    }
+
     public CategoryDto covertToCategoryDto(Category category) {
         return CategoryDto.builder()
                 .id(category.getId())
@@ -62,7 +69,6 @@ public class Mapper {
                 .image(category.getImage())
                 .desc(category.getDesc())
                 .status(category.getStatus())
-                .parent(category.getParentId() != null ? covertToCategoryDto(category.getParentId()) : null)
                 .build();
     }
 
@@ -72,6 +78,40 @@ public class Mapper {
                 .image(categoryDto.getImage())
                 .desc(categoryDto.getDesc())
                 .status(categoryDto.getStatus())
+                .build();
+    }
+
+    public SizeDto convertToSizeDto(Size size){
+        return SizeDto.builder()
+                .id(size.getId())
+                .name(size.getName())
+                .isActive(size.getIsActive())
+                .build();
+    }
+
+    public Size convertToSize(SizeDto sizeDto) {
+        return Size.builder()
+                .name(sizeDto.getName())
+                .isActive(sizeDto.getIsActive())
+                .build();
+    }
+
+    public FoodSize convertToFoodSize(FoodSizeDto foodSizeDto){
+        return FoodSize.builder()
+                .discount(foodSizeDto.getDiscount())
+                .readyInMinutes(foodSizeDto.getReadyInMinutes())
+                .price(foodSizeDto.getPrice())
+                .isActive(foodSizeDto.getIsActive())
+                .build();
+    }
+
+    public FoodSizeDto convertToFoodSizeDto(FoodSize foodSize) {
+        return FoodSizeDto.builder()
+                .discount(foodSize.getDiscount())
+                .readyInMinutes(foodSize.getReadyInMinutes())
+                .price(foodSize.getPrice())
+                .isActive(foodSize.getIsActive())
+                .id(foodSize.getId())
                 .build();
     }
 }

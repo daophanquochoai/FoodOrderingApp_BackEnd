@@ -1,5 +1,6 @@
 package doctorhoai.learn.foodservice.service.voucher;
 
+import doctorhoai.learn.basedomain.response.PageObject;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import doctorhoai.learn.foodservice.dto.CategoryDto;
 import doctorhoai.learn.foodservice.dto.FoodDto;
@@ -16,6 +17,7 @@ import doctorhoai.learn.foodservice.repository.FoodRepository;
 import doctorhoai.learn.foodservice.repository.VoucherRepository;
 import doctorhoai.learn.foodservice.utils.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,7 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -54,23 +58,30 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
-    public List<VoucherDto> getAllVouchers(Filter filter) {
+    public PageObject getAllVouchers(Filter filter) {
         Pageable pageable;
         if( filter.getSort().equals("desc")){
             pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()).descending());
         }else{
             pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()));
         }
-        List<Voucher> vouchers = voucherRepository.getAllVouchers(
+        Page<Voucher> vouchers = voucherRepository.getAllVouchers(
             filter.getId(),
             filter.getMax(),
             filter.getForFood(),
             filter.getForCategory(),
             filter.getStatusVouchers(),
+            filter.getFoodIds(),
+            filter.getCategoryIds(),
             filter.getSearch(),
             pageable
         );
-        return convertListVoucher(vouchers);
+
+        return PageObject.builder()
+                .page(filter.getPageNo())
+                .totalPage(vouchers.getTotalPages())
+                .data(convertListVoucher(vouchers.getContent()))
+                .build();
     }
 
     @Override
@@ -88,7 +99,7 @@ public class VoucherServiceImpl implements VoucherService {
                 throw new FoodNotFoundException();
             }
 
-            List<VoucherFood> voucherFoods = new ArrayList<>();
+            Set<VoucherFood> voucherFoods = new HashSet<>();
             for (Food food : foods) {
                 VoucherFood voucherFood = VoucherFood.builder()
                         .voucher(voucher)
@@ -111,7 +122,7 @@ public class VoucherServiceImpl implements VoucherService {
                 throw new CategoryNotFoundException();
             }
 
-            List<VoucherCategory> voucherCategories = new ArrayList<>();
+            Set<VoucherCategory> voucherCategories = new HashSet<>();
             for (Category category : categories) {
                 VoucherCategory voucherCategory = VoucherCategory.builder()
                         .voucher(voucher)
@@ -156,7 +167,7 @@ public class VoucherServiceImpl implements VoucherService {
             List<CategoryDto> categoryDtos = new ArrayList<>();
             for(VoucherCategory voucherCategory : v.getVoucherCategories()){
                 if( voucherCategory != null){
-                    categoryDtos.add(mapper.covertToCategoryDto(voucherCategory.getCategory()));
+                    categoryDtos.add(mapper.covertToCategoryDto_Stack(voucherCategory.getCategory()));
                 }
             }
             voucherDto.setCategories(categoryDtos);

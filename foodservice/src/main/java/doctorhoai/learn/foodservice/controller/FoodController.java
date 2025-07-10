@@ -29,6 +29,18 @@ public class FoodController {
         );
     }
 
+    @PostMapping("/ids")
+    public ResponseEntity<ResponseObject> getAllIdsFood(
+            @RequestBody List<Integer> ids
+    ) {
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .data(foodService.getAllIdsFood(ids))
+                        .message(EMessageResponse.GET_FOOD.getMessage())
+                        .build()
+        );
+    }
+
     @PostMapping("/add")
     public ResponseEntity<ResponseObject> addFood(
             @RequestBody @Valid FoodDto dto

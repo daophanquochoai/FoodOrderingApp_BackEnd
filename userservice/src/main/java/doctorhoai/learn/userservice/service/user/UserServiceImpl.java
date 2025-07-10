@@ -72,7 +72,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Integer id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFound(id.toString(), "id"));
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFound(id == null ? null : id.toString(), "id"));
+        if( !user.getIsActive() ){
+            throw new UserNotFound(id == null ? null : id.toString(), "id");
+        }
         return mapper.convertToUserDto(user);
     }
 
@@ -96,13 +99,13 @@ public class UserServiceImpl implements UserService {
     }
 
     public void checkInfoUser(UserDto userDto) {
-        if( employeeRepository.findByEmail(userDto.getEmail()).isPresent() ) {
+        if( employeeRepository.findByEmailAndIsActive(userDto.getEmail(), true).isPresent() ) {
             throw new EmailDuplicate();
         }
-        if(userRepository.findByEmail(userDto.getEmail()).isPresent()){
+        if(userRepository.findByEmailAndIsActive(userDto.getEmail(), true).isPresent()){
             throw new EmailDuplicate();
         }
-        if(userRepository.findByPhoneNumber(userDto.getPhoneNumber()).isPresent()){
+        if(userRepository.findByPhoneNumberAndIsActive(userDto.getPhoneNumber(), true).isPresent()){
             throw new PhoneNumberDuplicate();
         };
 

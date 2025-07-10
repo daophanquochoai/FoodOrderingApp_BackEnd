@@ -1,8 +1,6 @@
 package doctorhoai.learn.authservice.feign.userservice;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import doctorhoai.learn.authservice.feign.userservice.model.Filter.Filter;
-import doctorhoai.learn.authservice.feign.userservice.model.Filter.FilterUser;
 import doctorhoai.learn.authservice.feign.userservice.model.UserDto;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import jakarta.validation.Valid;

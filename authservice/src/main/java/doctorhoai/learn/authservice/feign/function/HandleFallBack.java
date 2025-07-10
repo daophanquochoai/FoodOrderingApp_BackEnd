@@ -24,6 +24,8 @@ public class HandleFallBack {
                 switch (status){
                     case 404 :
                         throw new NotFound(responseException.getMessage());
+                    case 503 :
+                        throw new ServerDownException(responseException.getMessage());
                 }
                 // TODO : chua xu ly
             }

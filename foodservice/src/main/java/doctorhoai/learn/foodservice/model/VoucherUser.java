@@ -2,13 +2,11 @@ package doctorhoai.learn.foodservice.model;
 
 import doctorhoai.learn.foodservice.model.audit.BaseModel;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "voucher_user")
 @Data

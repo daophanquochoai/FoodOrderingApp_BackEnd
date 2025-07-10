@@ -2,6 +2,7 @@ package doctorhoai.learn.foodservice.repository;
 
 import doctorhoai.learn.foodservice.model.Voucher;
 import doctorhoai.learn.foodservice.model.enums.EStatusVoucher;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -32,21 +33,27 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
             value = """
             SELECT v FROM Voucher v
             LEFT JOIN FETCH v.voucherUsers vu
+            LEFT JOIN FETCH v.voucherFoods vf
+            LEFT JOIN FETCH v.voucherCategories vc
             WHERE
             (:userIds IS NULL OR vu.userId IN :userIds) AND 
             (:status IS NULL OR v.status in :status) AND 
             (:search IS NULL OR v.code like CONCAT('%', :search, '%')) AND
             (:max IS NULL OR (:max = true AND v.maxUse = v.usedCount) OR (:max = false AND v.maxUse > v.usedCount)) AND 
             (:forFood IS NULL OR :forFood = false OR (:forFood = true AND size(v.voucherFoods) > 0)) AND 
-            (:forCategory IS NULL OR :forCategory = false OR (:forCategory = true AND ( size(v.voucherFoods) > 0)))
+            (:forCategory IS NULL OR :forCategory = false OR (:forCategory = true AND ( size(v.voucherFoods) > 0))) AND 
+            (:foodIds IS NULL OR (vf.food.id IN (:foodIds) AND vf.isActive = true ) ) AND
+            (:categoryIds IS NULL OR (vc.category.id IN (:categoryIds) AND vc.isActive = true))
             """
     )
-    List<Voucher> getAllVouchers(
+    Page<Voucher> getAllVouchers(
             List<Integer> userIds,
             Boolean max,
             Boolean forFood,
             Boolean forCategory,
             List<EStatusVoucher> status,
+                List<Integer> foodIds,
+                List<Integer> categoryIds,
             String search,
             Pageable pageable
     );

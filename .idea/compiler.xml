@@ -30,7 +30,7 @@
         </processorPath>
         <module name="userservice" />
       </profile>
-      <profile name="Annotation profile for inventoryservice" enabled="true">
+      <profile name="Annotation profile for orderservice" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -40,6 +40,7 @@
         <module name="inventoryservice" />
         <module name="authservice" />
         <module name="eureka" />
+        <module name="orderservice" />
         <module name="BaseDomain" />
       </profile>
     </annotationProcessing>
@@ -53,6 +54,7 @@
       <module name="eureka" options="-parameters" />
       <module name="foodservice" options="-parameters" />
       <module name="inventoryservice" options="-parameters" />
+      <module name="orderservice" options="-parameters" />
       <module name="userservice" options="-parameters" />
     </option>
   </component>

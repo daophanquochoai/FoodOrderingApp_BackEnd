@@ -14,6 +14,11 @@ public enum EMessageResponse {
     GET_EMPLOYEE("Get employee successful"),
     ADD_EMPLOYEE("Add employee successful"),
     UPDATE_EMPLOYEE("Update employee successful"),
+
+    // address
+    GET_ADDRESS_SUCCESS("Get address successful"),
+    ADD_ADDRESS("Add address successful"),
+    UPDATE_ADDRESS("Update address successful"),
     ;
 
     private String message;

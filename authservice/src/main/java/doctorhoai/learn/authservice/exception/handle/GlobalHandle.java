@@ -39,21 +39,21 @@ public class GlobalHandle extends ResponseEntityExceptionHandler {
         );
     }
 
-//    @ExceptionHandler({
-//            FeignException.class,
-//            FeignException.FeignServerException.class,
-//            FeignException.FeignClientException.class,
-//            ExecutionException.class
-//    })
-//    public <T extends FeignException> ResponseEntity<ResponseException> handleProxyException( final T e){
-//        log.info("** Api Exception Handler controller, handle feign proxy exception**");
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-//                ResponseException.builder()
-//                        .message("** Service Down!")
-//                        .timestamp(LocalDateTime.now())
-//                        .build()
-//        );
-//    }
+    @ExceptionHandler({
+            FeignException.class,
+            FeignException.FeignServerException.class,
+            FeignException.FeignClientException.class,
+            ExecutionException.class
+    })
+    public <T extends FeignException> ResponseEntity<ResponseException> handleProxyException( final T e){
+        log.info("** Api Exception Handler controller, handle feign proxy exception**");
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+                ResponseException.builder()
+                        .message("** Service Down!")
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+    }
 
     @ExceptionHandler(exception = {
             UnAuthorizedException.class,

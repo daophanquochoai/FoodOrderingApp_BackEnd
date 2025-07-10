@@ -92,13 +92,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     private void checkInfoEmployee(EmployeeDto employeeDto){
-        if( userRepository.findByEmail(employeeDto.getEmail()).isPresent() ) {
+        if( userRepository.findByEmailAndIsActive(employeeDto.getEmail(), true).isPresent() ) {
             throw new EmailDuplicate();
         }
-        if( employeeRepository.findByCccd(employeeDto.getCccd()).isPresent() ) {
+        if( employeeRepository.findByCccdAndIsActive(employeeDto.getCccd(), true).isPresent() ) {
             throw new CCCDDuplicate();
         }
-        if( employeeRepository.findByEmail(employeeDto.getEmail()).isPresent() ) {
+        if( employeeRepository.findByEmailAndIsActive(employeeDto.getEmail(), true).isPresent() ) {
             throw new EmailDuplicate();
         }
         if( employeeDto.getRole() == null ) {

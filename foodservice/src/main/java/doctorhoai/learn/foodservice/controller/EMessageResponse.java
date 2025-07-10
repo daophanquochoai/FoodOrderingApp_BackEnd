@@ -14,6 +14,14 @@ public enum EMessageResponse {
     GET_VOUCHER("Get voucher successful"),
     CREATE_VOUCHER("Create voucher successful"),
     UPDATE_VOUCHER("Update voucher successful"),
+
+    CREATE_SIZE_SUCCESSFUL("Create size successful"),
+    UPDATE_SIZE_SUCCESSFUL("Update size successful"),
+    GET_SIZE_SUCCESSFUL("Get size successful"),
+
+    CREATE_FOOD_SIZE_SUCCESSFUL("Create food size successful"),
+    UPDATE_FOOD_SIZE_SUCCESSFUL("Update food size successful"),
+    GET_FOOD_SIZE_SUCCESSFUL("Get food size successful"),
     ;
     private String message;
     EMessageResponse(String message) {

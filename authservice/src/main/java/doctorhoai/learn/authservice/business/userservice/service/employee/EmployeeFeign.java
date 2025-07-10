@@ -1,0 +1,59 @@
+package doctorhoai.learn.authservice.business.userservice.service.employee;
+
+import doctorhoai.learn.authservice.business.userservice.service.config.FeignConfig;
+import doctorhoai.learn.authservice.feign.userservice.UserFeignFallBack;
+import doctorhoai.learn.authservice.feign.userservice.model.EmployeeDto;
+import doctorhoai.learn.basedomain.response.ResponseObject;
+import jakarta.validation.Valid;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+
+@FeignClient(
+        name = "userservice",
+        path = "/employee",
+        contextId = "employeeFeignBusiness",
+        fallbackFactory = UserFeignFallBack.class,
+        configuration = FeignConfig.class
+)
+public interface EmployeeFeign {
+    @PostMapping("/add")
+    ResponseEntity<ResponseObject> addEmployeeIntoDb(
+            @RequestBody @Valid EmployeeDto employeeDto
+    );
+
+    @GetMapping("/{id}")
+    ResponseEntity<ResponseObject> getEmployeeById(
+            @PathVariable Integer id
+    );
+
+    @PutMapping("/update/{id}")
+    ResponseEntity<ResponseObject> updateEmployee(
+            @PathVariable Integer id,
+            @RequestBody @Valid EmployeeDto employeeDto
+    );
+
+    @GetMapping("/filter")
+    ResponseEntity<ResponseObject> getEmployeeWithFilter(
+            @RequestParam(required = false) Integer id,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String phoneNumber,
+            @RequestParam(required = false) String cccd,
+            @RequestParam(required = false) Boolean isActive
+    );
+
+    @GetMapping("/all")
+    ResponseEntity<ResponseObject> getListEmployeeWithFilter(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate
+    );
+
+    @PutMapping("/late_login/{id}")
+    ResponseEntity<ResponseObject> getLateLoginEmployee(
+            @PathVariable Integer id
+    );
+}

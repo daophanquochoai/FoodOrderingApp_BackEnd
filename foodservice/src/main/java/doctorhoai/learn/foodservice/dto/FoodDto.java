@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,4 +21,6 @@ public class FoodDto {
     private String desc;
     private EStatusFood status;
     private CategoryDto category;
+
+    private List<FoodSizeDto> foodSizes;
 }
