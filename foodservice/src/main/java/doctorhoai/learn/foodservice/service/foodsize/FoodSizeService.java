@@ -9,4 +9,5 @@ public interface FoodSizeService {
     FoodSizeDto createNewFoodSize(FoodSizeDto foodSizeDto);
     FoodSizeDto updateFoodSize(FoodSizeDto foodSizeDto, Integer id);
     PageObject getAllFoodSize(Filter filter);
+    FoodSizeDto getFoodSizeById(Integer id);
 }

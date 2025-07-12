@@ -20,6 +20,8 @@ public enum EMessageResponse {
     CREATE_FOOD_INGREDIENTS_SUCCESSFUL("Create food ingredients successful"),
     GET_FOOD_INGREDIENTS_SUCCESSFUL("Get food ingredients successful"),
     UPDATE_FOOD_INGREDIENTS_SUCCESSFUL("Update food ingredients successful"),
+
+    CHECK_ORDER_SUCCESSFUL("Check order successful"),
     ;
     private String message;
     EMessageResponse(String message) {

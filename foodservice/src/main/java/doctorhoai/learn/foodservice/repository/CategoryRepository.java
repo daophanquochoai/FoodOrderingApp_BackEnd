@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
@@ -38,4 +39,5 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             List<Integer> ids
     );
 
+    Optional<Category> findByIdAndStatus(Integer integer, EStatusCategory statusCategory);
 }

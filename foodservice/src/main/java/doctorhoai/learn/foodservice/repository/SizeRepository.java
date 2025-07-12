@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -33,4 +34,13 @@ public interface SizeRepository extends JpaRepository<Size, Integer> {
     Optional<Size> getSizeByIdAndIsActive(Integer id, Boolean isActive);
 
     Optional<Size> getSizeByNameAndIsActive(String name, Boolean isActive);
+
+    @Query(
+            value = """
+            SELECT s FROM Size s WHERE
+            s.isActive = true AND
+            (:ids IS NULL OR s.id IN (:ids))
+            """
+    )
+    List<Size> getSizeByIds(List<Integer> ids);
 }

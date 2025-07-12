@@ -21,4 +21,9 @@ public interface FoodIngredientsRepository extends JpaRepository<FoodIngredients
     )
     List<FoodIngredients> getFoodIngredientsByFoodId(Integer foodId);
 
+    List<FoodIngredients> getFoodIngredientOfFood(
+            List<Integer> foodIds,
+            Boolean isActive
+    );
+
 }

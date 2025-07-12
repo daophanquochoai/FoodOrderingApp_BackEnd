@@ -6,6 +6,7 @@ import doctorhoai.learn.foodservice.dto.FoodSizeDto;
 import doctorhoai.learn.foodservice.dto.SizeDto;
 import doctorhoai.learn.foodservice.dto.filter.Filter;
 import doctorhoai.learn.foodservice.exception.FoodNotFoundException;
+import doctorhoai.learn.foodservice.exception.FoodSizeException;
 import doctorhoai.learn.foodservice.exception.SizeNotFoundException;
 import doctorhoai.learn.foodservice.model.Food;
 import doctorhoai.learn.foodservice.model.FoodSize;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -122,20 +124,34 @@ public class FoodSizeServiceImpl implements FoodSizeService {
         return pageObject;
     }
 
+    @Override
+    public FoodSizeDto getFoodSizeById(Integer id) {
+        Optional<FoodSize> foodSizeOptional = foodSizeRepository.getFoodSizeByIdAndIsActive(id, true);
+        if(foodSizeOptional.isEmpty()){
+            throw new FoodSizeException();
+        }
+        FoodSize fs = foodSizeOptional.get();
+        return convertToFoodSizeDto(fs);
+    }
+
     private List<FoodSizeDto> convertListFoodSize(List<FoodSize> foodSizes){
         List<FoodSizeDto> foodSizeDtos = new ArrayList<>();
         for( FoodSize fs : foodSizes){
-            FoodSizeDto foodSizeDto = mapper.convertToFoodSizeDto(fs);
-            if( fs.getFood() != null && fs.getFood().getId() != null){
-                FoodDto foodDto = mapper.covertToFoodDto(fs.getFood());
-                foodSizeDto.setFoodId(foodDto);
-            }
-            if( fs.getSize() != null && fs.getSize().getId() != null){
-                SizeDto sizeDto = mapper.convertToSizeDto(fs.getSize());
-                foodSizeDto.setSizeId(sizeDto);
-            }
-            foodSizeDtos.add(foodSizeDto);
+            foodSizeDtos.add(convertToFoodSizeDto(fs));
         }
         return foodSizeDtos;
+    }
+
+    public FoodSizeDto convertToFoodSizeDto(FoodSize fs){
+        FoodSizeDto foodSizeDto = mapper.convertToFoodSizeDto(fs);
+        if( fs.getFood() != null && fs.getFood().getId() != null){
+            FoodDto foodDto = mapper.covertToFoodDto(fs.getFood());
+            foodSizeDto.setFoodId(foodDto);
+        }
+        if( fs.getSize() != null && fs.getSize().getId() != null){
+            SizeDto sizeDto = mapper.convertToSizeDto(fs.getSize());
+            foodSizeDto.setSizeId(sizeDto);
+        }
+        return foodSizeDto;
     }
 }

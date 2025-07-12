@@ -40,6 +40,7 @@ public class FoodSizeController {
         );
     }
 
+
     @PutMapping("/update/{id}")
     public ResponseEntity<ResponseObject> updateFoodSize(
             @RequestBody @Valid FoodSizeDto foodSizeDto,
@@ -49,6 +50,18 @@ public class FoodSizeController {
                 ResponseObject.builder()
                         .message(EMessageResponse.UPDATE_FOOD_SIZE_SUCCESSFUL.getMessage())
                         .data(foodSizeService.updateFoodSize(foodSizeDto, id))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseObject> getFoodSize(
+            @PathVariable Integer id
+    )
+    {
+        return ResponseEntity.ok(
+                ResponseObject.builder().message(EMessageResponse.GET_FOOD_SIZE_SUCCESSFUL.getMessage())
+                        .data(foodSizeService.getFoodSizeById(id))
                         .build()
         );
     }

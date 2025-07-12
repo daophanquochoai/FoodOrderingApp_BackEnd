@@ -6,6 +6,7 @@ public enum EMessageException {
     INGREDIENTS_ERROR_NOT_FOUND("Ingredients error not found"),
     SERVICE_DOWN("Service down"),
     FOOD_NOT_FOUND("Food not found"),
+    ORDER_ITEM_NOT_FOUND("Order item not found"),
     ;
     private String message;
     EMessageException(String message) {

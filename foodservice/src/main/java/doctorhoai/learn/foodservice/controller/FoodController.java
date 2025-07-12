@@ -17,7 +17,7 @@ import java.util.List;
 public class FoodController {
     private final FoodService foodService;
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     public ResponseEntity<ResponseObject> getAllFood(
             @RequestBody Filter filter
             ) {

@@ -54,4 +54,5 @@ public interface FoodSizeRepository extends JpaRepository<FoodSize, Integer> {
     );
 
     List<FoodSize> getFoodSizeByFood_IdAndIsActive(Integer foodId, Boolean isActive);
+
 }

@@ -32,6 +32,6 @@ public class Food extends BaseModel implements Serializable {
     private Category category;
     private String createBy;
 
-    @OneToMany(mappedBy = "food")
+    @OneToMany(mappedBy = "food",cascade = CascadeType.ALL)
     private List<FoodSize> foodSizes;
 }

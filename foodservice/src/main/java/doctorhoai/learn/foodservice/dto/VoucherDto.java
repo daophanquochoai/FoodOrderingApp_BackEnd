@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,7 +19,9 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
-public class VoucherDto {
+public class VoucherDto implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Integer id;
     @NotBlank(message = "Code can't empty")

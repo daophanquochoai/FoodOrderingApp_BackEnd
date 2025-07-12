@@ -13,6 +13,7 @@ import doctorhoai.learn.orderservice.exception.exception.CartItemNotFoundExcepti
 import doctorhoai.learn.orderservice.exception.exception.CartNotFoundException;
 import doctorhoai.learn.orderservice.exception.exception.FoodNotFoundException;
 import doctorhoai.learn.orderservice.feign.foodservice.FoodFeign;
+import doctorhoai.learn.orderservice.feign.foodservice.FoodSizeFeign;
 import doctorhoai.learn.orderservice.feign.userservice.UserFeign;
 import doctorhoai.learn.orderservice.model.Cart;
 import doctorhoai.learn.orderservice.model.CartItem;
@@ -41,6 +42,7 @@ public class CartServiceImpl implements CartService {
     private final FoodFeign foodFeign;
     private final Mapper mapper;
     private final CartItemRepository cartItemRepository;
+    private final FoodSizeFeign foodSizeFeign;
 
     @Override
     public void addCartItemIntoCart(CartItemDto cartItemDto, Integer userId) {
@@ -54,7 +56,7 @@ public class CartServiceImpl implements CartService {
             throw new FoodNotFoundException();
         }
 
-        foodFeign.getFood(cartItemDto.getFoodId().getId());
+        foodSizeFeign.getFoodSize(cartItemDto.getFoodId().getId());
 
         CartItem cartItem = mapper.convertToCartItem(cartItemDto);
         cartItem.setFoodId(cartItemDto.getFoodId().getId());
@@ -134,7 +136,7 @@ public class CartServiceImpl implements CartService {
         // get info food in cart items
         List<Integer> idsFood = cartItems.stream().map(CartItem::getFoodId).filter(Objects::nonNull).distinct().toList();
 
-        ResponseEntity<ResponseObject> responseFoods = foodFeign.getAllIdsFood(idsFood);
+        ResponseEntity<ResponseObject> responseFoods = foodFeign.getAllIdsFood(idsFood); // thay bang food size
         List<FoodDto> foodDtos = new ArrayList<>();
         if( responseFoods.getStatusCode().is2xxSuccessful()){
             foodDtos = objectMapper.convertValue(

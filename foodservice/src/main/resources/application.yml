@@ -5,6 +5,15 @@ spring:
     import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8071}
   profiles:
     active: dev
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    properties:
+      security.protocol: PLAINTEXT
+    topic:
+      name: food
+    bootstrap-servers: ${SPRING_URL_KAFKA:localhost:9092}
 server:
   port: 9002
 

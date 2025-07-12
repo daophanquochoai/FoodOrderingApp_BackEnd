@@ -30,7 +30,7 @@ public class FoodSize extends BaseModel implements Serializable {
     private Float price;
 
     @JoinColumn(name = "size_id")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Size size;
 
     @JoinColumn(name = "food_id")

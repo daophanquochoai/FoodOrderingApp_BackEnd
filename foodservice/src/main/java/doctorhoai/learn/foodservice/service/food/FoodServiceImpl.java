@@ -1,18 +1,24 @@
 package doctorhoai.learn.foodservice.service.food;
 
+import doctorhoai.learn.basedomain.kafka.EMessageType;
+import doctorhoai.learn.basedomain.kafka.MessageTemplate;
 import doctorhoai.learn.foodservice.dto.FoodDto;
 import doctorhoai.learn.foodservice.dto.FoodSizeDto;
 import doctorhoai.learn.foodservice.dto.SizeDto;
 import doctorhoai.learn.foodservice.dto.filter.Filter;
 import doctorhoai.learn.foodservice.exception.CategoryNotFoundException;
 import doctorhoai.learn.foodservice.exception.FoodNotFoundException;
+import doctorhoai.learn.foodservice.exception.SizeNotFoundException;
+import doctorhoai.learn.foodservice.kafka.proceducer.FoodEvent;
 import doctorhoai.learn.foodservice.model.Category;
 import doctorhoai.learn.foodservice.model.Food;
 import doctorhoai.learn.foodservice.model.FoodSize;
+import doctorhoai.learn.foodservice.model.Size;
+import doctorhoai.learn.foodservice.model.enums.EStatusCategory;
 import doctorhoai.learn.foodservice.model.enums.EStatusFood;
 import doctorhoai.learn.foodservice.repository.CategoryRepository;
 import doctorhoai.learn.foodservice.repository.FoodRepository;
-import doctorhoai.learn.foodservice.repository.FoodSizeRepository;
+import doctorhoai.learn.foodservice.repository.SizeRepository;
 import doctorhoai.learn.foodservice.utils.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -31,7 +37,8 @@ public class FoodServiceImpl implements FoodService {
     private final FoodRepository foodRepository;
     private final CategoryRepository categoryRepository;
     private final Mapper mapper;
-    private final FoodSizeRepository foodSizeRepository;
+    private final FoodEvent foodEvent;
+    private final SizeRepository sizeRepository;
 
 
     @Override
@@ -82,8 +89,39 @@ public class FoodServiceImpl implements FoodService {
             Category category = categoryRepository.findById(fooddto.getCategory().getId()).orElseThrow(CategoryNotFoundException::new);
             food.setCategory(category);
         }
+        if( fooddto.getFoodSizes() != null && !fooddto.getFoodSizes().isEmpty()){
+            List<FoodSize> foodSizes = new ArrayList<>();
+            List<Integer> sizeIds = fooddto.getFoodSizes().stream().map(FoodSizeDto::getSizeId).map(SizeDto::getId).toList();
+            List<Size> sizeList = sizeRepository.getSizeByIds(sizeIds);
+            for( FoodSizeDto foodSizeDto : fooddto.getFoodSizes()){
+                FoodSize foodSize = mapper.convertToFoodSize(foodSizeDto);
+                if( foodSizeDto.getSizeId() != null ){
+                    foodSize.setSize(getSizeByIndexList(sizeList, foodSizeDto.getSizeId().getId() ));
+                }else{
+                    throw new SizeNotFoundException();
+                }
+                foodSizes.add(foodSize);
+                foodSize.setFood(food);
+            }
+            food.setFoodSizes(foodSizes);
+        }
         food = foodRepository.save(food);
-        return mapper.covertToFoodDto(food);
+        FoodDto foodDto = convertListFood(food);
+        foodEvent.sendEventToTopic(MessageTemplate.<FoodDto>builder().data(foodDto).messageType(EMessageType.CREATE_FOOD).build());
+        return foodDto;
+    }
+
+    private Size getSizeByIndexList(List<Size> sizeList, Integer id){
+        for( Size size : sizeList ){
+            if( size != null ){
+                if( id.equals(size.getId()) ){
+                    return size;
+                }
+            }else{
+                throw new SizeNotFoundException();
+            }
+        }
+        throw new SizeNotFoundException();
     }
 
     @Override
@@ -93,8 +131,49 @@ public class FoodServiceImpl implements FoodService {
         food.setDesc(foodDto.getDesc());
         food.setImage(foodDto.getImage());
         food.setStatus(foodDto.getStatus());
+        if( foodDto.getCategory() != null){
+            if( foodDto.getCategory().getId() != null && !foodDto.getCategory().getId().equals(foodDto.getId()) ){
+                Category category = categoryRepository.findByIdAndStatus(food.getCategory().getId(), EStatusCategory.ACTIVE).orElseThrow(CategoryNotFoundException::new);
+                food.setCategory(category);
+            } else if( foodDto.getCategory().getId() == null){
+                throw new CategoryNotFoundException();
+            }
+        }
+        if( food.getFoodSizes() != null && !food.getFoodSizes().isEmpty() && foodDto.getFoodSizes() != null && !foodDto.getFoodSizes().isEmpty()){
+            List<FoodSize> foodSizes = new ArrayList<>();
+            for( FoodSize foodSize : food.getFoodSizes() ){
+                if( foodSize.getId() != null ){
+                    FoodSize foodUpdated = updateFoodSize(foodDto.getFoodSizes(), foodSize);
+                    if( food.getStatus() == EStatusFood.DELETE || food.getStatus() == EStatusFood.OUT_STOCK){
+                        foodUpdated.setIsActive(false);
+                    }
+                    foodSizes.add(foodUpdated);
+                }else{
+                    throw new FoodNotFoundException();
+                }
+            }
+            food.setFoodSizes(foodSizes);
+        }
         food = foodRepository.save(food);
-        return mapper.covertToFoodDto(food);
+        if( food.getStatus() == EStatusFood.DELETE || food.getStatus() == EStatusFood.OUT_STOCK){
+            foodEvent.sendEventToTopic(MessageTemplate.<FoodDto>builder().data(foodDto).messageType(EMessageType.DELETE_FOOD).build());
+        }else{
+            foodEvent.sendEventToTopic(MessageTemplate.<FoodDto>builder().data(foodDto).messageType(EMessageType.UPDATE_FOOD).build());
+        }
+        return convertListFood(food);
+    }
+
+    private FoodSize updateFoodSize(List<FoodSizeDto> dto, FoodSize foodSize){
+        for( FoodSizeDto foodSizeDto : dto){
+            if( foodSizeDto.getId() == foodSize.getId()){
+                foodSize.setDiscount(foodSizeDto.getDiscount());
+                foodSize.setReadyInMinutes(foodSizeDto.getReadyInMinutes());
+                foodSize.setIsActive(foodSizeDto.getIsActive());
+                foodSize.setPrice(foodSizeDto.getPrice());
+                return foodSize;
+            }
+        }
+        throw new FoodNotFoundException();
     }
 
     @Override
@@ -103,7 +182,7 @@ public class FoodServiceImpl implements FoodService {
         if( food.getStatus() == EStatusFood.DELETE) {
             throw new FoodNotFoundException();
         }
-        return mapper.covertToFoodDto(food);
+        return convertListFood(food);
     }
 
     @Override
@@ -117,21 +196,38 @@ public class FoodServiceImpl implements FoodService {
     @Override
     public List<FoodDto> getAllIdsFood(List<Integer> ids) {
         List<Food> foods = foodRepository.checkFood(ids, EStatusFood.ACTIVE);
-        return foods.stream().map(mapper::covertToFoodDto).toList();
+        return foods.stream().map(this::convertListFood).toList();
     }
 
 
-    private List<FoodSizeDto> convertListFoodSize(List<FoodSize> foodSizes){
-        List<FoodSizeDto> foodSizeDtos = new ArrayList<>();
-        for( FoodSize fs : foodSizes){
-            FoodSizeDto foodSizeDto = mapper.convertToFoodSizeDto(fs);
-            if( fs.getSize() != null && fs.getSize().getId() != null){
-                SizeDto sizeDto = mapper.convertToSizeDto(fs.getSize());
-                foodSizeDto.setSizeId(sizeDto);
+//    private List<FoodSizeDto> convertListFoodSize(List<FoodSize> foodSizes){
+//        List<FoodSizeDto> foodSizeDtos = new ArrayList<>();
+//        for( FoodSize fs : foodSizes){
+//            FoodSizeDto foodSizeDto = mapper.convertToFoodSizeDto(fs);
+//            if( fs.getSize() != null && fs.getSize().getId() != null){
+//                SizeDto sizeDto = mapper.convertToSizeDto(fs.getSize());
+//                foodSizeDto.setSizeId(sizeDto);
+//            }
+//            foodSizeDtos.add(foodSizeDto);
+//        }
+//        return foodSizeDtos;
+//    }
+
+    private FoodDto convertListFood(Food food){
+        FoodDto foodDto = mapper.covertToFoodDto(food);
+        if( food.getFoodSizes() != null && !food.getFoodSizes().isEmpty() ){
+            List<FoodSizeDto> foodSizesDto = new ArrayList<>();
+            for( FoodSize foodSize : food.getFoodSizes()){
+                FoodSizeDto dto = mapper.convertToFoodSizeDto(foodSize);
+                if( foodSize.getSize() != null ){
+                    dto.setSizeId(mapper.convertToSizeDto(foodSize.getSize()));
+                }else{
+                    throw new SizeNotFoundException();
+                }
+                foodSizesDto.add(dto);
             }
-            foodSizeDtos.add(foodSizeDto);
+            foodDto.setFoodSizes(foodSizesDto);
         }
-        return foodSizeDtos;
+        return foodDto;
     }
-
 }

@@ -32,10 +32,10 @@ public class HistoryIngredients extends BaseModel implements Serializable {
     @ManyToOne
     private HistoryImportOrExport history;
 
-    private Integer quantity;
+    private Float quantity;
 
     @Column(name = "used_unit")
-    private Integer usedUnit;
+    private Float usedUnit;
 
     @Column(name = "price_per_unit")
     private Float pricePerUnit;
