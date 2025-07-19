@@ -7,6 +7,7 @@ import doctorhoai.learn.basedomain.response.ResponseObject;
 import doctorhoai.learn.orderservice.dto.CartDto;
 import doctorhoai.learn.orderservice.dto.CartItemDto;
 import doctorhoai.learn.orderservice.dto.filter.Filter;
+import doctorhoai.learn.orderservice.dto.foodservice.FoodSizeDto;
 import doctorhoai.learn.orderservice.dto.userservice.UserDto;
 import doctorhoai.learn.orderservice.dto.voucherservice.FoodDto;
 import doctorhoai.learn.orderservice.exception.exception.CartItemNotFoundException;
@@ -39,10 +40,10 @@ public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
     private final UserFeign userFeign;
-    private final FoodFeign foodFeign;
     private final Mapper mapper;
     private final CartItemRepository cartItemRepository;
     private final FoodSizeFeign foodSizeFeign;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void addCartItemIntoCart(CartItemDto cartItemDto, Integer userId) {
@@ -105,7 +106,6 @@ public class CartServiceImpl implements CartService {
 
         //get user
         ResponseEntity<ResponseObject> responseUser = userFeign.getUserById(userId);
-        ObjectMapper objectMapper = new ObjectMapper();
         UserDto userDto = new UserDto();
         if( responseUser.getStatusCode().is2xxSuccessful()){
             userDto = objectMapper.convertValue(responseUser.getBody().getData(), UserDto.class);
@@ -134,21 +134,15 @@ public class CartServiceImpl implements CartService {
             return pageObject;
         }
         // get info food in cart items
-        List<Integer> idsFood = cartItems.stream().map(CartItem::getFoodId).filter(Objects::nonNull).distinct().toList();
+        List<Integer> idsFoodSize = cartItems.stream().map(CartItem::getFoodId).filter(Objects::nonNull).distinct().toList();
 
-        ResponseEntity<ResponseObject> responseFoods = foodFeign.getAllIdsFood(idsFood); // thay bang food size
-        List<FoodDto> foodDtos = new ArrayList<>();
-        if( responseFoods.getStatusCode().is2xxSuccessful()){
-            foodDtos = objectMapper.convertValue(
-                    responseFoods.getBody().getData(),
-                    new TypeReference<List<FoodDto>>() {}
-            );
-        }
+        List<FoodSizeDto> foodSizeDtos = getFoodSizeDto(idsFoodSize);
+
         List<CartItemDto> cartItemDtos = new ArrayList<>();
         for( CartItem cartItem : cartItems ){
             CartItemDto cartItemDto = mapper.convertToCartItemDto(cartItem);
             if( cartItem.getFoodId() != null){
-                cartItemDto.setFoodId(getFoodInList(foodDtos, cartItem.getFoodId()));
+                cartItemDto.setFoodId(getFoodSizeInList(foodSizeDtos, cartItem.getFoodId()));
             }
             if( cartItem.getFoodId() != null){
                 cartItemDtos.add(cartItemDto);
@@ -159,8 +153,20 @@ public class CartServiceImpl implements CartService {
         return pageObject;
     }
 
-    private FoodDto getFoodInList(List<FoodDto> foodDtos, Integer id){
-        for( FoodDto foodDto : foodDtos){
+    public List<FoodSizeDto> getFoodSizeDto(List<Integer> idsFoodSize){
+        ResponseEntity<ResponseObject> responseFoodSize = foodSizeFeign.mulFoodSize(idsFoodSize);
+        List<FoodSizeDto> foodSizeDtos = new ArrayList<>();
+        if( responseFoodSize.getStatusCode().is2xxSuccessful()){
+            foodSizeDtos = objectMapper.convertValue(
+                    responseFoodSize.getBody().getData(),
+                    new TypeReference<List<FoodSizeDto>>() {}
+            );
+        }
+        return foodSizeDtos;
+    }
+
+    private FoodSizeDto getFoodSizeInList(List<FoodSizeDto> foodDtos, Integer id){
+        for( FoodSizeDto foodDto : foodDtos){
             if( foodDto.getId().equals(id)){
                 return foodDto;
             }

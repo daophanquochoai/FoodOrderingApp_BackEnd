@@ -22,4 +22,5 @@ public class FoodDto {
     private String image;
     private String desc;
     private EStatusFood status;
+    private CategoryDto category;
 }

@@ -4,6 +4,7 @@ package doctorhoai.learn.orderservice.exception.handle;
 import doctorhoai.learn.basedomain.exception.Duplicate;
 import doctorhoai.learn.basedomain.exception.NotFound;
 import doctorhoai.learn.basedomain.exception.ResponseException;
+import doctorhoai.learn.orderservice.exception.exception.CantDoException;
 import io.sentry.Sentry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -71,7 +72,7 @@ public class GlobalHandleException extends ResponseEntityExceptionHandler {
         );
     }
 
-    @ExceptionHandler(value = {Duplicate.class})
+    @ExceptionHandler(value = {Duplicate.class, CantDoException.class})
     public ResponseEntity<ResponseException> handleDuplicate(Duplicate exception) {
         log.info("**ApiExceptionHandler controller, handle duplicate**");
         logWithSl4j(exception.getMessage(), ETypeLog.ERROR, exception);

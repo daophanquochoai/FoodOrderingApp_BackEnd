@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/food_size")
 @RequiredArgsConstructor
@@ -50,6 +52,18 @@ public class FoodSizeController {
                 ResponseObject.builder()
                         .message(EMessageResponse.UPDATE_FOOD_SIZE_SUCCESSFUL.getMessage())
                         .data(foodSizeService.updateFoodSize(foodSizeDto, id))
+                        .build()
+        );
+    }
+
+    @PostMapping("/mul")
+    public ResponseEntity<ResponseObject> mulFoodSize(
+            @RequestBody List<Integer> idsFoodSize
+            ){
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.GET_FOOD_SIZE_SUCCESSFUL.getMessage())
+                        .data(foodSizeService.getFoodSizeList(idsFoodSize))
                         .build()
         );
     }

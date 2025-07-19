@@ -2,9 +2,6 @@ package doctorhoai.learn.orderservice.dto.voucherservice;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import doctorhoai.learn.orderservice.dto.userservice.UserDto;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,18 +18,12 @@ import java.util.List;
 public class VoucherDto {
 
     private Integer id;
-    @NotBlank(message = "Code can't empty")
     private String code;
-    @NotNull(message = "Discount type can't empty")
     private EDiscountType discountType;
     private Double maxDiscount;
-    @Min( value = 0, message = "Max use should high than 0")
     private Integer maxUse;
-    @Min(value = 0, message = "Used count should high than 0")
     private Integer usedCount;
-    @NotNull( message = "Start date can't empty")
     private LocalDate startDate;
-    @NotNull(message = "End date can't empty")
     private LocalDate endDate;
     private EStatusVoucher status;
 

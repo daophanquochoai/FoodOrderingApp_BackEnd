@@ -28,7 +28,7 @@ public class CategoryController {
         );
     }
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     public ResponseEntity<ResponseObject> getCategoryByFilter(
             @RequestBody Filter filter
             ){

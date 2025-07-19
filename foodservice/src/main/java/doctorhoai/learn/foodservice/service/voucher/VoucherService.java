@@ -15,4 +15,6 @@ public interface VoucherService {
     VoucherDto createVoucher(VoucherDto voucherDto);
 
     VoucherDto getVoucherByCode(String code);
+
+    VoucherDto getVoucherById(Integer id);
 }

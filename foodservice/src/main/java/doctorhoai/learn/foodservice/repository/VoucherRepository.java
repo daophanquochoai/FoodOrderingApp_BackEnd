@@ -1,5 +1,6 @@
 package doctorhoai.learn.foodservice.repository;
 
+import doctorhoai.learn.foodservice.dto.VoucherDto;
 import doctorhoai.learn.foodservice.model.Voucher;
 import doctorhoai.learn.foodservice.model.enums.EStatusVoucher;
 import org.springframework.data.domain.Page;
@@ -65,4 +66,6 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
             """
     )
     Optional<Voucher> getVoucherByCode(String code);
+
+    Optional<Voucher> getVoucherByIdAndStatus(Integer id, EStatusVoucher status);
 }

@@ -13,6 +13,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +24,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final UserDetailsService userDetailsService;
 
     @PostMapping("/login")
     public ResponseEntity<ResponseAuth> login(@RequestBody @Valid RequestAuth auth){
@@ -42,6 +44,24 @@ public class AuthController {
             );
         }
         throw new BadCredentialsException("Bad credentials");
+    }
+
+    @PostMapping("/refreshToken")
+    public ResponseEntity<ResponseAuth> refreshToken(@RequestBody String refreshToken){
+        String username = jwtService.extractUsername(refreshToken);
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        if( !jwtService.validateToken(refreshToken, userDetails) ){
+            throw new BadCredentialsException("Bad credentials");
+        }
+        String accessToken = jwtService.generateToken(userDetails);
+        tokenService.saveToken(accessToken, userDetails.getUsername());
+        return ResponseEntity.ok(
+                ResponseAuth.builder()
+                        .access_token(jwtService.generateToken((userDetails)))
+                        .refresh_token(jwtService.generateRefreshToken(userDetails))
+                        .data(userDetails)
+                        .build()
+        );
     }
 
     @PostMapping("/logout")

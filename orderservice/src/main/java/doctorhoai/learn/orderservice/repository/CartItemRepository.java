@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
@@ -27,4 +28,13 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
             LocalDateTime endDate,
             Pageable pageable
     );
+
+    @Query(
+            value = """
+            SELECT ci FROM CartItem ci WHERE
+            (:ids IS NULL OR ci.cartId.id IN (:ids)) AND ci.isActive = TRUE 
+            """
+    )
+    List<CartItem> getCartItemByIds( List<Integer> ids );
 }
+

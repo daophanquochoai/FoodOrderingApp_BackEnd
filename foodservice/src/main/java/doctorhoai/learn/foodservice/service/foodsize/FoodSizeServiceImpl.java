@@ -134,6 +134,12 @@ public class FoodSizeServiceImpl implements FoodSizeService {
         return convertToFoodSizeDto(fs);
     }
 
+    @Override
+    public List<FoodSizeDto> getFoodSizeList(List<Integer> idsFood) {
+        List<FoodSize> foodSizes = foodSizeRepository.getFoodSizeByIdsAndIsActive(idsFood, true);
+        return convertListFoodSize(foodSizes);
+    }
+
     private List<FoodSizeDto> convertListFoodSize(List<FoodSize> foodSizes){
         List<FoodSizeDto> foodSizeDtos = new ArrayList<>();
         for( FoodSize fs : foodSizes){

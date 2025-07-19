@@ -6,12 +6,14 @@ import doctorhoai.learn.foodservice.dto.CategoryDto;
 import doctorhoai.learn.foodservice.dto.FoodDto;
 import doctorhoai.learn.foodservice.dto.VoucherDto;
 import doctorhoai.learn.foodservice.dto.filter.Filter;
+import doctorhoai.learn.foodservice.dto.userservice.UserDto;
 import doctorhoai.learn.foodservice.exception.CategoryNotFoundException;
 import doctorhoai.learn.foodservice.exception.FoodNotFoundException;
 import doctorhoai.learn.foodservice.exception.UserNotFoundException;
 import doctorhoai.learn.foodservice.exception.VoucherNotFoundException;
 import doctorhoai.learn.foodservice.feign.userservice.UserFeign;
 import doctorhoai.learn.foodservice.model.*;
+import doctorhoai.learn.foodservice.model.enums.EStatusVoucher;
 import doctorhoai.learn.foodservice.repository.CategoryRepository;
 import doctorhoai.learn.foodservice.repository.FoodRepository;
 import doctorhoai.learn.foodservice.repository.VoucherRepository;
@@ -148,6 +150,12 @@ public class VoucherServiceImpl implements VoucherService {
         );
     }
 
+    @Override
+    public VoucherDto getVoucherById(Integer id) {
+        Voucher voucher = voucherRepository.getVoucherByIdAndStatus(id, EStatusVoucher.ACTIVE).orElseThrow(VoucherNotFoundException::new);
+        return convertVoucher(voucher);
+    }
+
     private List<VoucherDto> convertListVoucher(List<Voucher> vouchers) {
         return vouchers.stream().map(this::convertVoucher).toList();
     }
@@ -171,6 +179,15 @@ public class VoucherServiceImpl implements VoucherService {
                 }
             }
             voucherDto.setCategories(categoryDtos);
+        }
+        if( v.getVoucherUsers() != null && !v.getVoucherUsers().isEmpty()){
+            List<UserDto> userDtos = new ArrayList<>();
+            for(VoucherUser voucherUser : v.getVoucherUsers()){
+                if( voucherUser != null){
+                    userDtos.add(UserDto.builder().id(voucherUser.getUserId()).build());
+                }
+            }
+            voucherDto.setUsers(userDtos);
         }
         return voucherDto;
     }

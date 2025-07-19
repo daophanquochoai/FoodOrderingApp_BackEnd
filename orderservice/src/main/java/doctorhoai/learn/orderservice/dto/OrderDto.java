@@ -29,6 +29,7 @@ public class OrderDto {
     private String transactionCode;
     private VoucherDto discountApplied;
     private Float shipFee;
+    private String address;
     private EStatusOrder status;
     private Integer tableNumber;
     private UserDto shipperId;

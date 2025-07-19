@@ -53,6 +53,13 @@ public interface FoodSizeRepository extends JpaRepository<FoodSize, Integer> {
             Pageable pageable
     );
 
-    List<FoodSize> getFoodSizeByFood_IdAndIsActive(Integer foodId, Boolean isActive);
+    @Query(
+            value = """
+            SELECT fs FROM FoodSize fs
+            WHERE fs.isActive = :isActive AND 
+            (:ids IS NULL OR fs.id in (:ids))
+            """
+    )
+    List<FoodSize> getFoodSizeByIdsAndIsActive(List<Integer> ids, Boolean isActive);
 
 }

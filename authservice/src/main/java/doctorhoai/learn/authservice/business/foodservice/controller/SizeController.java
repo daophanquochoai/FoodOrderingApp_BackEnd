@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/size")
 public class SizeController {
 
     private final SizeFeign sizeFeign;

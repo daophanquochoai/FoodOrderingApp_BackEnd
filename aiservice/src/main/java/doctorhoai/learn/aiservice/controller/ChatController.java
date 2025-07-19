@@ -1,6 +1,7 @@
 package doctorhoai.learn.aiservice.controller;
 
 import doctorhoai.learn.aiservice.service.chatbot.AiChatService;
+import doctorhoai.learn.aiservice.service.chatbot.AiChatWithToolService;
 import doctorhoai.learn.aiservice.service.chatbot.RagService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -16,10 +17,10 @@ import java.io.IOException;
 @Slf4j
 public class ChatController {
 
-    private final AiChatService chatService;
+    private final AiChatWithToolService chatService;
     private final RagService ragService;
 
-    public ChatController(AiChatService chatService, RagService ragService) {
+    public ChatController(AiChatWithToolService chatService, RagService ragService) {
         this.chatService = chatService;
         this.ragService = ragService;
     }

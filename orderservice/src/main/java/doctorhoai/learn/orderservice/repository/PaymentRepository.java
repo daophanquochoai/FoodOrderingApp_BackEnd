@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Integer> {
@@ -27,4 +28,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
             Boolean isActive,
             Pageable pageable
     );
+
+    Optional<Payment> getPaymentByIdAndIsActive(Integer integer, Boolean isActive);
 }

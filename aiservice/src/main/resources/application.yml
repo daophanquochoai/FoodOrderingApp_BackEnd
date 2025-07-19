@@ -28,5 +28,13 @@ spring:
               packages: "*"
     topic:
       name: food
+  config:
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8071}
+  profiles:
+    active: dev
 server:
   port: 8081
+logging:
+  level:
+    dev:
+      langchain4j: DEBUG

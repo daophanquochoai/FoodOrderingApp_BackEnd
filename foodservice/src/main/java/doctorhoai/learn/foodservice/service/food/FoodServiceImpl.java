@@ -51,32 +51,39 @@ public class FoodServiceImpl implements FoodService {
             pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()));
         }
         List<Food> foods = foodRepository.getListFood(
-            filter.getId(),
-            filter.getStatusFoods(),
+                (filter.getId() == null || filter.getId().isEmpty()) ? null : filter.getId(),
+                (filter.getStatusFoods() == null || filter.getStatusFoods().isEmpty()) ? null : filter.getStatusFoods(),
                 filter.getSearch(),
+                filter.getMinDiscount(),
+                filter.getMaxDiscount(),
+                filter.getMinPrice(),
+                filter.getMaxPrice(),
+                filter.getMinReady(),
+                filter.getMaxReady(),
+                (filter.getSizeIds() == null || filter.getSizeIds().isEmpty()) ? null : filter.getSizeIds(),
                 pageable
         );
         if( filter.getDeep() == 0 ){
             return foods.stream().map(mapper::covertToFoodDto).toList();
         }else {
             return foods.stream().map( f -> {
-                    FoodDto foodDto = mapper.covertToFoodDto(f);
-                    if( f.getCategory() != null){
-                        foodDto.setCategory(mapper.covertToCategoryDto(f.getCategory()));
+                        FoodDto foodDto = mapper.covertToFoodDto(f);
+                        if( f.getCategory() != null){
+                            foodDto.setCategory(mapper.covertToCategoryDto(f.getCategory()));
+                        }
+                        if( f.getFoodSizes() != null && !f.getFoodSizes().isEmpty()){
+                            foodDto.setFoodSizes(
+                                    f.getFoodSizes().stream().map( fs -> {
+                                        FoodSizeDto foodSizeDto = mapper.convertToFoodSizeDto(fs);
+                                        if( fs.getSize() != null){
+                                            foodSizeDto.setSizeId(mapper.convertToSizeDto(fs.getSize()));
+                                        }
+                                        return foodSizeDto;
+                                    }).toList()
+                            );
+                        }
+                        return foodDto;
                     }
-                    if( f.getFoodSizes() != null && !f.getFoodSizes().isEmpty()){
-                        foodDto.setFoodSizes(
-                                f.getFoodSizes().stream().map( fs -> {
-                                    FoodSizeDto foodSizeDto = mapper.convertToFoodSizeDto(fs);
-                                    if( fs.getSize() != null){
-                                        foodSizeDto.setSizeId(mapper.convertToSizeDto(fs.getSize()));
-                                    }
-                                    return foodSizeDto;
-                                }).toList()
-                        );
-                    }
-                    return foodDto;
-                }
             ).toList();
         }
     }
@@ -196,6 +203,12 @@ public class FoodServiceImpl implements FoodService {
     @Override
     public List<FoodDto> getAllIdsFood(List<Integer> ids) {
         List<Food> foods = foodRepository.checkFood(ids, EStatusFood.ACTIVE);
+        return foods.stream().map(this::convertListFood).toList();
+    }
+
+    @Override
+    public List<FoodDto> getAll() {
+        List<Food> foods = foodRepository.getAllFood( EStatusFood.ACTIVE);
         return foods.stream().map(this::convertListFood).toList();
     }
 

@@ -23,7 +23,7 @@ public class CategoryController {
         return categoryFeign.addCategory(categoryDto);
     }
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     ResponseEntity<ResponseObject> getCategoryByFilter(
             @RequestBody Filter filter
     ){

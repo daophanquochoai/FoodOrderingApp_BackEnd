@@ -39,6 +39,8 @@ public class Order extends BaseModel implements Serializable {
     @Column(name = "discount_applied")
     private Integer discountApplied;
 
+    private String address;
+
     @Column(name = "ship_fee")
     private Float shipFee;
 

@@ -28,6 +28,16 @@ public class FoodController {
                         .build()
         );
     }
+    @GetMapping("/food/all")
+    public ResponseEntity<ResponseObject> getAllFoodNoFilter(
+    ) {
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .data(foodService.getAll())
+                        .message(EMessageResponse.GET_FOOD.getMessage())
+                        .build()
+        );
+    }
 
     @PostMapping("/ids")
     public ResponseEntity<ResponseObject> getAllIdsFood(

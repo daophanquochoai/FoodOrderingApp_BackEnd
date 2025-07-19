@@ -12,4 +12,5 @@ public interface FoodService {
     FoodDto getFoodById(Integer id);
     void checkFood(List<Integer> ids);
     List<FoodDto> getAllIdsFood(List<Integer> ids);
+    List<FoodDto> getAll();
 }

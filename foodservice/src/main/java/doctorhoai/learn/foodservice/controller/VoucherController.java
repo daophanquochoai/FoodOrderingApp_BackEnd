@@ -62,4 +62,17 @@ public class VoucherController {
                         .build()
         );
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseObject> getVoucherById(
+            @PathVariable Integer id
+    )
+    {
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.GET_VOUCHER.getMessage())
+                        .data(voucherService.getVoucherById(id))
+                        .build()
+        );
+    }
 }

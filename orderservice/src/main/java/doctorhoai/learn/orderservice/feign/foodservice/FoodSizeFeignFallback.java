@@ -7,6 +7,8 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class FoodSizeFeignFallback implements FallbackFactory<FoodSizeFeign> {
@@ -18,6 +20,11 @@ public class FoodSizeFeignFallback implements FallbackFactory<FoodSizeFeign> {
         return new FoodSizeFeign() {
             @Override
             public ResponseEntity<ResponseObject> getFoodSize(Integer id) {
+                return fallBack.processFallback(cause);
+            }
+
+            @Override
+            public ResponseEntity<ResponseObject> mulFoodSize(List<Integer> idsFoodSize) {
                 return fallBack.processFallback(cause);
             }
         };

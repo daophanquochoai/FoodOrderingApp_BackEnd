@@ -69,9 +69,11 @@ public class Mapper {
 
     public Order convertToOrder(OrderDto orderDto){
         return Order.builder()
+                .userId(orderDto.getUserId().getId())
                 .totalPrice(orderDto.getTotalPrice())
                 .transactionCode(orderDto.getTransactionCode())
                 .status(orderDto.getStatus())
+                .address(orderDto.getAddress())
                 .shipFee(orderDto.getShipFee())
                 .tableNumber(orderDto.getTableNumber())
                 .build();
@@ -80,6 +82,7 @@ public class Mapper {
     public OrderDto convertToOrderDto(Order order){
         return OrderDto.builder()
                 .id(order.getId())
+                .address(order.getAddress())
                 .totalPrice(order.getTotalPrice())
                 .transactionCode(order.getTransactionCode())
                 .status(order.getStatus())
