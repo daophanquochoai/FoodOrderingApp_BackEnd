@@ -11,9 +11,9 @@ import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
-    Optional<Employee> findById(int employeeId);
-    Optional<Employee> findByEmail(String email);
-    Optional<Employee> findByCccd(String cccd);
+    Optional<Employee> findByIdAndIsActive(int employeeId, boolean isActive);
+    Optional<Employee> findByEmailAndIsActive(String email, Boolean isActive);
+    Optional<Employee> findByCccdAndIsActive(String cccd, Boolean isActive);
 
     @Query(
             value = """

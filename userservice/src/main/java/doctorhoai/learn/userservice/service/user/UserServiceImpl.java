@@ -9,6 +9,7 @@ import doctorhoai.learn.userservice.exception.exception.RoleNotFound;
 import doctorhoai.learn.userservice.exception.exception.UserNotFound;
 import doctorhoai.learn.userservice.model.Role;
 import doctorhoai.learn.userservice.model.User;
+import doctorhoai.learn.userservice.repository.EmployeeRepository;
 import doctorhoai.learn.userservice.repository.RoleRepository;
 import doctorhoai.learn.userservice.repository.UserRepository;
 import doctorhoai.learn.userservice.utils.Mapper;
@@ -28,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final Mapper mapper;
     private final RoleRepository roleRepository;
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final EmployeeRepository employeeRepository;
 
 
     @Override
@@ -70,14 +72,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Integer id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFound(id.toString(), "id"));
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFound(id == null ? null : id.toString(), "id"));
+        if( !user.getIsActive() ){
+            throw new UserNotFound(id == null ? null : id.toString(), "id");
+        }
         return mapper.convertToUserDto(user);
     }
 
     @Override
     public UserDto getUserByFilter(FilterUser filter) {
         User user = userRepository.getUserByFilter(filter.getId(), filter.getEmail(), filter.getPhoneNumber(), filter.getIsActive())
-                .orElseThrow(() -> new UserNotFound(filter.getId().toString() + ", " + filter.getEmail() + ", " + filter.getPhoneNumber(),"id, email, phoneNumber" ));
+                .orElseThrow(() -> new UserNotFound(filter.getId() == null ? null : filter.getId().toString() + ", " + filter.getEmail() + ", " + filter.getPhoneNumber(),"id, email, phoneNumber" ));
         return mapper.convertToUserDto(user);
     }
 
@@ -94,10 +99,13 @@ public class UserServiceImpl implements UserService {
     }
 
     public void checkInfoUser(UserDto userDto) {
-        if(userRepository.findByEmail(userDto.getEmail()).isPresent()){
+        if( employeeRepository.findByEmailAndIsActive(userDto.getEmail(), true).isPresent() ) {
             throw new EmailDuplicate();
         }
-        if(userRepository.findByPhoneNumber(userDto.getPhoneNumber()).isPresent()){
+        if(userRepository.findByEmailAndIsActive(userDto.getEmail(), true).isPresent()){
+            throw new EmailDuplicate();
+        }
+        if(userRepository.findByPhoneNumberAndIsActive(userDto.getPhoneNumber(), true).isPresent()){
             throw new PhoneNumberDuplicate();
         };
 

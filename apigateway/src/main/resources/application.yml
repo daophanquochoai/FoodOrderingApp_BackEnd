@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: apigateway
+  config:
+    import: ${SPRING_CONFIG_IMPORT:configserver:http://localhost:8071/}
+  profiles:
+    active: dev
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: http://localhost:5173
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true

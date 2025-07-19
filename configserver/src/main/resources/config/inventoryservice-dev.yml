@@ -1,0 +1,106 @@
+spring:
+  datasource:
+    enabled: true
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/ThucTapTotNghiep}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+      show-sql: true
+      hibernate:
+        ddl-auto: none
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.MySQLDialect
+  zipkin:
+    baseUrl: ${SPRING_ZIPKIN_BASE_URL:http://localhost:9411/api/v2/spans}
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8070/eureka/}
+
+# cau hinh actuator
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  zipkin:
+    tracing:
+      endpoint: ${SPRING_ZIPKIN_BASE_URL:http://localhost:9411/api/v2/spans}
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+    circuitbreakers:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+# thong tin ung dung
+info:
+  app:
+    name: "Inventory service"
+    description: "Using fetch about Inventory"
+    version: "1.0.0"
+
+pattern:
+  level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+
+sentry:
+  traces-sample-rat: 1.0
+  exception-resolver-order: -2147483647
+  environment: ${SENTRY_ENV:dev}
+  dsn: ${SENTRY_DSN:https://a95701bd885c17f6070f1369551276a2@o4509342987911168.ingest.de.sentry.io/4509342990401616}
+
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+        automatic-transition-from-open-to-half-open-enabled: true
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+        wait-duration-in-open-state: 5s
+        sliding-window-type: COUNT_BASED
+  retry:
+    configs:
+      default:
+        maxRetryAttempts: 3
+        waitDuration: 500
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        ignoreExceptions:
+          - java.lang.NullPointerException
+        retryExceptions:
+          - java.util.concurrent.TimeoutException
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 10s  # Tăng timeout lên 10 giây
+        cancelRunningFuture: false
+  ratelimiter:
+    configs:
+      default:
+        timeoutDuration: 1000
+        limitRefreshPeriod: 5000
+        limitForPeriod: 1

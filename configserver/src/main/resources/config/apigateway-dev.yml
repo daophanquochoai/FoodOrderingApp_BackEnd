@@ -12,13 +12,6 @@ spring:
         discovery:
           locator:
             lower-case-service-id: true
-        globalcors:
-          corsConfigurations:
-            '[/**]':
-              allowedOrigins: ${SPRING_CQRS_URL:http://localhost:5173}
-              allowedMethods: "*"
-              allowedHeaders: "*"
-              allowCredentials: true
 resilience4j.circuitbreaker:
   instances:
     proxySupport:

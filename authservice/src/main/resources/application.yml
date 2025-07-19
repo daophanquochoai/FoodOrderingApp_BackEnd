@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: authservice
+  config:
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8071}
+  profiles:
+    active: dev
+  dinary:
+    cloud:
+      name: ${DINARY_CLOUD_NAME:de8nxh0wc}
+    api:
+      key: ${DINARY_API_KEY:878329439565671}
+      secret: ${DINARY_API_SECRET:BUu5E2lxTuE8q9233XjxCm_ok4g}
+  servlet:
+    multipart:
+      max-file-size: 2GB
+      max-request-size: 2GB
+server:
+  port: 9001
+
+logging:
+  level:
+    org.springframework.security : DEBUG

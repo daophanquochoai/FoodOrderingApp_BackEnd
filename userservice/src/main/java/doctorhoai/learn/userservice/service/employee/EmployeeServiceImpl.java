@@ -11,6 +11,7 @@ import doctorhoai.learn.userservice.model.Employee;
 import doctorhoai.learn.userservice.model.Role;
 import doctorhoai.learn.userservice.repository.EmployeeRepository;
 import doctorhoai.learn.userservice.repository.RoleRepository;
+import doctorhoai.learn.userservice.repository.UserRepository;
 import doctorhoai.learn.userservice.utils.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,6 +26,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final Mapper mapper;
 
@@ -90,10 +92,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     private void checkInfoEmployee(EmployeeDto employeeDto){
-        if( employeeRepository.findByCccd(employeeDto.getCccd()).isPresent() ) {
+        if( userRepository.findByEmailAndIsActive(employeeDto.getEmail(), true).isPresent() ) {
+            throw new EmailDuplicate();
+        }
+        if( employeeRepository.findByCccdAndIsActive(employeeDto.getCccd(), true).isPresent() ) {
             throw new CCCDDuplicate();
         }
-        if( employeeRepository.findByEmail(employeeDto.getEmail()).isPresent() ) {
+        if( employeeRepository.findByEmailAndIsActive(employeeDto.getEmail(), true).isPresent() ) {
             throw new EmailDuplicate();
         }
         if( employeeDto.getRole() == null ) {

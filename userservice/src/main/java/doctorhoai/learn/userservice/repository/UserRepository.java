@@ -12,7 +12,8 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
-    Optional<User> findByEmail(String email);
+    Optional<User> findByEmailAndIsActive(String email, Boolean isActive);
+    Optional<User> findByIdAndIsActive(Integer id, Boolean isActive);
     @Query(
             value = """
             SELECT u FROM User u where 
@@ -23,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             """
     )
     Optional<User> getUserByFilter(Integer id, String email, String phoneNumber, Boolean isActive);
-    Optional<User> findByPhoneNumber(String phoneNumber);
+    Optional<User> findByPhoneNumberAndIsActive(String phoneNumber, Boolean isActive);
 
     @Query(
             value = """

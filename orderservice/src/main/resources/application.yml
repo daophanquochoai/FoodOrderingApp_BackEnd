@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: orderservice
+  config:
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8071}
+  profiles:
+    active: dev
+server:
+  port: 9004

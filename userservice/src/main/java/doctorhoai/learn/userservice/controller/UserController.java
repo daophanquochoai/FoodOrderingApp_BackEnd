@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -57,8 +59,13 @@ public class UserController {
 
     @GetMapping("/filter")
     public ResponseEntity<ResponseObject> getUserWithFilter(
-            @ModelAttribute  FilterUser filterUser
+            @RequestParam(required = false) Integer id,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String phoneNumber,
+            @RequestParam(required = false) String cccd,
+            @RequestParam(required = false) Boolean isActive
             ){
+        FilterUser filterUser = new FilterUser(id, email, phoneNumber, cccd, isActive);
         return ResponseEntity.ok(
                 ResponseObject.builder()
                         .message(EMessageResponse.GET_USER.getMessage())
@@ -69,8 +76,17 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<ResponseObject> getListUserWithFilter(
-            @ModelAttribute Filter filter
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate
             ){
+        Filter filter = Filter.builder()
+                .search(search)
+                .isActive(isActive)
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
         return ResponseEntity.ok(
                 ResponseObject.builder()
                         .message(EMessageResponse.GET_USER.getMessage())
