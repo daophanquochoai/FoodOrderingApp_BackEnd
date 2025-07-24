@@ -2,7 +2,7 @@ package doctorhoai.learn.authservice.business.foodservice.service.categoryservic
 
 import doctorhoai.learn.authservice.business.foodservice.model.CategoryDto;
 import doctorhoai.learn.authservice.business.foodservice.model.Filter;
-import doctorhoai.learn.authservice.business.userservice.service.config.FeignConfig;
+import doctorhoai.learn.authservice.config.feign.FeignConfig;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @FeignClient(
         name = "foodservice",
-        path = "/food",
+        path = "/category",
         contextId = "foodFeignBusiness",
         fallbackFactory = CategoryFeignFallback.class,
         configuration = FeignConfig.class
@@ -22,7 +22,7 @@ public interface CategoryFeign {
             @RequestBody @Valid CategoryDto categoryDto
     );
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     ResponseEntity<ResponseObject> getCategoryByFilter(
             @RequestBody Filter filter
     );

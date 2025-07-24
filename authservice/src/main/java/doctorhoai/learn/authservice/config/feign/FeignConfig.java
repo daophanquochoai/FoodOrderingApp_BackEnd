@@ -1,4 +1,5 @@
-package doctorhoai.learn.authservice.business.userservice.service.config;
+package doctorhoai.learn.authservice.config.feign;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -20,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 public class FeignConfig {
     @Bean
     public ErrorDecoder errorDecoder() {
-        return new DefaultErrorDecoder();
+        return new FeignConfig.DefaultErrorDecoder();
     }
 
     public static class DefaultErrorDecoder implements ErrorDecoder {
@@ -55,3 +56,4 @@ public class FeignConfig {
         }
     }
 }
+

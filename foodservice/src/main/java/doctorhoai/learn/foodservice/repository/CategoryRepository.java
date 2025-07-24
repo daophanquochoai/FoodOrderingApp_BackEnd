@@ -2,6 +2,7 @@ package doctorhoai.learn.foodservice.repository;
 
 import doctorhoai.learn.foodservice.model.Category;
 import doctorhoai.learn.foodservice.model.enums.EStatusCategory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,7 +22,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             (:search IS NULL OR c.name like CONCAT('%', :search, '%'))
             """
     )
-    List<Category> getAllCategories(
+    Page<Category> getAllCategories(
             List<Integer> ids,
             List<EStatusCategory> status,
             String search,
@@ -40,4 +41,13 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     );
 
     Optional<Category> findByIdAndStatus(Integer integer, EStatusCategory statusCategory);
+
+    @Query(
+            value = """
+            SELECT c FROM Category c WHERE
+            (:state is true OR c.status = 'ACTIVE')
+            """
+    )
+    List<Category> getCategory( Boolean state);
+
 }

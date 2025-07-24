@@ -1,5 +1,6 @@
 package doctorhoai.learn.inventoryservice.dto;
 
+import doctorhoai.learn.inventoryservice.model.Ingredients;
 import doctorhoai.learn.inventoryservice.model.enums.EUnitType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,8 +17,8 @@ import java.util.List;
 public class HistoryIngredientsDto {
     private Integer id;
 
-    private Integer quantity;
-    private Integer usedUnit;
+    private Float quantity;
+    private Float usedUnit;
     private Float pricePerUnit;
     private Float avgPrice;
     private EUnitType unit;
@@ -26,4 +27,5 @@ public class HistoryIngredientsDto {
 
     private IngredientsDto ingredients;
     private List<IngredientsErrorDto> errors;
+    private List<IngredientsUseDto> uses;
 }

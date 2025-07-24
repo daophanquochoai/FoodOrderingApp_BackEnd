@@ -106,4 +106,16 @@ public class UserController {
                         .build()
         );
     }
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<ResponseObject> getUserByUsername(
+            @PathVariable String username
+    ){
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.GET_USER.getMessage())
+                        .data(userService.getUserByUsername(username))
+                        .build()
+        );
+    }
 }

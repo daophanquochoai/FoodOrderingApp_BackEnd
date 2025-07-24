@@ -58,6 +58,8 @@ public class HistoryIngredients extends BaseModel implements Serializable {
     //list
     @OneToMany(mappedBy = "historyIngredients")
     private List<IngredientError> errors;
+    @OneToMany(mappedBy = "historyIngredients")
+    private List<IngredientsUse> uses;
 
 
 }

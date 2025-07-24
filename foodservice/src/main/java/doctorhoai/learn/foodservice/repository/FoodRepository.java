@@ -2,9 +2,12 @@ package doctorhoai.learn.foodservice.repository;
 
 import doctorhoai.learn.foodservice.model.Food;
 import doctorhoai.learn.foodservice.model.enums.EStatusFood;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,37 +16,66 @@ import java.util.Optional;
 @Repository
 public interface FoodRepository extends JpaRepository<Food, Integer> {
 
-    @Query(
-            value = """
-            SELECT food FROM Food food
-            JOIN FETCH food.foodSizes fs 
-             JOIN FETCH fs.size s
-            WHERE
-            (:ids IS NULL OR food.id IN :ids) AND 
-            (:status IS NULL OR food.status IN :status) AND
-            (:search IS NULL OR food.name LIKE CONCAT('%',:search,'%') OR food.desc LIKE CONCAT('%',:search,'%') ) AND 
-            (:minDiscount IS NULL OR fs.discount >= :minDiscount) AND
-            (:maxDiscount IS NULL OR fs.discount <= :maxDiscount) AND
-            (:minPrice IS NULL OR fs.price >= :minPrice) AND
-            (:maxPrice IS NULL OR fs.price <= :maxPrice) AND
-            (:minReady IS NULL OR fs.readyInMinutes >= :minReady) AND
-            (:maxReady IS NULL OR fs.readyInMinutes <= :maxReady) AND
-            (:sizeIds IS NULL OR s.id in (:sizeIds))
-            """
-    )
-    List<Food> getListFood(
-            List<Integer> ids,
-            List<EStatusFood> status,
-            String search,
-            Float minDiscount,
-            Float maxDiscount,
-            Float minPrice,
-            Float maxPrice,
-            Float minReady,
-            Float maxReady,
-            List<Integer> sizeIds,
+    @EntityGraph(attributePaths = {
+            "foodSizes",
+            "foodSizes.size"
+    })
+    @Query("""
+    SELECT food FROM Food food
+    WHERE
+        (:ids IS NULL OR food.id IN :ids) AND 
+        (:status IS NULL OR food.status IN :status) AND
+        (:search IS NULL OR food.name LIKE CONCAT('%',:search,'%') OR food.desc LIKE CONCAT('%',:search,'%')) AND 
+        (
+            :minDiscount IS NULL OR EXISTS (
+                SELECT 1 FROM food.foodSizes fs WHERE COALESCE(fs.discount, -1000) >= :minDiscount
+            )
+        ) AND
+        (
+            :maxDiscount IS NULL OR EXISTS (
+                SELECT 1 FROM food.foodSizes fs WHERE COALESCE(fs.discount, 1000) <= :maxDiscount
+            )
+        ) AND
+        (
+            :minPrice IS NULL OR EXISTS (
+                SELECT 1 FROM food.foodSizes fs WHERE COALESCE(fs.price, -1) >= :minPrice
+            )
+        ) AND
+        (
+            :maxPrice IS NULL OR EXISTS (
+                SELECT 1 FROM food.foodSizes fs WHERE COALESCE(fs.price, 10000000000) <= :maxPrice
+            )
+        ) AND
+        (
+            :minReady IS NULL OR EXISTS (
+                SELECT 1 FROM food.foodSizes fs WHERE COALESCE(fs.readyInMinutes, -1) >= :minReady
+            )
+        ) AND
+        (
+            :maxReady IS NULL OR EXISTS (
+                SELECT 1 FROM food.foodSizes fs WHERE COALESCE(fs.readyInMinutes, -1) <= :maxReady
+            )
+        ) AND
+        (
+            :sizeIds IS NULL OR EXISTS (
+                SELECT 1 FROM food.foodSizes fs WHERE fs.size.id IN :sizeIds
+            )
+        )
+""")
+    Page<Food> getListFood(
+            @Param("ids") List<Integer> ids,
+            @Param("status") List<EStatusFood> status,
+            @Param("search") String search,
+            @Param("minDiscount") Float minDiscount,
+            @Param("maxDiscount") Float maxDiscount,
+            @Param("minPrice") Float minPrice,
+            @Param("maxPrice") Float maxPrice,
+            @Param("minReady") Float minReady,
+            @Param("maxReady") Float maxReady,
+            @Param("sizeIds") List<Integer> sizeIds,
             Pageable pageable
     );
+
 
     @Query(
             value = """
@@ -59,7 +91,7 @@ public interface FoodRepository extends JpaRepository<Food, Integer> {
     @Query(
             value = """
             SELECT food FROM Food food WHERE
-            food.id IN :id and food.status = 'ACTIVE'
+            food.id = :id 
             """
     )
     Optional<Food> getFoodById(Integer id);
@@ -80,5 +112,13 @@ public interface FoodRepository extends JpaRepository<Food, Integer> {
             """
     )
     List<Food> getAllFood(EStatusFood status);
+
+    @Query(
+            value = """
+            SELECT food FROM Food food WHERE
+            (:state is true OR food.status = 'ACTIVE')
+            """
+    )
+    List<Food> getFood(Boolean state);
 
 }

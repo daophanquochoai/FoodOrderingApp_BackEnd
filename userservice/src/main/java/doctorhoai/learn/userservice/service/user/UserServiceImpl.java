@@ -98,6 +98,15 @@ public class UserServiceImpl implements UserService {
         return userList.stream().map(mapper::convertToUserDto).toList();
     }
 
+    @Override
+    public UserDto getUserByUsername(String username) {
+        User user = userRepository.getUserByEmail(username).orElseThrow(() -> new UserNotFound(username == null ? null : username.toString(), "username"));
+        if( !user.getIsActive() ){
+            throw new UserNotFound(username == null ? null : username.toString(), "username");
+        }
+        return mapper.convertToUserDto(user);
+    }
+
     public void checkInfoUser(UserDto userDto) {
         if( employeeRepository.findByEmailAndIsActive(userDto.getEmail(), true).isPresent() ) {
             throw new EmailDuplicate();

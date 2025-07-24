@@ -1,6 +1,6 @@
 package doctorhoai.learn.authservice.business.userservice.service.employee;
 
-import doctorhoai.learn.authservice.business.userservice.service.config.FeignConfig;
+import doctorhoai.learn.authservice.config.feign.FeignConfig;
 import doctorhoai.learn.authservice.feign.userservice.UserFeignFallBack;
 import doctorhoai.learn.authservice.feign.userservice.model.EmployeeDto;
 import doctorhoai.learn.basedomain.response.ResponseObject;

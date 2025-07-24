@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "ingredients_user")
+@Table(name = "ingredients_use")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

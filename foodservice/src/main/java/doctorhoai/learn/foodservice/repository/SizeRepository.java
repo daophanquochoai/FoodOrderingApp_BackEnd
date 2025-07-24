@@ -33,6 +33,8 @@ public interface SizeRepository extends JpaRepository<Size, Integer> {
 
     Optional<Size> getSizeByIdAndIsActive(Integer id, Boolean isActive);
 
+    Optional<Size> getSizeById(Integer id);
+
     Optional<Size> getSizeByNameAndIsActive(String name, Boolean isActive);
 
     @Query(
@@ -43,4 +45,12 @@ public interface SizeRepository extends JpaRepository<Size, Integer> {
             """
     )
     List<Size> getSizeByIds(List<Integer> ids);
+
+    @Query(
+            value = """
+            SELECT s FROM Size s WHERE
+            (:state is true OR s.isActive = true)
+            """
+    )
+    List<Size> getSize(Boolean state);
 }

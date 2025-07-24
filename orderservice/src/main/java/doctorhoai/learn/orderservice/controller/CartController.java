@@ -16,13 +16,13 @@ public class CartController {
 
     private final CartService cartService;
 
-    @PostMapping("/user/{id}/add")
+    @PostMapping("/user/{username}/add")
     public ResponseEntity<ResponseObject> addCart(
-            @PathVariable Integer id,
+            @PathVariable String username,
             @RequestBody @Valid CartItemDto cartItemDto
             )
     {
-        cartService.addCartItemIntoCart(cartItemDto, id);
+        cartService.addCartItemIntoCart(cartItemDto, username);
         return ResponseEntity.ok(
                 ResponseObject.builder()
                         .message(EMessageResponse.CREATE_CART_SUCCESSFUL.getMessage())
@@ -30,12 +30,12 @@ public class CartController {
         );
     }
 
-    @PutMapping("/user/{id}/remove/{cartId}")
+    @PutMapping("/user/{username}/remove/{cartId}")
     public ResponseEntity<ResponseObject> removeCart(
-            @PathVariable Integer id,
+            @PathVariable String username,
             @PathVariable Integer cartId
     ){
-        cartService.removeCartItemFromCart(cartId, id);
+        cartService.removeCartItemFromCart(cartId, username);
         return ResponseEntity.ok(
                 ResponseObject.builder()
                         .message(EMessageResponse.UPDATE_CART_SUCCESSFUL.getMessage())
@@ -43,15 +43,15 @@ public class CartController {
         );
     }
 
-    @GetMapping("/user/{id}/all")
+    @PostMapping("/user/{username}/all")
     public ResponseEntity<ResponseObject> getAllCarts(
-            @PathVariable Integer id,
+            @PathVariable String username,
             @RequestBody Filter filter
             ){
         return ResponseEntity.ok(
                 ResponseObject.builder()
                         .message(EMessageResponse.GET_CART_SUCCESSFUL.getMessage())
-                        .data(cartService.getCartByUserId(id, filter))
+                        .data(cartService.getCartByUsername(username, filter))
                         .build()
         );
     }

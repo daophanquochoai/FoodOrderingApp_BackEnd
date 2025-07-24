@@ -14,4 +14,5 @@ public interface UserService {
     UserDto getUserById(Integer id);
     UserDto getUserByFilter(FilterUser filter);
     List<UserDto> getAllUsers(Filter filter);
+    UserDto getUserByUsername(String username);
 }

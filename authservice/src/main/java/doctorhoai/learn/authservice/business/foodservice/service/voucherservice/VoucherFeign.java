@@ -2,6 +2,7 @@ package doctorhoai.learn.authservice.business.foodservice.service.voucherservice
 
 import doctorhoai.learn.authservice.business.foodservice.model.Filter;
 import doctorhoai.learn.authservice.business.foodservice.model.VoucherDto;
+import doctorhoai.learn.authservice.config.feign.FeignConfig;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
         path = "/voucher",
         contextId = "voucherFeignBusiness",
         fallbackFactory = VoucherFeignFallback.class,
-        configuration = VoucherFeignFallback.class
+        configuration = FeignConfig.class
 )
 public interface VoucherFeign {
     @GetMapping("/user")

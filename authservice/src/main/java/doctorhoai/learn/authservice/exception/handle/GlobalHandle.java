@@ -1,6 +1,8 @@
 package doctorhoai.learn.authservice.exception.handle;
 
 import doctorhoai.learn.authservice.exception.UnAuthorizedException;
+import doctorhoai.learn.basedomain.exception.Duplicate;
+import doctorhoai.learn.basedomain.exception.NotFound;
 import doctorhoai.learn.basedomain.exception.ResponseException;
 import feign.FeignException;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -71,6 +73,28 @@ public class GlobalHandle extends ResponseEntityExceptionHandler {
                        .timestamp(LocalDateTime.now())
                        .build()
         );
+    }
+    @ExceptionHandler(value = {Duplicate.class})
+    public ResponseEntity<ResponseException> handleDuplicate(Duplicate exception) {
+        log.info("**ApiExceptionHandler controller, handle duplicate**");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ResponseException.builder()
+                                .message(exception.getMessage())
+                                .timestamp(LocalDateTime.now())
+                                .build()
+                );
+    }
+    @ExceptionHandler(value = {NotFound.class})
+    public ResponseEntity<ResponseException> handleNotFound(NotFound exception) {
+        log.info("**ApiExceptionHandler controller, handle notfound**");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(
+                        ResponseException.builder()
+                                .message(exception.getMessage())
+                                .timestamp(LocalDateTime.now())
+                                .build()
+                );
     }
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<Object> handleGlobalException(Exception exception) {

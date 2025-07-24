@@ -40,6 +40,7 @@ public class Mapper {
                 .note(historyImportOrExport.getNote())
                 .bathCode(historyImportOrExport.getBath_code())
                 .isActive(historyImportOrExport.getIsActive())
+                .createdAt(historyImportOrExport.getCreatedAt())
                 .build();
     }
 
@@ -128,6 +129,16 @@ public class Mapper {
                 .unit(ingredients.getUnit())
                 .lowThreshold(ingredients.getLowThreshold())
                 .isActive(ingredients.getIsActive())
+                .build();
+    }
+
+    public IngredientsUseDto convertToIngredientsUseDto(IngredientsUse ingredientsUse){
+        return IngredientsUseDto.builder()
+                .id(ingredientsUse.getId())
+                .orderItemId(ingredientsUse.getOrderItemId())
+                .unit(ingredientsUse.getUnit())
+                .quantity(ingredientsUse.getQuantity())
+                .isActive(ingredientsUse.getIsActive())
                 .build();
     }
 }

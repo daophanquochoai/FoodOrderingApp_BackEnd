@@ -1,6 +1,6 @@
 package doctorhoai.learn.authservice.business.userservice.service.user;
 
-import doctorhoai.learn.authservice.business.userservice.service.config.FeignConfig;
+import doctorhoai.learn.authservice.config.feign.FeignConfig;
 import doctorhoai.learn.authservice.feign.userservice.model.UserDto;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import jakarta.validation.Valid;

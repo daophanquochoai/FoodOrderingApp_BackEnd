@@ -43,4 +43,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             LocalDateTime startDate,
             LocalDateTime endDate
     );
+
+    Optional<User> getUserByEmail(String email);
 }

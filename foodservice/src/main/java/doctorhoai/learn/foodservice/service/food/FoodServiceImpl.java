@@ -2,6 +2,7 @@ package doctorhoai.learn.foodservice.service.food;
 
 import doctorhoai.learn.basedomain.kafka.EMessageType;
 import doctorhoai.learn.basedomain.kafka.MessageTemplate;
+import doctorhoai.learn.basedomain.response.PageObject;
 import doctorhoai.learn.foodservice.dto.FoodDto;
 import doctorhoai.learn.foodservice.dto.FoodSizeDto;
 import doctorhoai.learn.foodservice.dto.SizeDto;
@@ -21,6 +22,7 @@ import doctorhoai.learn.foodservice.repository.FoodRepository;
 import doctorhoai.learn.foodservice.repository.SizeRepository;
 import doctorhoai.learn.foodservice.utils.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -42,7 +44,7 @@ public class FoodServiceImpl implements FoodService {
 
 
     @Override
-    public List<FoodDto> getFoodByFilter(Filter filter) {
+    public PageObject getFoodByFilter(Filter filter) {
 
         Pageable pageable ;
         if( filter.getSort().equals("desc")){
@@ -50,7 +52,7 @@ public class FoodServiceImpl implements FoodService {
         }else{
             pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()));
         }
-        List<Food> foods = foodRepository.getListFood(
+        Page<Food> foods = foodRepository.getListFood(
                 (filter.getId() == null || filter.getId().isEmpty()) ? null : filter.getId(),
                 (filter.getStatusFoods() == null || filter.getStatusFoods().isEmpty()) ? null : filter.getStatusFoods(),
                 filter.getSearch(),
@@ -63,10 +65,14 @@ public class FoodServiceImpl implements FoodService {
                 (filter.getSizeIds() == null || filter.getSizeIds().isEmpty()) ? null : filter.getSizeIds(),
                 pageable
         );
+        PageObject pageObject = PageObject.builder()
+                .totalPage((int) foods.getTotalElements())
+                .page(filter.getPageNo())
+                .build();
         if( filter.getDeep() == 0 ){
-            return foods.stream().map(mapper::covertToFoodDto).toList();
+            pageObject.setData(foods.stream().map(mapper::covertToFoodDto).toList());
         }else {
-            return foods.stream().map( f -> {
+            pageObject.setData(foods.stream().map( f -> {
                         FoodDto foodDto = mapper.covertToFoodDto(f);
                         if( f.getCategory() != null){
                             foodDto.setCategory(mapper.covertToCategoryDto(f.getCategory()));
@@ -84,8 +90,9 @@ public class FoodServiceImpl implements FoodService {
                         }
                         return foodDto;
                     }
-            ).toList();
+            ).toList());
         }
+        return pageObject;
     }
 
     @Override

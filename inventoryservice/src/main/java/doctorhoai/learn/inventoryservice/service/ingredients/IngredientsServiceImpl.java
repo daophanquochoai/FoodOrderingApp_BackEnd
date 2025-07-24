@@ -41,7 +41,7 @@ public class IngredientsServiceImpl implements IngredientsService {
         }
         Page<Ingredients> page = ingredientsRepository.findIngredientsByFilter(
                 filter.getSearch(),
-                filter.getUnit(),
+                filter.getUnit() == null || filter.getUnit().size() == 0 ? null : filter.getUnit(),
                 filter.getMinThreshold(),
                 filter.getMaxThreshold(),
                 filter.getStartDate() == null ? null : filter.getStartDate().atStartOfDay(),
@@ -52,7 +52,7 @@ public class IngredientsServiceImpl implements IngredientsService {
         List<Ingredients> ingredientsDtos = page.getContent();
 
         return PageObject.builder()
-                .totalPage(ingredientsDtos.size())
+                .totalPage((int) page.getTotalElements())
                 .page(filter.getPageNo())
                 .data(ingredientsDtos.stream().map(mapper::convertToIngredientsDto))
                 .build();
