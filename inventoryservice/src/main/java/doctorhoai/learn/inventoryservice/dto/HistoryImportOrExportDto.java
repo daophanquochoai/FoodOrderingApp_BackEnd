@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -24,6 +25,6 @@ public class HistoryImportOrExportDto {
     private String bathCode;
     private SourceDto source;
     private Boolean isActive;
-
+    private LocalDateTime createdAt;
     private List<HistoryIngredientsDto> historyIngredients;
 }

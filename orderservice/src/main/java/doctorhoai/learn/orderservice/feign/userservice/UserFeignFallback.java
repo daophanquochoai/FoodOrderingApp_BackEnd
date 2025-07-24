@@ -20,6 +20,11 @@ public class UserFeignFallback implements FallbackFactory<UserFeign> {
             public ResponseEntity<ResponseObject> getUserById(Integer id) {
                 return handleFallBack.processFallback(cause);
             }
+
+            @Override
+            public ResponseEntity<ResponseObject> getUserByUsername(String username) {
+                return handleFallBack.processFallback(cause);
+            }
         };
     }
 }

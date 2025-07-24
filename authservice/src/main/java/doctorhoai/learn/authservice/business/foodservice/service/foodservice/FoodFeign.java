@@ -2,7 +2,7 @@ package doctorhoai.learn.authservice.business.foodservice.service.foodservice;
 
 import doctorhoai.learn.authservice.business.foodservice.model.Filter;
 import doctorhoai.learn.authservice.business.foodservice.model.FoodDto;
-import doctorhoai.learn.authservice.business.userservice.service.config.FeignConfig;
+import doctorhoai.learn.authservice.config.feign.FeignConfig;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -16,7 +16,7 @@ import java.util.List;
         path = "/food",
         contextId = "foodFeignBusinessService",
         fallbackFactory = FoodFeignFallback.class,
-    configuration = FeignConfig .class
+    configuration = FeignConfig.class
 )
 public interface FoodFeign {
     @PostMapping("/all")

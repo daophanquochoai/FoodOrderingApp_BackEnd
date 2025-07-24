@@ -18,7 +18,7 @@ public class FoodService {
 
     private final FoodFeign foodFeign;
 
-    @Tool("Khi khách hàng hỏi về món ăn")
+//    @Tool("Khi khách hàng hỏi về món ăn")
     public List<FoodDto> getAllFood(){
         try{
             ObjectMapper objectMapper = new ObjectMapper();

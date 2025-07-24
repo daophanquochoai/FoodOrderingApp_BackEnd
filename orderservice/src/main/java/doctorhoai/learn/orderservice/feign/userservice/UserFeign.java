@@ -13,4 +13,8 @@ public interface UserFeign {
     ResponseEntity<ResponseObject> getUserById(
             @PathVariable Integer id
     );
+    @GetMapping("/username/{username}")
+    ResponseEntity<ResponseObject> getUserByUsername(
+            @PathVariable String username
+    );
 }

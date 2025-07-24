@@ -46,11 +46,16 @@ public class CartServiceImpl implements CartService {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void addCartItemIntoCart(CartItemDto cartItemDto, Integer userId) {
+    public void addCartItemIntoCart(CartItemDto cartItemDto, String username) {
 
-        userFeign.getUserById(userId);
+        //get user
+        ResponseEntity<ResponseObject> responseUser = userFeign.getUserByUsername(username);
+        UserDto userDto = new UserDto();
+        if( responseUser.getStatusCode().is2xxSuccessful()){
+            userDto = objectMapper.convertValue(responseUser.getBody().getData(), UserDto.class);
+        }
 
-        Optional<Cart> cart = cartRepository.getCartByUserId(userId);
+        Optional<Cart> cart = cartRepository.getCartByUserId(userDto.getId());
 
         //check food
         if( cartItemDto.getFoodId() == null || cartItemDto.getFoodId().getId() == null){
@@ -65,7 +70,7 @@ public class CartServiceImpl implements CartService {
         Cart cartNew;
         if( cart.isEmpty() ){
             cartNew = Cart.builder()
-                    .userId(userId)
+                    .userId(userDto.getId())
                     .isActive(true)
                     .build();
             cartNew.setCartItems(List.of(cartItem));
@@ -78,9 +83,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void removeCartItemFromCart(Integer cartItemId, Integer userId) {
+    public void removeCartItemFromCart(Integer cartItemId, String username) {
 
-        userFeign.getUserById(userId);
+        userFeign.getUserByUsername(username);
 
         CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow(CartItemNotFoundException::new);
 
@@ -94,7 +99,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public PageObject getCartByUserId(Integer userId, Filter filter) {
+    public PageObject getCartByUsername(String username, Filter filter) {
 
         //panigation
         Pageable pageable;
@@ -105,20 +110,20 @@ public class CartServiceImpl implements CartService {
         }
 
         //get user
-        ResponseEntity<ResponseObject> responseUser = userFeign.getUserById(userId);
+        ResponseEntity<ResponseObject> responseUser = userFeign.getUserByUsername(username);
         UserDto userDto = new UserDto();
         if( responseUser.getStatusCode().is2xxSuccessful()){
             userDto = objectMapper.convertValue(responseUser.getBody().getData(), UserDto.class);
         }
         Page<CartItem> page = cartItemRepository.getCartItemByFilter(
-                userId,
+                userDto.getId(),
                 filter.getStartDate() == null ? null : filter.getStartDate().atStartOfDay(),
                 filter.getEndDate() == null ? null : filter.getEndDate().plusDays(1).atStartOfDay(),
                 pageable
         );
 
         //get cart
-        Cart cart = cartRepository.getCartByUserId(userId).orElseThrow(CartNotFoundException::new);
+        Cart cart = cartRepository.getCartByUserId(userDto.getId()).orElseThrow(CartNotFoundException::new);
         CartDto cartDto = mapper.convertToCartDto(cart);
         cartDto.setUserId(userDto);
 

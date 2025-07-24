@@ -2,7 +2,7 @@ package doctorhoai.learn.authservice.business.foodservice.service.foodsizeservic
 
 import doctorhoai.learn.authservice.business.foodservice.model.Filter;
 import doctorhoai.learn.authservice.business.foodservice.model.FoodSizeDto;
-import doctorhoai.learn.authservice.business.userservice.service.config.FeignConfig;
+import doctorhoai.learn.authservice.config.feign.FeignConfig;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;

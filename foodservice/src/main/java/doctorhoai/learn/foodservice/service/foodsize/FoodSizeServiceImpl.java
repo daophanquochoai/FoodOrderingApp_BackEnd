@@ -45,8 +45,8 @@ public class FoodSizeServiceImpl implements FoodSizeService {
             throw new FoodNotFoundException();
         }
 
-        Food food = foodRepository.getFoodById(foodSizeDto.getId()).orElseThrow(FoodNotFoundException::new);
-        Size size = sizeRepository.getSizeByIdAndIsActive(foodSizeDto.getSizeId().getId(), true).orElseThrow(SizeNotFoundException::new);
+        Food food = foodRepository.getFoodById(foodSizeDto.getFoodId().getId()).orElseThrow(FoodNotFoundException::new);
+        Size size = sizeRepository.getSizeById(foodSizeDto.getSizeId().getId()).orElseThrow(SizeNotFoundException::new);
 
         FoodSize foodSize = mapper.convertToFoodSize(foodSizeDto);
         foodSize.setFood(food);
@@ -54,7 +54,7 @@ public class FoodSizeServiceImpl implements FoodSizeService {
         foodSize = foodSizeRepository.save(foodSize);
         FoodSizeDto foodSizeReturn = mapper.convertToFoodSizeDto(foodSize);
         foodSizeReturn.setFoodId(mapper.covertToFoodDto(food));
-        foodSizeReturn.setSizeId(foodSizeDto.getSizeId());
+        foodSizeReturn.setSizeId(mapper.convertToSizeDto(size));
         return foodSizeReturn;
     }
 

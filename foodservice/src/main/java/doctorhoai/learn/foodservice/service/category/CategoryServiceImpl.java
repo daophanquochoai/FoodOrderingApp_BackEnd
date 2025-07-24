@@ -1,5 +1,6 @@
 package doctorhoai.learn.foodservice.service.category;
 
+import doctorhoai.learn.basedomain.response.PageObject;
 import doctorhoai.learn.foodservice.dto.CategoryDto;
 import doctorhoai.learn.foodservice.dto.FoodDto;
 import doctorhoai.learn.foodservice.dto.filter.Filter;
@@ -8,6 +9,7 @@ import doctorhoai.learn.foodservice.model.Category;
 import doctorhoai.learn.foodservice.repository.CategoryRepository;
 import doctorhoai.learn.foodservice.utils.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,38 +27,44 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public List<CategoryDto> getAllCategories(Filter filter) {
+    public PageObject getAllCategories(Filter filter) {
         Pageable pageable ;
         if( filter.getSort().equals("desc")){
             pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()));
         }else{
             pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize());
         }
-        List<Category> categories = categoryRepository.getAllCategories(
+        Page<Category> categories = categoryRepository.getAllCategories(
                 filter.getId(),
                 filter.getStatusCategories(),
                 filter.getSearch(),
                 pageable
         );
+        PageObject pageObject = PageObject.builder()
+                .page(categories.getNumber())
+                .totalPage(categories.getTotalPages())
+                .data(categories.getContent())
+                .build();
         if( filter.getDeep() == 0 ){
-            return categories.stream().map(mapper::covertToCategoryDto_Stack).toList();
+            pageObject.setData(categories.getContent().stream().map(mapper::covertToCategoryDto_Stack).toList());
         }else{
-            return categories.stream().map( c-> {
+            pageObject.setData(categories.getContent().stream().map( c-> {
                 CategoryDto categoryDto = mapper.covertToCategoryDto_Stack(c);
                 if( c.getFoods() != null && !c.getFoods().isEmpty()){
                     List<FoodDto> foods = c.getFoods().stream().map(mapper::covertToFoodDto).toList();
                     categoryDto.setFoods(foods);
                 }
                 return categoryDto;
-            }).toList();
+            }).toList());
         }
+        return pageObject;
     }
 
     @Override
     @Transactional
     public CategoryDto addCategory(CategoryDto categoryDto) {
         Category category = mapper.covertToCategory(categoryDto);
-        if( categoryDto.getParent() != null ){
+        if( categoryDto.getParent() != null && categoryDto.getParent().getId() != null ){
             Category parent = categoryRepository.findById(categoryDto.getParent().getId()).orElseThrow(CategoryNotFoundException::new);
             category.setParentId(parent);
         }

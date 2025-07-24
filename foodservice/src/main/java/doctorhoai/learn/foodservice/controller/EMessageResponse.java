@@ -22,6 +22,8 @@ public enum EMessageResponse {
     CREATE_FOOD_SIZE_SUCCESSFUL("Create food size successful"),
     UPDATE_FOOD_SIZE_SUCCESSFUL("Update food size successful"),
     GET_FOOD_SIZE_SUCCESSFUL("Get food size successful"),
+
+    GET_FILTER("Get filter successful"),
     ;
     private String message;
     EMessageResponse(String message) {

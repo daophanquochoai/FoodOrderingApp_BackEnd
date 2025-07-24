@@ -1,18 +1,12 @@
 package doctorhoai.learn.inventoryservice.service.history_import_or_export;
 
 import doctorhoai.learn.basedomain.response.PageObject;
-import doctorhoai.learn.inventoryservice.dto.HistoryImportOrExportDto;
-import doctorhoai.learn.inventoryservice.dto.HistoryIngredientsDto;
-import doctorhoai.learn.inventoryservice.dto.IngredientsDto;
-import doctorhoai.learn.inventoryservice.dto.SourceDto;
+import doctorhoai.learn.inventoryservice.dto.*;
 import doctorhoai.learn.inventoryservice.dto.filter.Filter;
 import doctorhoai.learn.inventoryservice.exception.exception.IngredientsNotFoundException;
 import doctorhoai.learn.inventoryservice.exception.exception.SourceNotFoundException;
 import doctorhoai.learn.inventoryservice.mapper.Mapper;
-import doctorhoai.learn.inventoryservice.model.HistoryImportOrExport;
-import doctorhoai.learn.inventoryservice.model.HistoryIngredients;
-import doctorhoai.learn.inventoryservice.model.Ingredients;
-import doctorhoai.learn.inventoryservice.model.Source;
+import doctorhoai.learn.inventoryservice.model.*;
 import doctorhoai.learn.inventoryservice.repository.HistoryImportOrExportRepository;
 import doctorhoai.learn.inventoryservice.repository.IngredientsRepository;
 import doctorhoai.learn.inventoryservice.repository.SourceRepository;
@@ -70,9 +64,54 @@ public class HistoryImportOrExportServiceImpl implements HistoryImportOrExportSe
             List<HistoryImportOrExportDto> historyImportOrExportDtos = data.stream().map(mapper::convertToHistoryImportOrExportDto).collect(Collectors.toList());
             pageObject.setData(historyImportOrExportDtos);
         }else{
-            pageObject.setData(convertToHistoryImportOrExportDtoWithDeep(data));
+            pageObject.setData(convertToHistoryImportOrExportDto(data));
         }
         return pageObject;
+    }
+
+    private List<HistoryImportOrExportDto> convertToHistoryImportOrExportDto( List<HistoryImportOrExport> historyImportOrExportList ){
+        List<HistoryImportOrExportDto> returnValue = new ArrayList<>();
+        for( HistoryImportOrExport historyImportOrExport : historyImportOrExportList ){
+            HistoryImportOrExportDto historyImportOrExportDto = mapper.convertToHistoryImportOrExportDto(historyImportOrExport);
+            if( historyImportOrExport != null && historyImportOrExport.getHistoryIngredients() != null && !historyImportOrExport.getHistoryIngredients().isEmpty()){
+                historyImportOrExportDto.setHistoryIngredients(convertToHistoryIngredientsDto(historyImportOrExport.getHistoryIngredients()));
+            }
+            returnValue.add(historyImportOrExportDto);
+        }
+        return returnValue;
+    }
+
+    private List<HistoryIngredientsDto> convertToHistoryIngredientsDto( List<HistoryIngredients> historyIngredientsList){
+        List<HistoryIngredientsDto> returnValue = new ArrayList<>();
+        for( HistoryIngredients historyIngredients : historyIngredientsList ){
+            HistoryIngredientsDto historyIngredientsDto = mapper.convertToHistoryIngredientsDto(historyIngredients);
+            if( historyIngredients != null){
+                if( historyIngredients.getErrors() != null && !historyIngredients.getErrors().isEmpty() ){
+                    historyIngredientsDto.setErrors(convertToHistoryIngredientsErrorDto(historyIngredients.getErrors()));
+                }
+                if( historyIngredients.getUses() != null && !historyIngredients.getUses().isEmpty() ){
+                    historyIngredientsDto.setUses(convertToHistoryIngredientsUseDto(historyIngredients.getUses()));
+                }
+            }
+            returnValue.add(historyIngredientsDto);
+        }
+        return returnValue;
+    }
+
+    private List<IngredientsErrorDto> convertToHistoryIngredientsErrorDto( List<IngredientError> ingredientErrors){
+        List<IngredientsErrorDto> returnValue = new ArrayList<>();
+        for( IngredientError ingredientError : ingredientErrors ){
+            returnValue.add(mapper.convertToIngredientsErrorDto(ingredientError));
+        }
+        return returnValue;
+    }
+
+    private List<IngredientsUseDto> convertToHistoryIngredientsUseDto( List<IngredientsUse> ingredientsUseList){
+        List<IngredientsUseDto> returnValue = new ArrayList<>();
+        for( IngredientsUse ingredientsUse : ingredientsUseList ){
+            returnValue.add(mapper.convertToIngredientsUseDto(ingredientsUse));
+        }
+        return returnValue;
     }
 
     @Override

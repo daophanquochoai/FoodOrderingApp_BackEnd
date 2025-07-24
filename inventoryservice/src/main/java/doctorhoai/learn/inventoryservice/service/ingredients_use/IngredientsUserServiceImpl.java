@@ -32,7 +32,7 @@ public class IngredientsUserServiceImpl implements IngredientsUserService {
         }).toList();
 
         // get ingredients
-        List<FoodIngredients> foodIngredients = foodIngredientsRepository.getFoodIngredientOfFood( foodIds, true );
+        List<FoodIngredients> foodIngredients = foodIngredientsRepository.getFoodIngredientOfFood( foodIds, List.of(true) );
 
         Map<Integer, Float> ingredientsQuantity = new HashMap<>();
 

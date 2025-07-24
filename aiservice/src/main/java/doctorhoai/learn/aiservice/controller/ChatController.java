@@ -1,7 +1,7 @@
 package doctorhoai.learn.aiservice.controller;
 
 import doctorhoai.learn.aiservice.service.chatbot.AiChatService;
-import doctorhoai.learn.aiservice.service.chatbot.AiChatWithToolService;
+//import doctorhoai.learn.aiservice.service.chatbot.AiChatWithToolService;
 import doctorhoai.learn.aiservice.service.chatbot.RagService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -17,11 +17,13 @@ import java.io.IOException;
 @Slf4j
 public class ChatController {
 
-    private final AiChatWithToolService chatService;
+//    private final AiChatWithToolService chatService;
+    private final AiChatService aiChatService;
     private final RagService ragService;
 
-    public ChatController(AiChatWithToolService chatService, RagService ragService) {
-        this.chatService = chatService;
+    public ChatController(RagService ragService, AiChatService aiChatService) {
+//        this.chatService = chatService;
+        this.aiChatService = aiChatService;
         this.ragService = ragService;
     }
 
@@ -30,7 +32,7 @@ public class ChatController {
         // Simple chat endpoint:
         // - Handles basic questions without document context
         // - Returns streaming response
-        return chatService.chat(message);
+        return aiChatService.chat(message);
     }
 
     @PostMapping("/load")
@@ -40,7 +42,7 @@ public class ChatController {
         // 1. Check if file is provided
         if(file == null || file.isEmpty()) {
             log.info("File is empty");
-            return chatService.chat(message);
+            return aiChatService.chat(message);
         }
 
         // 2. Process uploaded document
@@ -54,6 +56,6 @@ public class ChatController {
         log.info("Segments saved");
 
         // 4. Generate response using document context
-        return chatService.chat(message);
+        return aiChatService.chat(message);
     }
 }
