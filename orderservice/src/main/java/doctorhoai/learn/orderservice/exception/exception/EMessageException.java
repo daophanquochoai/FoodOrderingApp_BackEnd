@@ -14,7 +14,9 @@ public enum EMessageException {
     VOUCHER_CANT_USE("Voucher Cant Use"),
 
     TOTAL_COST_NOT_CORRECT("Total Cost Not Correct"),
-    ORDER_NOT_FOUND("Order Not Found");
+    ORDER_NOT_FOUND("Order Not Found"),
+
+    POINT_OF_USER_NOT_FOUND("Point of user not found")
     ;
 
 

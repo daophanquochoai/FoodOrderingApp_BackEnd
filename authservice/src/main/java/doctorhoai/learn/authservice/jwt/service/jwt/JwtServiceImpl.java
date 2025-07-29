@@ -17,7 +17,7 @@ import java.util.function.Function;
 public class JwtServiceImpl implements JwtService {
 
     private final JwtUtil jwtUtil;
-    private static final long ACCESS_TOKEN_TTL = 5 * 60 * 1000;
+    private static final long ACCESS_TOKEN_TTL = 5 * 24 * 60 * 1000;
     private static final long REFRESH_TOKEN_TTL = 7 * 24 * 3600 * 1000;
 
     @Override

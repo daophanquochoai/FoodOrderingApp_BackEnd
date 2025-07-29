@@ -158,6 +158,15 @@ public class CartServiceImpl implements CartService {
         return pageObject;
     }
 
+    @Override
+    public void createCart(Integer userId) {
+        Cart cart = Cart.builder()
+                .isActive(true)
+                .userId(userId)
+                .build();
+        cartRepository.save(cart);
+    }
+
     public List<FoodSizeDto> getFoodSizeDto(List<Integer> idsFoodSize){
         ResponseEntity<ResponseObject> responseFoodSize = foodSizeFeign.mulFoodSize(idsFoodSize);
         List<FoodSizeDto> foodSizeDtos = new ArrayList<>();

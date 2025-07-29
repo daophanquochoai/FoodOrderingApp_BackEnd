@@ -29,5 +29,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
             Pageable pageable
     );
 
-    Optional<Payment> getPaymentByIdAndIsActive(Integer integer, Boolean isActive);
+    Optional<Payment> getPaymentByCodeAndIsActive(String code, Boolean isActive);
 }

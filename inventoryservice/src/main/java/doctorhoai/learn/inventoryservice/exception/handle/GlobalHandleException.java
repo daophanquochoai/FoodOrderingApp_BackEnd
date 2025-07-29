@@ -1,6 +1,7 @@
 package doctorhoai.learn.inventoryservice.exception.handle;
 
 
+import doctorhoai.learn.basedomain.exception.BadException;
 import doctorhoai.learn.basedomain.exception.Duplicate;
 import doctorhoai.learn.basedomain.exception.NotFound;
 import doctorhoai.learn.basedomain.exception.ResponseException;
@@ -71,7 +72,7 @@ public class GlobalHandleException extends ResponseEntityExceptionHandler {
         );
     }
 
-    @ExceptionHandler(value = {Duplicate.class})
+    @ExceptionHandler(value = {Duplicate.class, BadException.class})
     public ResponseEntity<ResponseException> handleDuplicate(Duplicate exception) {
         log.info("**ApiExceptionHandler controller, handle duplicate**");
         logWithSl4j(exception.getMessage(), ETypeLog.ERROR, exception);

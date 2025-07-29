@@ -46,8 +46,8 @@ public class AuthController {
         throw new BadCredentialsException("Bad credentials");
     }
 
-    @PostMapping("/refreshToken")
-    public ResponseEntity<ResponseAuth> refreshToken(@RequestBody String refreshToken){
+    @PostMapping("/refreshToken/{token}/{refreshToken}")
+    public ResponseEntity<ResponseAuth> refreshToken(@PathVariable String refreshToken, @PathVariable String token){
         String username = jwtService.extractUsername(refreshToken);
         final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         if( !jwtService.validateToken(refreshToken, userDetails) ){
@@ -55,6 +55,7 @@ public class AuthController {
         }
         String accessToken = jwtService.generateToken(userDetails);
         tokenService.saveToken(accessToken, userDetails.getUsername());
+        tokenService.deleteToken(token);
         return ResponseEntity.ok(
                 ResponseAuth.builder()
                         .access_token(jwtService.generateToken((userDetails)))

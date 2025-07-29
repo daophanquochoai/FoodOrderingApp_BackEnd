@@ -29,11 +29,12 @@ public class IngredientsUse extends BaseModel implements Serializable {
     @Enumerated(EnumType.STRING)
     private EUnitType unit;
 
-    private Integer quantity;
+    private Float quantity;
 
-    @Column(name = "order_item_id")
-    private Integer orderItemId;
+    @Column(name = "order_id")
+    private Integer orderId;
 
     @Column(name = "is_active")
     private Boolean isActive;
+
 }

@@ -1,5 +1,6 @@
 package doctorhoai.learn.inventoryservice.service.source;
 
+import doctorhoai.learn.basedomain.response.PageObject;
 import doctorhoai.learn.inventoryservice.dto.SourceDto;
 import doctorhoai.learn.inventoryservice.dto.filter.Filter;
 import doctorhoai.learn.inventoryservice.exception.exception.SourceNotFoundException;
@@ -7,6 +8,7 @@ import doctorhoai.learn.inventoryservice.mapper.Mapper;
 import doctorhoai.learn.inventoryservice.model.Source;
 import doctorhoai.learn.inventoryservice.repository.SourceRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,14 +24,14 @@ public class SourceServiceImpl implements SourceService {
     private final Mapper mapper;
 
     @Override
-    public List<SourceDto> getAllSources(Filter filter) {
+    public PageObject getAllSources(Filter filter) {
         Pageable pageable;
         if( filter.getSort().equals("desc")){
             pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()).descending());
         } else{
             pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()));
         }
-        List<Source> sources = sourceRepository.getAllSources(
+        Page<Source> sources = sourceRepository.getAllSources(
                 filter.getSearch(),
                 filter.getIsActive(),
                 filter.getStartDate() == null ? null : filter.getStartDate().atStartOfDay(),
@@ -37,7 +39,12 @@ public class SourceServiceImpl implements SourceService {
                 pageable
         );
 
-        return sources.stream().map(mapper::convertToSourceDto).toList();
+        PageObject pageObject = PageObject.builder()
+                .page(filter.getPageNo())
+                .totalPage(sources.getTotalPages())
+                .data( sources.stream().map(mapper::convertToSourceDto).toList())
+                .build();
+        return pageObject;
     }
 
     @Override

@@ -5,8 +5,10 @@ import doctorhoai.learn.foodservice.model.Voucher;
 import doctorhoai.learn.foodservice.model.enums.EStatusVoucher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -30,34 +32,39 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
             Pageable pageable
     );
 
-    @Query(
-            value = """
-            SELECT v FROM Voucher v
-            LEFT JOIN FETCH v.voucherUsers vu
-            LEFT JOIN FETCH v.voucherFoods vf
-            LEFT JOIN FETCH v.voucherCategories vc
-            WHERE
-            (:userIds IS NULL OR vu.userId IN :userIds) AND 
-            (:status IS NULL OR v.status in :status) AND 
-            (:search IS NULL OR v.code like CONCAT('%', :search, '%')) AND
-            (:max IS NULL OR (:max = true AND v.maxUse = v.usedCount) OR (:max = false AND v.maxUse > v.usedCount)) AND 
-            (:forFood IS NULL OR :forFood = false OR (:forFood = true AND size(v.voucherFoods) > 0)) AND 
-            (:forCategory IS NULL OR :forCategory = false OR (:forCategory = true AND ( size(v.voucherFoods) > 0))) AND 
-            (:foodIds IS NULL OR (vf.food.id IN (:foodIds) AND vf.isActive = true ) ) AND
-            (:categoryIds IS NULL OR (vc.category.id IN (:categoryIds) AND vc.isActive = true))
-            """
+    @Query("""
+    SELECT v FROM Voucher v
+    WHERE
+    (:status IS NULL OR v.status IN :status) AND 
+    (:search IS NULL OR v.code LIKE CONCAT('%', :search, '%')) AND
+    (:max IS NULL OR (:max = true AND v.maxUse = v.usedCount) OR (:max = false AND v.maxUse > v.usedCount)) AND 
+    (:forFood IS NULL OR :forFood = false OR (:forFood = true AND size(v.voucherFoods) > 0)) AND 
+    (:forCategory IS NULL OR :forCategory = false OR (:forCategory = true AND size(v.voucherCategories) > 0)) AND 
+    (
+        (:foodIds IS NULL OR EXISTS (
+            SELECT 1 FROM VoucherFood vf WHERE vf.voucher = v AND vf.food.id IN :foodIds AND vf.isActive = true
+        )) OR
+        (:userIds IS NULL OR EXISTS (
+            SELECT 1 FROM VoucherUser vu WHERE vu.voucher = v AND vu.userId IN :userIds
+        )) OR
+        (:categoryIds IS NULL OR EXISTS (
+            SELECT 1 FROM VoucherCategory vc WHERE vc.voucher = v AND vc.category.id IN :categoryIds AND vc.isActive = true
+        ))
     )
+""")
+    @EntityGraph(attributePaths = {"voucherUsers", "voucherFoods", "voucherCategories"})
     Page<Voucher> getAllVouchers(
-            List<Integer> userIds,
-            Boolean max,
-            Boolean forFood,
-            Boolean forCategory,
-            List<EStatusVoucher> status,
-                List<Integer> foodIds,
-                List<Integer> categoryIds,
-            String search,
+            @Param("userIds") List<Integer> userIds,
+            @Param("max") Boolean max,
+            @Param("forFood") Boolean forFood,
+            @Param("forCategory") Boolean forCategory,
+            @Param("status") List<EStatusVoucher> status,
+            @Param("foodIds") List<Integer> foodIds,
+            @Param("categoryIds") List<Integer> categoryIds,
+            @Param("search") String search,
             Pageable pageable
     );
+
 
     @Query(
             value = """

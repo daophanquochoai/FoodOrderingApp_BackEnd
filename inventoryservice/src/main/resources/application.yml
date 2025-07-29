@@ -5,5 +5,22 @@ spring:
     import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8071}
   profiles:
     active: dev
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+    properties:
+      security.protocol: PLAINTEXT
+    topic:
+      point : point
+      sender_rollback : food_rollback
 server:
   port: 9003

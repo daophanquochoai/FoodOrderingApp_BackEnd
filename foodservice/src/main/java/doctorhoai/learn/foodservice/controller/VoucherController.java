@@ -39,7 +39,7 @@ public class VoucherController {
         );
     }
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     public ResponseEntity<ResponseObject> getAllVoucher(
             @RequestBody Filter filter
     ){
@@ -50,8 +50,7 @@ public class VoucherController {
                         .build()
         );
     }
-
-    @GetMapping("/{code}")
+    @GetMapping("code/{code}")
     public ResponseEntity<ResponseObject> getVoucherByCode(
             @PathVariable String code
     ){
@@ -63,7 +62,7 @@ public class VoucherController {
         );
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<ResponseObject> getVoucherById(
             @PathVariable Integer id
     )

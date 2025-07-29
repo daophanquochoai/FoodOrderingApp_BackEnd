@@ -3,7 +3,6 @@ package doctorhoai.learn.foodservice.service.voucher;
 import doctorhoai.learn.basedomain.response.PageObject;
 import doctorhoai.learn.foodservice.dto.VoucherDto;
 import doctorhoai.learn.foodservice.dto.filter.Filter;
-import doctorhoai.learn.foodservice.model.enums.EStatusVoucher;
 
 import java.util.List;
 
@@ -17,4 +16,7 @@ public interface VoucherService {
     VoucherDto getVoucherByCode(String code);
 
     VoucherDto getVoucherById(Integer id);
+
+    String updateVoucher( Integer id);
+    String updateRollbackVoucher( Integer id);
 }

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
         configuration = FeignConfig.class
 )
 public interface VoucherFeign {
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     ResponseEntity<ResponseObject> getVoucherById(
             @PathVariable Integer id
     );

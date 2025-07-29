@@ -1,7 +1,7 @@
 package doctorhoai.learn.authservice.business.userservice.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import doctorhoai.learn.authservice.feign.userservice.UserFeign;
+import doctorhoai.learn.authservice.business.userservice.service.user.UserFeign;
 import doctorhoai.learn.authservice.feign.userservice.model.UserDto;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import jakarta.validation.Valid;
@@ -35,7 +35,7 @@ public class UserController {
     @PutMapping("/update/{id}")
     ResponseEntity<ResponseObject> updateUser(
             @PathVariable Integer id,
-            @RequestBody @Valid UserDto userDto
+            @RequestBody UserDto userDto
     ){
         return userFeign.updateUser(id, userDto);
     }
@@ -66,5 +66,12 @@ public class UserController {
             @PathVariable Integer id
     ){
         return userFeign.updateLatestUpdateTime(id);
+    }
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<ResponseObject> getUserByUsername(
+            @PathVariable String username
+    ){
+        return userFeign.getUserByUsername(username);
     }
 }

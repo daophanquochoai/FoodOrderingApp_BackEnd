@@ -10,7 +10,7 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "order")
+@Table(name = "`order`")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -56,7 +56,15 @@ public class Order extends BaseModel implements Serializable {
     @Column(name = "create_by")
     private Integer createBy;
 
+    @Column(name = "name")
+    private String name;
 
-    @OneToMany(mappedBy = "orderId")
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    private String message;
+
+
+    @OneToMany(mappedBy = "orderId", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 }

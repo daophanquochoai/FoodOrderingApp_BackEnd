@@ -30,6 +30,9 @@ public class Voucher extends BaseModel implements Serializable {
     @Enumerated(EnumType.STRING)
     private EDiscountType discountType;
 
+    @Column(name = "discount_value")
+    private Integer discountValue;
+
     @Column(name = "max_discount")
     private Double maxDiscount;
 

@@ -2,8 +2,6 @@ package doctorhoai.learn.orderservice.dto;
 
 import doctorhoai.learn.orderservice.dto.userservice.UserDto;
 import doctorhoai.learn.orderservice.dto.voucherservice.VoucherDto;
-import doctorhoai.learn.orderservice.model.OrderItem;
-import doctorhoai.learn.orderservice.model.Payment;
 import doctorhoai.learn.orderservice.model.enums.EStatusOrder;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -33,6 +31,10 @@ public class OrderDto {
     private EStatusOrder status;
     private Integer tableNumber;
     private UserDto shipperId;
+    private String name;
+    private String phoneNumber;
 
-    private List<OrderItem> orderItems;
+    private Integer point;
+
+    private List<OrderItemDto> orderItems;
 }

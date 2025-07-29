@@ -7,7 +7,6 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import doctorhoai.learn.authservice.feign.userservice.EmployeeFeign;
 import doctorhoai.learn.authservice.feign.userservice.UserFeign;
 import doctorhoai.learn.authservice.feign.userservice.model.EmployeeDto;
-import doctorhoai.learn.authservice.feign.userservice.model.Filter.FilterUser;
 import doctorhoai.learn.authservice.feign.userservice.model.UserDto;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import io.jsonwebtoken.Claims;
@@ -62,7 +61,7 @@ public class JwtutilImpl implements JwtUtil{
                 .registerModule(new ParameterNamesModule())
                 .registerModule(new Jdk8Module())
                 .registerModule(new JavaTimeModule());
-        if( !authorities.get(0).equals("USER")){
+        if( !authorities.get(0).equals("ROLE_USER")){
             data = employmentFeign.getEmployeeWithFilter(null, userDetails.getUsername(),null,null,null);
             if( data.getStatusCode() != HttpStatusCode.valueOf(200)){
                 log.error("Can't get info account");

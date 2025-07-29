@@ -1,5 +1,6 @@
 package doctorhoai.learn.userservice.service.user;
 
+import doctorhoai.learn.basedomain.response.ResponseObject;
 import doctorhoai.learn.userservice.dto.Filter.Filter;
 import doctorhoai.learn.userservice.dto.Filter.FilterUser;
 import doctorhoai.learn.userservice.dto.UserDto;
@@ -7,6 +8,8 @@ import doctorhoai.learn.userservice.exception.exception.EmailDuplicate;
 import doctorhoai.learn.userservice.exception.exception.PhoneNumberDuplicate;
 import doctorhoai.learn.userservice.exception.exception.RoleNotFound;
 import doctorhoai.learn.userservice.exception.exception.UserNotFound;
+import doctorhoai.learn.userservice.feign.model.PointDto;
+import doctorhoai.learn.userservice.feign.orderservice.PointFeign;
 import doctorhoai.learn.userservice.model.Role;
 import doctorhoai.learn.userservice.model.User;
 import doctorhoai.learn.userservice.repository.EmployeeRepository;
@@ -14,9 +17,11 @@ import doctorhoai.learn.userservice.repository.RoleRepository;
 import doctorhoai.learn.userservice.repository.UserRepository;
 import doctorhoai.learn.userservice.utils.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.ErrorResponseException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,12 +35,13 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final EmployeeRepository employeeRepository;
+    private final PointFeign pointFeign;
 
 
     @Override
     @Transactional
     public UserDto addUser(UserDto userDto) {
-        checkInfoUser(userDto);
+        checkInfoUser(userDto, null);
         Role role = roleRepository.findByRoleName(userDto.getRole().getRoleName()).orElseThrow(RoleNotFound::new);
         User user = mapper.convertToUser(userDto);
 
@@ -49,14 +55,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(UserDto userDto, Integer id) {
-        checkInfoUser(userDto);
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFound(id.toString(), "id"));
+        checkInfoUser(userDto, user);
         user.setName(userDto.getName());
         user.setImage(userDto.getImage());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setPhoneNumber(String.valueOf(userDto.getPhoneNumber()));
-        user.setIsActive(userDto.getIsActive());
-
+        user.setEmail(userDto.getEmail());
         User userSaved = userRepository.save(user);
         return mapper.convertToUserDto(userSaved);
     }
@@ -107,14 +111,23 @@ public class UserServiceImpl implements UserService {
         return mapper.convertToUserDto(user);
     }
 
-    public void checkInfoUser(UserDto userDto) {
-        if( employeeRepository.findByEmailAndIsActive(userDto.getEmail(), true).isPresent() ) {
+    public void checkInfoUser(UserDto userDto, User user) {
+        if(
+                employeeRepository.findByEmailAndIsActive(userDto.getEmail(), true).isPresent() &&
+                        (user == null || !userDto.getEmail().equals(user.getEmail()) )
+        ) {
             throw new EmailDuplicate();
         }
-        if(userRepository.findByEmailAndIsActive(userDto.getEmail(), true).isPresent()){
+        if(
+                userRepository.findByEmailAndIsActive(userDto.getEmail(), true).isPresent() &&
+                        ( user == null || !userDto.getEmail().equals(user.getEmail()))
+        ){
             throw new EmailDuplicate();
         }
-        if(userRepository.findByPhoneNumberAndIsActive(userDto.getPhoneNumber(), true).isPresent()){
+        if(
+                userRepository.findByPhoneNumberAndIsActive(userDto.getPhoneNumber(), true).isPresent() &&
+                        (user == null || !userDto.getPhoneNumber().equals(user.getPhoneNumber()))
+        ){
             throw new PhoneNumberDuplicate();
         };
 
