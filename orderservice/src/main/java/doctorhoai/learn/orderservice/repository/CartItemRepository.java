@@ -36,5 +36,14 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
             """
     )
     List<CartItem> getCartItemByIds( List<Integer> ids );
+
+    @Query(
+            value = """
+            SELECT ci FROM CartItem ci WHERE
+            (ci.cartId.userId = :userId) AND 
+            (ci.isActive = true)
+            """
+    )
+    List<CartItem> getCartItemByCartToUpdate( Integer userId);
 }
 

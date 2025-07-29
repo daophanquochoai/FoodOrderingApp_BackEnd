@@ -12,12 +12,14 @@ public class Mapper {
                 .id(payment.getId())
                 .methodName(payment.getMethodName())
                 .isActive(payment.getIsActive())
+                .code(payment.getCode())
                 .build();
     }
 
     public Payment convertToPayment(PaymentDto paymentDto){
         return Payment.builder()
                 .methodName(paymentDto.getMethodName())
+                .code(paymentDto.getCode())
                 .isActive(paymentDto.getIsActive())
                 .build();
     }

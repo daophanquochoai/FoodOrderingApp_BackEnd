@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class IngredientsUseDto {
     private Integer id;
     private EUnitType unit;
-    private Integer quantity;
-    private Integer orderItemId;
+    private Float quantity;
+    private Integer orderId;
     private Boolean isActive;
 }

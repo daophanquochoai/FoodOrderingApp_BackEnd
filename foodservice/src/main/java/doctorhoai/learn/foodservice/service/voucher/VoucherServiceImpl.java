@@ -27,10 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -68,13 +65,13 @@ public class VoucherServiceImpl implements VoucherService {
             pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()));
         }
         Page<Voucher> vouchers = voucherRepository.getAllVouchers(
-            filter.getId(),
+            filter.getId() == null || filter.getId().isEmpty() ? null : filter.getId(),
             filter.getMax(),
             filter.getForFood(),
             filter.getForCategory(),
             filter.getStatusVouchers(),
-            filter.getFoodIds(),
-            filter.getCategoryIds(),
+            filter.getFoodIds() == null || filter.getFoodIds().isEmpty() ? null :filter.getFoodIds(),
+            filter.getCategoryIds() == null || filter.getCategoryIds().isEmpty() ? null :filter.getCategoryIds(),
             filter.getSearch(),
             pageable
         );
@@ -156,6 +153,38 @@ public class VoucherServiceImpl implements VoucherService {
         return convertVoucher(voucher);
     }
 
+    @Override
+    public String updateVoucher(Integer id) {
+        Voucher data = findVoucher(id);
+        if( data.getMaxDiscount() > data.getUsedCount() ){
+            data.setUsedCount(data.getUsedCount() + 1);
+            voucherRepository.save(data);
+            return "";
+        }else {
+            return "Voucher was max";
+        }
+    }
+
+    public Voucher findVoucher ( Integer id ){
+        Optional<Voucher> v = voucherRepository.findById(id);
+        if( v.isEmpty()){
+            throw new VoucherNotFoundException();
+        }
+        return v.get();
+    }
+
+    @Override
+    public String updateRollbackVoucher(Integer id) {
+        Voucher data = findVoucher(id);
+        if( data.getUsedCount() - 1 > 0){
+            data.setUsedCount(data.getUsedCount() - 1);
+            voucherRepository.save(data);
+            return "";
+        }else {
+            return "Voucher use equals 0";
+        }
+    }
+
     private List<VoucherDto> convertListVoucher(List<Voucher> vouchers) {
         return vouchers.stream().map(this::convertVoucher).toList();
     }
@@ -179,15 +208,6 @@ public class VoucherServiceImpl implements VoucherService {
                 }
             }
             voucherDto.setCategories(categoryDtos);
-        }
-        if( v.getVoucherUsers() != null && !v.getVoucherUsers().isEmpty()){
-            List<UserDto> userDtos = new ArrayList<>();
-            for(VoucherUser voucherUser : v.getVoucherUsers()){
-                if( voucherUser != null){
-                    userDtos.add(UserDto.builder().id(voucherUser.getUserId()).build());
-                }
-            }
-            voucherDto.setUsers(userDtos);
         }
         return voucherDto;
     }

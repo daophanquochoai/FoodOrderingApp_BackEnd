@@ -7,7 +7,6 @@ import doctorhoai.learn.inventoryservice.model.HistoryIngredients;
 import doctorhoai.learn.inventoryservice.model.enums.EUnitType;
 import doctorhoai.learn.inventoryservice.repository.FoodIngredientsRepository;
 import doctorhoai.learn.inventoryservice.repository.HistoryIngredientsRepository;
-import doctorhoai.learn.inventoryservice.repository.IngredientsUserRepository;
 import doctorhoai.learn.inventoryservice.utils.ExchangeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

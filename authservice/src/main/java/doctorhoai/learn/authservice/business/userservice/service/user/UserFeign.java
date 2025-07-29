@@ -56,4 +56,8 @@ public interface UserFeign {
     ResponseEntity<ResponseObject> updateLatestUpdateTime(
             @PathVariable Integer id
     );
+    @GetMapping("/username/{username}")
+    ResponseEntity<ResponseObject> getUserByUsername(
+            @PathVariable String username
+    );
 }

@@ -14,5 +14,6 @@ public class PaymentDto {
     private Integer id;
     @NotBlank(message = "Method name can't empty")
     private String methodName;
+    private String code;
     private Boolean isActive;
 }

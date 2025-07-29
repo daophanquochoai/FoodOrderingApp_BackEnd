@@ -10,7 +10,7 @@
         <module name="apigateway" />
         <module name="configserver" />
       </profile>
-      <profile name="Annotation profile for authservice" enabled="true">
+      <profile name="Annotation profile for userservice" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -20,8 +20,8 @@
         <module name="aiservice" />
         <module name="authservice" />
         <module name="eureka" />
-        <module name="BaseDomain" />
         <module name="userservice" />
+        <module name="BaseDomain" />
         <module name="inventoryservice" />
         <module name="foodservice" />
         <module name="orderservice" />

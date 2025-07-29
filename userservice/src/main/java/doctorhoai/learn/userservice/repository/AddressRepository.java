@@ -18,7 +18,7 @@ public interface AddressRepository extends JpaRepository<Address, Integer> {
             SELECT a FROM Address a WHERE 
             (:search IS NULL OR a.address like concat('%', :search, '%') OR a.commune like concat('%', :search, '%') OR a.province like concat('%', :search, '%')) AND 
             (:isActive IS NULL OR a.isActive = :isActive) AND 
-            (:userId IS NULL OR a.userId = :userId)
+            (:userId IS NULL OR a.userId.id = :userId)
             """
     )
     Page<Address> getAddressByFilter(

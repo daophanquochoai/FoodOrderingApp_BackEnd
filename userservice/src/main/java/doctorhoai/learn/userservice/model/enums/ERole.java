@@ -1,10 +1,10 @@
 package doctorhoai.learn.userservice.model.enums;
 
 public enum ERole {
-    ADMIN,
-    CHEF,
-    USER,
-    SHIPPER,
-    SALE,
-    WAREHOUSE,
+    ROLE_ADMIN,
+    ROLE_CHEF,
+    ROLE_USER,
+    ROLE_SHIPPER,
+    ROLE_SALE,
+    ROLE_WAREHOUSE,
 }

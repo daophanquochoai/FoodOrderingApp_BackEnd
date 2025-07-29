@@ -42,7 +42,7 @@ public class PaymentController {
          );
      }
 
-     @GetMapping("/all")
+     @PostMapping("/all")
     public ResponseEntity<ResponseObject> getAllPayments(
              @RequestBody Filter filter
              ) {

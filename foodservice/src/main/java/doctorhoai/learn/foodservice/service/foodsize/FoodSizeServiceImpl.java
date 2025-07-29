@@ -143,7 +143,11 @@ public class FoodSizeServiceImpl implements FoodSizeService {
     private List<FoodSizeDto> convertListFoodSize(List<FoodSize> foodSizes){
         List<FoodSizeDto> foodSizeDtos = new ArrayList<>();
         for( FoodSize fs : foodSizes){
-            foodSizeDtos.add(convertToFoodSizeDto(fs));
+            FoodSizeDto foodSizeDto = convertToFoodSizeDto(fs);
+            if( fs.getFood() != null && fs.getFood().getCategory() != null){
+                foodSizeDto.getFoodId().setCategory(mapper.covertToCategoryDto(fs.getFood().getCategory()));
+            }
+            foodSizeDtos.add(foodSizeDto);
         }
         return foodSizeDtos;
     }

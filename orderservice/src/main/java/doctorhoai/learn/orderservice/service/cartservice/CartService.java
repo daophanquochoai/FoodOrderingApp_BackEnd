@@ -9,4 +9,5 @@ public interface CartService {
     void addCartItemIntoCart(CartItemDto cartItemDto, String username);
     void removeCartItemFromCart(Integer cartItemId, String name);
     PageObject getCartByUsername(String username, Filter filter);
+    void createCart(Integer userId);
 }

@@ -135,7 +135,7 @@ public class Mapper {
     public IngredientsUseDto convertToIngredientsUseDto(IngredientsUse ingredientsUse){
         return IngredientsUseDto.builder()
                 .id(ingredientsUse.getId())
-                .orderItemId(ingredientsUse.getOrderItemId())
+                .orderId(ingredientsUse.getOrderId())
                 .unit(ingredientsUse.getUnit())
                 .quantity(ingredientsUse.getQuantity())
                 .isActive(ingredientsUse.getIsActive())

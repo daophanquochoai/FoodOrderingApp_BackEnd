@@ -10,7 +10,6 @@ import doctorhoai.learn.foodservice.dto.filter.Filter;
 import doctorhoai.learn.foodservice.exception.CategoryNotFoundException;
 import doctorhoai.learn.foodservice.exception.FoodNotFoundException;
 import doctorhoai.learn.foodservice.exception.SizeNotFoundException;
-import doctorhoai.learn.foodservice.kafka.proceducer.FoodEvent;
 import doctorhoai.learn.foodservice.model.Category;
 import doctorhoai.learn.foodservice.model.Food;
 import doctorhoai.learn.foodservice.model.FoodSize;
@@ -39,7 +38,6 @@ public class FoodServiceImpl implements FoodService {
     private final FoodRepository foodRepository;
     private final CategoryRepository categoryRepository;
     private final Mapper mapper;
-    private final FoodEvent foodEvent;
     private final SizeRepository sizeRepository;
 
 
@@ -121,7 +119,6 @@ public class FoodServiceImpl implements FoodService {
         }
         food = foodRepository.save(food);
         FoodDto foodDto = convertListFood(food);
-        foodEvent.sendEventToTopic(MessageTemplate.<FoodDto>builder().data(foodDto).messageType(EMessageType.CREATE_FOOD).build());
         return foodDto;
     }
 
@@ -170,9 +167,8 @@ public class FoodServiceImpl implements FoodService {
         }
         food = foodRepository.save(food);
         if( food.getStatus() == EStatusFood.DELETE || food.getStatus() == EStatusFood.OUT_STOCK){
-            foodEvent.sendEventToTopic(MessageTemplate.<FoodDto>builder().data(foodDto).messageType(EMessageType.DELETE_FOOD).build());
+            // TODO semantic search
         }else{
-            foodEvent.sendEventToTopic(MessageTemplate.<FoodDto>builder().data(foodDto).messageType(EMessageType.UPDATE_FOOD).build());
         }
         return convertListFood(food);
     }

@@ -23,6 +23,8 @@ public class VoucherDto {
     private String code;
     @NotNull(message = "Discount type can't empty")
     private EDiscountType discountType;
+    @Min( value = 0, message = "Discount value should high than 0")
+    private Integer discountValue;
     private Double maxDiscount;
     @Min( value = 0, message = "Max use should high than 0")
     private Integer maxUse;
@@ -33,6 +35,7 @@ public class VoucherDto {
     @NotNull(message = "End date can't empty")
     private LocalDate endDate;
     private EStatusVoucher status;
+    private String desc;
 
     private List<FoodDto> foods;
     private List<CategoryDto> categories;

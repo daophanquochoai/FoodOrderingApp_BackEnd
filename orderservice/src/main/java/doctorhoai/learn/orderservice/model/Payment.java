@@ -24,6 +24,9 @@ public class Payment extends BaseModel implements Serializable {
     @Column(name = "method_name")
     private String methodName;
 
+    @Column(name = "code")
+    private String code;
+
     @Column(name = "is_active")
     private Boolean isActive;
 }

@@ -55,4 +55,16 @@ public class CartController {
                         .build()
         );
     }
+
+    @PostMapping("/cart/{userId}")
+    public ResponseEntity<ResponseObject> createCart(
+            @PathVariable Integer userId
+    ){
+        cartService.createCart(userId);
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.CREATE_CART_SUCCESSFUL.getMessage())
+                        .build()
+        );
+    }
 }

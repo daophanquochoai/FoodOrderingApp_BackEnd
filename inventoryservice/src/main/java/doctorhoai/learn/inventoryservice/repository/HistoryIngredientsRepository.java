@@ -16,7 +16,9 @@ public interface HistoryIngredientsRepository extends JpaRepository<HistoryIngre
             SELECT hi FROM HistoryIngredients hi
             WHERE 
             (hi.isActive = true) AND 
-            (hi.quantity > hi.usedUnit) order by hi.createdAt desc 
+            (hi.quantity > hi.usedUnit) AND 
+            (:ingredientIds IS NULL OR hi.ingredientsId.id IN :ingredientIds)
+            order by hi.createdAt desc 
             """
     )
     List<HistoryIngredients> getIngredientsInInventory(

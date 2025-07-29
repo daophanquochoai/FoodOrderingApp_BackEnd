@@ -11,6 +11,11 @@ public enum EMessageResponse {
 
     GET_SHIPPING_FEE_CONFIG_SUCCESSFUL("Get shipping fee config successful"),
     CREATE_SHIPPING_FEE_SUCCESSFUL("Create shipping fee successful"),
+
+    ORDER_SUCCESSFUL("Order successful"),
+
+    GET_POINT_SUCCESSFUL("Get point successful"),
+    CREATE_POINT_SUCCESSFUL("Create point successful"),
     ;
 
     private String message;

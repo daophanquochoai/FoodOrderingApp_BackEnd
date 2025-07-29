@@ -29,7 +29,7 @@ public class VoucherController {
         return voucherFeign.addVoucher(voucherDto);
     }
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     ResponseEntity<ResponseObject> getAllVoucher(
             @RequestBody Filter filter
     ){

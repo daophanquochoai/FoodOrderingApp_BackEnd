@@ -9,10 +9,19 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
     properties:
       security.protocol: PLAINTEXT
     topic:
-      name: food
+      inventory : inventory
+      order_rollback : order_rollback
     bootstrap-servers: ${SPRING_URL_KAFKA:localhost:9092}
 server:
   port: 9002

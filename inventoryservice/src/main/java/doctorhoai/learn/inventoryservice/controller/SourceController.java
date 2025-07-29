@@ -28,7 +28,7 @@ public class SourceController {
         );
     }
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     public ResponseEntity<ResponseObject> getAllSource(
             @RequestBody Filter filter
             ){
