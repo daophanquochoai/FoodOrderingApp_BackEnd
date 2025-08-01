@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/voucher")
 @RequiredArgsConstructor
@@ -71,6 +73,19 @@ public class VoucherController {
                 ResponseObject.builder()
                         .message(EMessageResponse.GET_VOUCHER.getMessage())
                         .data(voucherService.getVoucherById(id))
+                        .build()
+        );
+    }
+
+    @PostMapping("/get/mul")
+    public ResponseEntity<ResponseObject> getVoucherByMul(
+            @RequestBody List<Integer> ids
+            )
+    {
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.GET_VOUCHER.getMessage())
+                        .data(voucherService.getVoucherByIds(ids))
                         .build()
         );
     }

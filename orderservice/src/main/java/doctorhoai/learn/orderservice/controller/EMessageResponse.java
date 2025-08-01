@@ -13,6 +13,7 @@ public enum EMessageResponse {
     CREATE_SHIPPING_FEE_SUCCESSFUL("Create shipping fee successful"),
 
     ORDER_SUCCESSFUL("Order successful"),
+    GET_ORDER_SUCCESSFUL("Get order successful"),
 
     GET_POINT_SUCCESSFUL("Get point successful"),
     CREATE_POINT_SUCCESSFUL("Create point successful"),

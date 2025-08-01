@@ -1,6 +1,8 @@
 package doctorhoai.learn.userservice.repository;
 
 import doctorhoai.learn.userservice.model.Employee;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,20 +19,23 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     @Query(
             value = """
-            SELECT e FROM Employee e WHERE
-            (:search IS NULL OR e.name like CONCAT('%',:search,'%') OR e.cccd like CONCAT('%',:search,'%') OR e.email like CONCAT('%',:search,'%')) AND 
-            (:isActive IS NULL OR e.isActive = :isActive) AND 
-            (:isLogin IS NULL OR (:isLogin = true AND e.lastLogin IS NOT NULL) OR  (:isLogin = false AND e.lastLogin IS NULL)) AND 
-            (:startDate IS NULL OR e.createdAt > :startDate) AND
-            (:endDate IS NULL OR e.createdAt < :endDate)
+            SELECT e FROM Employee e where 
+            (:startDate IS NULL OR e.lastLogin >= :startDate) AND 
+            (:endDate IS NULL OR e.lastLogin <= :endDate) AND
+            (:email IS NULL OR e.email in :email) AND 
+            (:search IS NULL OR e.name LIKE CONCAT('%', :search, '%') OR e.cccd LIKE CONCAT('%', :search, '%') OR e.email LIKE CONCAT('%', :search, '%') ) AND
+            (:cccd IS NULL OR e.cccd in :cccd) AND
+            (:isActive IS NULL OR e.isActive in :isActive)
             """
     )
-    List<Employee> getListByFilter(
-            String search,
-            Boolean isLogin,
-            Boolean isActive,
+    Page<Employee> getEmployeeByFilter(
             LocalDateTime startDate,
-            LocalDateTime endDate
+            LocalDateTime endDate,
+            List<String> email,
+            String search,
+            List<String> cccd,
+            List<Boolean> isActive,
+            Pageable pageable
     );
 
     @Query(

@@ -7,5 +7,5 @@ import doctorhoai.learn.orderservice.dto.filter.Filter;
 public interface OrderService {
     OrderDto save(OrderDto orderDto);
     OrderDto update(OrderDto orderDto, Integer id);
-    PageObject getVoucherAll(Filter filter);
+    PageObject getOrderByFilter(Filter filter);
 }

@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -31,4 +33,5 @@ public class EmployeeDto {
     @NotBlank(message = "Email can't be blank")
     @Email(message = "Invalid email format")
     private String email;
+    private LocalDateTime lastLogin;
 }

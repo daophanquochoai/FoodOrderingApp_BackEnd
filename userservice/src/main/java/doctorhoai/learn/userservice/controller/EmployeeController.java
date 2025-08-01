@@ -2,6 +2,7 @@ package doctorhoai.learn.userservice.controller;
 
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import doctorhoai.learn.userservice.controller.contanst.EMessageResponse;
+import doctorhoai.learn.userservice.dto.ChangePassword;
 import doctorhoai.learn.userservice.dto.EmployeeDto;
 import doctorhoai.learn.userservice.dto.Filter.Filter;
 import doctorhoai.learn.userservice.dto.Filter.FilterUser;
@@ -32,14 +33,14 @@ public class EmployeeController {
         );
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseObject> getEmployeeById(
-            @PathVariable Integer id
+    @GetMapping("/{username}")
+    ResponseEntity<ResponseObject> getEmployeeById(
+            @PathVariable String username
     ){
         return ResponseEntity.ok(
                 ResponseObject.builder()
                         .message(EMessageResponse.GET_EMPLOYEE.getMessage())
-                        .data(employeeService.getEmployeeById(id))
+                        .data(employeeService.getEmployeeByUsername(username))
                         .build()
         );
     }
@@ -74,19 +75,10 @@ public class EmployeeController {
         );
     }
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     public ResponseEntity<ResponseObject> getListEmployeeWithFilter(
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) Boolean isActive,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate
+            @RequestBody Filter filter
     ){
-        Filter filter = Filter.builder()
-                .search(search)
-                .isActive(isActive)
-                .startDate(startDate)
-                .endDate(endDate)
-                .build();
         return ResponseEntity.ok(
                 ResponseObject.builder()
                         .message(EMessageResponse.GET_USER.getMessage())
@@ -103,6 +95,19 @@ public class EmployeeController {
                 ResponseObject.builder()
                         .message(EMessageResponse.UPDATE_EMPLOYEE.getMessage())
                         .data(employeeService.updateLateLoginEmployee(id))
+                        .build()
+        );
+    }
+
+    @PutMapping("/update/password/{username}")
+    public ResponseEntity<ResponseObject> updatePassword(
+            @PathVariable String username,
+            @RequestBody ChangePassword password
+    ) {
+        employeeService.updatePassword(username,password);
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.UPDATE_EMPLOYEE.getMessage())
                         .build()
         );
     }

@@ -1,5 +1,7 @@
 package doctorhoai.learn.authservice.business.userservice.service.employee;
 
+import doctorhoai.learn.authservice.business.userservice.model.ChangePassword;
+import doctorhoai.learn.authservice.business.userservice.model.Filter;
 import doctorhoai.learn.authservice.feign.function.HandleFallBack;
 import doctorhoai.learn.authservice.feign.userservice.model.EmployeeDto;
 import doctorhoai.learn.basedomain.response.ResponseObject;
@@ -25,7 +27,7 @@ public class EmployeeFeignFallback implements FallbackFactory<EmployeeFeign> {
             }
 
             @Override
-            public ResponseEntity<ResponseObject> getEmployeeById(Integer id) {
+            public ResponseEntity<ResponseObject> getEmployeeById(String username) {
                 return fallBack.processFallback(cause);
             }
 
@@ -40,12 +42,17 @@ public class EmployeeFeignFallback implements FallbackFactory<EmployeeFeign> {
             }
 
             @Override
-            public ResponseEntity<ResponseObject> getListEmployeeWithFilter(String search, Boolean isActive, LocalDate startDate, LocalDate endDate) {
+            public ResponseEntity<ResponseObject> getListEmployeeWithFilter(Filter filter) {
                 return fallBack.processFallback(cause);
             }
 
             @Override
             public ResponseEntity<ResponseObject> getLateLoginEmployee(Integer id) {
+                return fallBack.processFallback(cause);
+            }
+
+            @Override
+            public ResponseEntity<ResponseObject> updatePassword(String email, ChangePassword newPassword) {
                 return fallBack.processFallback(cause);
             }
         };

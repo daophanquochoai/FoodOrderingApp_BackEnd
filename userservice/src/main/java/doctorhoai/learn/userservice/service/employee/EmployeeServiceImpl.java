@@ -1,12 +1,11 @@
 package doctorhoai.learn.userservice.service.employee;
 
+import doctorhoai.learn.basedomain.response.PageObject;
+import doctorhoai.learn.userservice.dto.ChangePassword;
 import doctorhoai.learn.userservice.dto.EmployeeDto;
 import doctorhoai.learn.userservice.dto.Filter.Filter;
 import doctorhoai.learn.userservice.dto.Filter.FilterUser;
-import doctorhoai.learn.userservice.exception.exception.CCCDDuplicate;
-import doctorhoai.learn.userservice.exception.exception.EmailDuplicate;
-import doctorhoai.learn.userservice.exception.exception.EmployeeNotFound;
-import doctorhoai.learn.userservice.exception.exception.RoleNotFound;
+import doctorhoai.learn.userservice.exception.exception.*;
 import doctorhoai.learn.userservice.model.Employee;
 import doctorhoai.learn.userservice.model.Role;
 import doctorhoai.learn.userservice.repository.EmployeeRepository;
@@ -14,6 +13,10 @@ import doctorhoai.learn.userservice.repository.RoleRepository;
 import doctorhoai.learn.userservice.repository.UserRepository;
 import doctorhoai.learn.userservice.utils.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDto addEmployee(EmployeeDto employeeDto) {
-        checkInfoEmployee(employeeDto);
+        checkInfoEmployee(employeeDto , null);
         Role role = roleRepository.findByRoleName(employeeDto.getRole().getRoleName()).orElseThrow(RoleNotFound::new);
 
         Employee employee = mapper.convertToEmployee(employeeDto);
@@ -45,9 +48,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDto updateEmployee(EmployeeDto employeeDto, Integer id) {
-        checkInfoEmployee(employeeDto);
         Employee employee = employeeRepository.findById(id).orElseThrow(EmployeeNotFound::new);
-        employee.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
+        checkInfoEmployee(employeeDto, employee);
         employee.setName(employeeDto.getName());
         employee.setEmail(employeeDto.getEmail());
         employee.setIsActive(employeeDto.getIsActive());
@@ -69,8 +71,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDto getEmployeeById(Integer id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(EmployeeNotFound::new);
+    public EmployeeDto getEmployeeByUsername(String username) {
+        Employee employee = employeeRepository.findByEmailAndIsActive(username, true).orElseThrow(EmployeeNotFound::new);
         return mapper.convertToEmployeeDto(employee);
     }
 
@@ -81,24 +83,52 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeDto> getAllEmployees(Filter filter) {
-        List<Employee> employeeList = employeeRepository.getListByFilter(filter.getSearch(),
-                filter.getIsLogin(),
-                filter.getIsActive(),
+    public PageObject getAllEmployees(Filter filter) {
+
+        Pageable pageable ;
+        if( filter.getSort().equals("desc")){
+            pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()).descending());
+        }else{
+            pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()));
+        }
+
+
+        Page<Employee> employeeList = employeeRepository.getEmployeeByFilter(
                 filter.getStartDate() == null ? null : filter.getStartDate().atStartOfDay(),
-                filter.getEndDate() == null ? null : filter.getEndDate().plusDays(1).atStartOfDay()
+                filter.getEndDate() == null ? null : filter.getEndDate().plusDays(1).atStartOfDay(),
+                filter.getEmail() == null || filter.getEmail().isEmpty() ? null : filter.getEmail(),
+                filter.getSearch(),
+                filter.getCccd() == null || filter.getCccd().isEmpty() ? null : filter.getCccd(),
+                filter.getIsActiveEmploy() == null || filter.getIsActiveEmploy().isEmpty() ? null : filter.getIsActiveEmploy(),
+                pageable
         );
-        return employeeList.stream().map(mapper::convertToEmployeeDto).toList();
+        return PageObject.builder()
+                .page(filter.getPageNo())
+                .totalPage(employeeList.getNumberOfElements())
+                .data(employeeList.getContent().stream().map(mapper::convertToEmployeeDto).toList())
+                .build();
     }
 
-    private void checkInfoEmployee(EmployeeDto employeeDto){
-        if( userRepository.findByEmailAndIsActive(employeeDto.getEmail(), true).isPresent() ) {
+    @Override
+    public void updatePassword(String username, ChangePassword newPassword) {
+        Employee employee = employeeRepository.findByEmailAndIsActive(username, true).orElseThrow(EmployeeNotFound::new);
+        boolean match = passwordEncoder.matches(newPassword.getOldPassword(), employee.getPassword());
+        if(match){
+            employee.setPassword(passwordEncoder.encode(newPassword.getNewPassword()));
+            employeeRepository.save(employee);
+        }else{
+            throw new PasswordNotCorrect();
+        }
+    }
+
+    private void checkInfoEmployee(EmployeeDto employeeDto, Employee employee){
+        if( userRepository.findByEmailAndIsActive(employeeDto.getEmail(), true).isPresent() &&  ( employee == null || !employee.getEmail().equals(employeeDto.getEmail())) ) {
             throw new EmailDuplicate();
         }
-        if( employeeRepository.findByCccdAndIsActive(employeeDto.getCccd(), true).isPresent() ) {
+        if( employeeRepository.findByCccdAndIsActive(employeeDto.getCccd(), true).isPresent() && (employee == null ||!employee.getCccd().equals(employeeDto.getCccd())) ) {
             throw new CCCDDuplicate();
         }
-        if( employeeRepository.findByEmailAndIsActive(employeeDto.getEmail(), true).isPresent() ) {
+        if( employeeRepository.findByEmailAndIsActive(employeeDto.getEmail(), true).isPresent() && ( employee == null || !employee.getEmail().equals(employeeDto.getEmail())) ) {
             throw new EmailDuplicate();
         }
         if( employeeDto.getRole() == null ) {

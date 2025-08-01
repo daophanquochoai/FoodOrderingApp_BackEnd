@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -37,4 +38,9 @@ public class OrderDto {
     private Integer point;
 
     private List<OrderItemDto> orderItems;
+
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
+    private String nameUpdated;
+    private String message;
 }

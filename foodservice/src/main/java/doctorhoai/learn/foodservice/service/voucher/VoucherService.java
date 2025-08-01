@@ -19,4 +19,6 @@ public interface VoucherService {
 
     String updateVoucher( Integer id);
     String updateRollbackVoucher( Integer id);
+
+    List<VoucherDto> getVoucherByIds(List<Integer> ids);
 }

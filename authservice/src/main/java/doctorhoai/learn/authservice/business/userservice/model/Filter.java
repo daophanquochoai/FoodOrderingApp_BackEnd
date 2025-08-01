@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -24,4 +25,8 @@ public class Filter {
     private Integer pageSize;
     private Integer userId;
 
+    private List<String> email;
+    private List<String> phoneNumber;
+    private List<String> cccd;
+    private List<Boolean> isActiveEmploy;
 }

@@ -23,4 +23,7 @@ public class Filter {
     private Integer deep;
     private List<Integer> id;
     private Boolean isActive;
+
+    private List<EStatusOrder> statusOrders;
+    private Boolean type;
 }

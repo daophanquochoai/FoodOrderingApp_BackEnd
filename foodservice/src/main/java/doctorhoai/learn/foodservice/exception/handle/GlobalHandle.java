@@ -1,21 +1,16 @@
-package doctorhoai.learn.authservice.exception.handle;
+package doctorhoai.learn.foodservice.exception.handle;
 
-import doctorhoai.learn.authservice.exception.UnAuthorizedException;
 import doctorhoai.learn.basedomain.exception.BadException;
 import doctorhoai.learn.basedomain.exception.Duplicate;
 import doctorhoai.learn.basedomain.exception.NotFound;
 import doctorhoai.learn.basedomain.exception.ResponseException;
 import feign.FeignException;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
 import jakarta.ws.rs.BadRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -58,23 +53,6 @@ public class GlobalHandle extends ResponseEntityExceptionHandler {
         );
     }
 
-    @ExceptionHandler(exception = {
-            UnAuthorizedException.class,
-            BadRequestException.class,
-            ExpiredJwtException.class,
-            BadCredentialsException.class,
-            MalformedJwtException.class,
-            DisabledException.class
-    })
-    public <T extends RuntimeException>ResponseEntity<ResponseException> handleApiRequestException( final T e){
-        log.info("**ApiExceptionHandler controller, handle Api request**");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-               ResponseException.builder()
-                       .message("Bad Credentials")
-                       .timestamp(LocalDateTime.now())
-                       .build()
-        );
-    }
     @ExceptionHandler(value = {Duplicate.class})
     public ResponseEntity<ResponseException> handleDuplicate(Duplicate exception) {
         log.info("**ApiExceptionHandler controller, handle duplicate**");

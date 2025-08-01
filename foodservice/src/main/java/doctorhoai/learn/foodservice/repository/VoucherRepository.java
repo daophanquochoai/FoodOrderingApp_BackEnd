@@ -75,4 +75,13 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
     Optional<Voucher> getVoucherByCode(String code);
 
     Optional<Voucher> getVoucherByIdAndStatus(Integer id, EStatusVoucher status);
+
+    @Query(
+            value = """
+            SELECT v FROM Voucher v WHERE
+            (:isActive IS NULL OR v.status = :isActive) AND
+            (:ids IS NULL OR v.id IN :ids)
+            """
+    )
+    List<Voucher> getVoucherByIds(List<Integer> ids, Boolean isActive);
 }

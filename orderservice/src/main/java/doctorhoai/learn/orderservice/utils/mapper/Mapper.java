@@ -69,17 +69,17 @@ public class Mapper {
                 .build();
     }
 
-    public Order convertToOrder(OrderDto orderDto){
-        return Order.builder()
-                .userId(orderDto.getUserId().getId())
-                .totalPrice(orderDto.getTotalPrice())
-                .transactionCode(orderDto.getTransactionCode())
-                .status(orderDto.getStatus())
-                .address(orderDto.getAddress())
-                .shipFee(orderDto.getShipFee())
-                .tableNumber(orderDto.getTableNumber())
-                .build();
-    }
+//    public Order convertToOrder(OrderDto orderDto){
+//        return Order.builder()
+//                .userId(orderDto.getUserId().getId())
+//                .totalPrice(orderDto.getTotalPrice())
+//                .transactionCode(orderDto.getTransactionCode())
+//                .status(orderDto.getStatus())
+//                .address(orderDto.getAddress())
+//                .shipFee(orderDto.getShipFee())
+//                .tableNumber(orderDto.getTableNumber())
+//                .build();
+//    }
 
     public OrderDto convertToOrderDto(Order order){
         return OrderDto.builder()
@@ -90,6 +90,12 @@ public class Mapper {
                 .status(order.getStatus())
                 .shipFee(order.getShipFee())
                 .tableNumber(order.getTableNumber())
+                .createTime(order.getCreatedAt())
+                .updateTime(order.getLateUpdateTime())
+                .message(order.getMessage())
+                .name(order.getName())
+                .phoneNumber(order.getPhoneNumber())
+                .createTime(order.getCreatedAt())
                 .build();
     }
 

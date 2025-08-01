@@ -136,7 +136,7 @@ public class FoodSizeServiceImpl implements FoodSizeService {
 
     @Override
     public List<FoodSizeDto> getFoodSizeList(List<Integer> idsFood) {
-        List<FoodSize> foodSizes = foodSizeRepository.getFoodSizeByIdsAndIsActive(idsFood, true);
+        List<FoodSize> foodSizes = foodSizeRepository.getFoodSizeByIdsAndIsActive(idsFood, null); // can check neu order
         return convertListFoodSize(foodSizes);
     }
 

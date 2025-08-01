@@ -1,5 +1,6 @@
 package doctorhoai.learn.orderservice.dto.filter;
 
+import doctorhoai.learn.orderservice.model.enums.EStatusOrder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,4 +24,7 @@ public class Filter {
     private Integer deep;
     private List<Integer> id;
     private Boolean isActive;
+
+    private List<EStatusOrder> statusOrders;
+    private Boolean type;
 }

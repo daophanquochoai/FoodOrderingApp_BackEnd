@@ -68,6 +68,7 @@ public class Mapper {
                 .cccd(employee.getCccd())
                 .password(null)
                 .role(roleDto)
+                .lastLogin(employee.getLastLogin())
                 .build();
     }
 

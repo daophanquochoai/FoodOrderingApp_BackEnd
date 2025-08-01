@@ -1,7 +1,10 @@
 package doctorhoai.learn.orderservice.service.orderservice;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import doctorhoai.learn.basedomain.kafka.order.EventOrder;
 import doctorhoai.learn.basedomain.response.PageObject;
+import doctorhoai.learn.basedomain.response.ResponseObject;
 import doctorhoai.learn.orderservice.dto.OrderDto;
 import doctorhoai.learn.orderservice.dto.OrderItemDto;
 import doctorhoai.learn.orderservice.dto.filter.Filter;
@@ -9,6 +12,7 @@ import doctorhoai.learn.orderservice.dto.foodservice.FoodSizeDto;
 import doctorhoai.learn.orderservice.dto.userservice.UserDto;
 import doctorhoai.learn.orderservice.dto.voucherservice.VoucherDto;
 import doctorhoai.learn.orderservice.exception.exception.*;
+import doctorhoai.learn.orderservice.feign.foodservice.FoodSizeFeign;
 import doctorhoai.learn.orderservice.feign.foodservice.VoucherFeign;
 import doctorhoai.learn.orderservice.feign.userservice.UserFeign;
 import doctorhoai.learn.orderservice.kafka.sender.KafkaMessageSender;
@@ -20,11 +24,17 @@ import doctorhoai.learn.orderservice.utils.mapper.Mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,8 +50,8 @@ public class OrderServiceImpl implements OrderService{
     private final CartServiceImpl cartService;
     private final Mapper mapper;
     private final KafkaMessageSender sender;
-    private final PointRepository pointRepository;
-    private final HistoryPointRepository historyPointRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final ObjectMapper objectMapper;
     @Value("${spring.kafka.topic.food}")
     private String foodTopic;
     @Value("${spring.kafka.topic.inventory}")
@@ -122,30 +132,6 @@ public class OrderServiceImpl implements OrderService{
         order.setStatus(EStatusOrder.CREATING);
         order = orderRepository.save(order);
 
-//        Optional<Point> point = pointRepository.findByUserIdAndIsActive(orderDto.getUserId().getId(), true);
-//        if( point.isEmpty()){
-//            throw new PointNotFound();
-//        }
-//
-//        List<HistoryPoint> historyPoints = new ArrayList<>();
-//        historyPoints.add(HistoryPoint.builder()
-//                        .userId(orderDto.getUserId().getId())
-//                        .isActive(true)
-//                        .usedPoint( -1 * orderDto.getPoint())
-//                        .orderId(order)
-//                .build());
-//        historyPoints.add(HistoryPoint.builder()
-//                .userId(orderDto.getUserId().getId())
-//                .isActive(true)
-//                .usedPoint((int) (orderDto.getTableNumber() * 0.01))
-//                .orderId(order)
-//                .build());
-//        historyPointRepository.saveAll(historyPoints);
-//
-//        point.get().setPoint((int) (point.get().getPoint() + (-1 * orderDto.getPoint() + orderDto.getTableNumber() * 0.01 )));
-//        pointRepository.save(point.get());
-
-
         // update cart
         List<CartItem> cartItems = cartItemRepository.getCartItemByCartToUpdate(orderDto.getUserId().getId());
         cartItems.forEach(cartItem -> cartItem.setIsActive(false));
@@ -169,7 +155,7 @@ public class OrderServiceImpl implements OrderService{
             sender.sendTo(
                     EventOrder.<OrderDto>builder()
                             .order(kafkaOrder)
-                            .cart(cartItems.stream().map(i -> i.getId()).toList())
+                            .cart(cartItems.stream().map(CartItem::getId).toList())
                             .voucher(order.getDiscountApplied())
                             .status(doctorhoai.learn.basedomain.kafka.order.EStatusOrder.CREATE)
                             .build(),
@@ -280,6 +266,100 @@ public class OrderServiceImpl implements OrderService{
 
     }
 
+    @Override
+    public PageObject getOrderByFilter(Filter filter) {
+        Pageable pageable;
+        if( filter.getSort().equals("desc")){
+            pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()).descending());
+        }else{
+            pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()));
+        }
+        Page<Order> orderPage = orderRepository.getOrderByFilter(
+                filter.getSearch(),
+                filter.getStartDate() == null ? null : filter.getStartDate().atStartOfDay(),
+                filter.getEndDate() == null ? null : filter.getEndDate().plusDays(1).atStartOfDay(),
+                filter.getStatusOrders() == null || filter.getStatusOrders().isEmpty() ? null : filter.getStatusOrders(),
+                filter.getType(),
+                pageable
+        );
+
+        List<Integer> orderIds = orderPage.getContent().stream().map(Order::getId).toList();
+
+        List<OrderItem> orderItems = orderItemRepository.findByOrder(orderIds);
+
+        List<Integer> idsFoodSize = orderItems.stream().map(OrderItem::getFoodId).distinct().toList();
+
+        List<FoodSizeDto> foodSizeDtos = cartService.getFoodSizeDto(idsFoodSize);
+
+
+        List<OrderItemDto> orderItemDtos = orderItems.stream().map(i -> {
+            OrderItemDto orderItemDto = mapper.convertToOrderItemDto(i);
+            orderItemDto.setId(i.getId());
+            FoodSizeDto foodSizeDto = getFoodSizeInList(foodSizeDtos, i.getFoodId());
+            orderItemDto.setFoodId(foodSizeDto);
+            return orderItemDto;
+        }).toList();
+
+        List<Integer> idsVoucher = orderPage.getContent().stream().map(Order::getDiscountApplied).filter(Objects::nonNull).toList();
+
+        List<VoucherDto> voucherDtos = getVoucherByIds(idsVoucher);
+
+        List<OrderDto> order = orderPage.getContent().stream().map( (item) -> {
+            OrderDto orderDto = mapper.convertToOrderDto(item);
+            List<OrderItemDto> orderItemDto = new ArrayList<>();
+            for( OrderItem orderItem : item.getOrderItems()){
+                orderItemDto.add(
+                        getOrderItemInList(orderItemDtos, orderItem.getId())
+                );
+            }
+            if( item.getPaymentId() != null){
+                orderDto.setPaymentId(mapper.convertToPaymentDto(item.getPaymentId()));
+            }
+            orderDto.setOrderItems(orderItemDto);
+            if( item.getDiscountApplied() != null){
+                orderDto.setDiscountApplied(getVoucherByIds(voucherDtos,item.getDiscountApplied()));
+            }
+            return orderDto;
+        }).toList();
+
+
+        return PageObject.builder()
+                .page(filter.getPageNo())
+                .totalPage(orderPage.getTotalPages())
+                .data(order)
+                .build();
+    }
+
+    public VoucherDto getVoucherByIds( List<VoucherDto> voucherDtos, Integer id){
+        for(VoucherDto voucherDto : voucherDtos){
+            if(voucherDto.getId() == id){
+                return voucherDto;
+            }
+        }
+        return null;
+    }
+
+    public List<VoucherDto> getVoucherByIds( List<Integer> ids){
+        ResponseEntity<ResponseObject> responseVoucher = voucherFeign.getVoucherByMul(ids);
+        List<VoucherDto> voucherDtos = new ArrayList<>();
+        if( responseVoucher.getStatusCode().is2xxSuccessful()){
+            voucherDtos = objectMapper.convertValue(
+                    responseVoucher.getBody().getData(),
+                    new TypeReference<List<VoucherDto>>() {}
+            );
+        }
+        return voucherDtos;
+    }
+
+    public OrderItemDto getOrderItemInList(List<OrderItemDto> orderItemDtos, Integer orderId) {
+        for( OrderItemDto orderItemDto : orderItemDtos){
+            if(orderItemDto.getId().equals(orderId)){
+                return orderItemDto;
+            }
+        }
+        return null;
+    }
+
     private OrderDto convertToOrder( Order order , VoucherDto voucherDto){
         return OrderDto.builder()
                 .userId(UserDto.builder()
@@ -330,10 +410,5 @@ public class OrderServiceImpl implements OrderService{
 
         order = orderRepository.save(order);
         return convertToOrder(order, null);
-    }
-
-    @Override
-    public PageObject getVoucherAll(Filter filter) {
-        return null;
     }
 }

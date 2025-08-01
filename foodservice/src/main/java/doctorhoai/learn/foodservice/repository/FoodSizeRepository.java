@@ -56,7 +56,7 @@ public interface FoodSizeRepository extends JpaRepository<FoodSize, Integer> {
     @Query(
             value = """
             SELECT fs FROM FoodSize fs
-            WHERE fs.isActive = :isActive AND 
+            WHERE (:isActive IS NULL OR fs.isActive = :isActive) AND 
             (:ids IS NULL OR fs.id in (:ids))
             """
     )

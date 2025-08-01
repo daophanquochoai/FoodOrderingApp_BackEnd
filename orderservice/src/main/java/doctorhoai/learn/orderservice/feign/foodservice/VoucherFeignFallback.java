@@ -7,6 +7,8 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class VoucherFeignFallback implements FallbackFactory<VoucherFeign> {
@@ -18,6 +20,11 @@ public class VoucherFeignFallback implements FallbackFactory<VoucherFeign> {
         return new VoucherFeign() {
             @Override
             public ResponseEntity<ResponseObject> getVoucherById(Integer id) {
+                return fallBack.processFallback(cause);
+            }
+
+            @Override
+            public ResponseEntity<ResponseObject> getVoucherByMul(List<Integer> ids) {
                 return fallBack.processFallback(cause);
             }
         };

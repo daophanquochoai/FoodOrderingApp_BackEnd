@@ -1,5 +1,7 @@
 package doctorhoai.learn.authservice.business.userservice.service.employee;
 
+import doctorhoai.learn.authservice.business.userservice.model.ChangePassword;
+import doctorhoai.learn.authservice.business.userservice.model.Filter;
 import doctorhoai.learn.authservice.config.feign.FeignConfig;
 import doctorhoai.learn.authservice.feign.userservice.UserFeignFallBack;
 import doctorhoai.learn.authservice.feign.userservice.model.EmployeeDto;
@@ -24,9 +26,9 @@ public interface EmployeeFeign {
             @RequestBody @Valid EmployeeDto employeeDto
     );
 
-    @GetMapping("/{id}")
+    @GetMapping("/{username}")
     ResponseEntity<ResponseObject> getEmployeeById(
-            @PathVariable Integer id
+            @PathVariable String username
     );
 
     @PutMapping("/update/{id}")
@@ -44,16 +46,19 @@ public interface EmployeeFeign {
             @RequestParam(required = false) Boolean isActive
     );
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     ResponseEntity<ResponseObject> getListEmployeeWithFilter(
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) Boolean isActive,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate
+            @RequestBody Filter filter
     );
 
     @PutMapping("/late_login/{id}")
     ResponseEntity<ResponseObject> getLateLoginEmployee(
             @PathVariable Integer id
+    );
+
+    @PutMapping("/update/password/{username}")
+    ResponseEntity<ResponseObject> updatePassword(
+            @PathVariable String username,
+            @RequestBody ChangePassword password
     );
 }

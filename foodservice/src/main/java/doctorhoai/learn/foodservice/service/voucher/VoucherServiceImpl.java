@@ -185,6 +185,12 @@ public class VoucherServiceImpl implements VoucherService {
         }
     }
 
+    @Override
+    public List<VoucherDto> getVoucherByIds(List<Integer> ids) {
+        List<Voucher> vouchers = voucherRepository.getVoucherByIds(ids, null);
+        return vouchers.stream().map(mapper::convertToVoucherDto).toList();
+    }
+
     private List<VoucherDto> convertListVoucher(List<Voucher> vouchers) {
         return vouchers.stream().map(this::convertVoucher).toList();
     }

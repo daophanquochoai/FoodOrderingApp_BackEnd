@@ -13,7 +13,9 @@ public enum EMessageException {
     // not found
     ROLE_NOT_FOUND("Role not found"),
     USER_NOT_FOUND("User not found with %s : %s"),
-    EMPLOYEE_NOT_FOUND("Employee not found "),;
+    EMPLOYEE_NOT_FOUND("Employee not found "),
+    PASSWORD_NOT_CORRECT("Password is not correct"),
+    ;
 
     private String message;
     EMessageException(String message) {

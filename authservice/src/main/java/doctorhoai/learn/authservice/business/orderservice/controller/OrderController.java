@@ -1,5 +1,6 @@
 package doctorhoai.learn.authservice.business.orderservice.controller;
 
+import doctorhoai.learn.authservice.business.orderservice.model.Filter;
 import doctorhoai.learn.authservice.business.orderservice.model.OrderDto;
 import doctorhoai.learn.authservice.business.orderservice.service.orderservice.OrderFeign;
 import doctorhoai.learn.basedomain.response.ResponseObject;
@@ -22,5 +23,13 @@ public class OrderController {
             @RequestBody OrderDto orderDto
     ){
         return orderFeign.order(orderDto);
+    }
+
+    @PostMapping("/all")
+    public ResponseEntity<ResponseObject> all(
+            @RequestBody Filter filter
+    )
+    {
+        return orderFeign.all(filter);
     }
 }
