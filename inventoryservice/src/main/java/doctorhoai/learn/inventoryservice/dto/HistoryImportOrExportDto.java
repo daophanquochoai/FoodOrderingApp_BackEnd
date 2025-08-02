@@ -17,11 +17,8 @@ import java.util.List;
 @Builder
 public class HistoryImportOrExportDto {
     private Integer id;
-    @NotNull(message = "Type can't empty")
     private ETypeHistory type;
-    @NotBlank(message = "Note can't empty")
     private String note;
-    @NotBlank(message = "Bath code can't empty")
     private String bathCode;
     private SourceDto source;
     private Boolean isActive;

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface HistoryImportOrExportRepository extends JpaRepository<HistoryImportOrExport, Integer> {
@@ -65,4 +66,12 @@ public interface HistoryImportOrExportRepository extends JpaRepository<HistoryIm
             @Param("search") String search,
             Pageable pageable
     );
+
+    @Query(
+            value = """
+            SELECT h FROM HistoryImportOrExport h 
+            WHERE h.bath_code = :batchCode
+            """
+    )
+    Optional<HistoryImportOrExport> getByBathCode(String batchCode);
 }

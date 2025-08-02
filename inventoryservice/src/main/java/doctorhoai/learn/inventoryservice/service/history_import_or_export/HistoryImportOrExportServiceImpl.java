@@ -3,6 +3,8 @@ package doctorhoai.learn.inventoryservice.service.history_import_or_export;
 import doctorhoai.learn.basedomain.response.PageObject;
 import doctorhoai.learn.inventoryservice.dto.*;
 import doctorhoai.learn.inventoryservice.dto.filter.Filter;
+import doctorhoai.learn.inventoryservice.exception.exception.HistoryImportAndExportNotFound;
+import doctorhoai.learn.inventoryservice.exception.exception.HistoryImportDuplicate;
 import doctorhoai.learn.inventoryservice.exception.exception.IngredientsNotFoundException;
 import doctorhoai.learn.inventoryservice.exception.exception.SourceNotFoundException;
 import doctorhoai.learn.inventoryservice.mapper.Mapper;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,11 +44,11 @@ public class HistoryImportOrExportServiceImpl implements HistoryImportOrExportSe
         }
 
         Page<HistoryImportOrExport> historyImportOrExportList = historyImportOrExportRepository.getHistoryImportOrExportByFilter(
-                filter.getHistoryImportOrExportId(),
-                filter.getSourceId(),
+                filter.getHistoryImportOrExportId() == null || filter.getHistoryImportOrExportId().isEmpty() ? null : filter.getHistoryImportOrExportId(),
+                filter.getSourceId() == null || filter.getSourceId().isEmpty() ? null : filter.getSourceId(),
                 filter.getInventory(),
                 filter.getIsActive(),
-                filter.getIngredientsId(),
+                filter.getIngredientsId() == null || filter.getIngredientsId().isEmpty() ? null : filter.getIngredientsId(),
                 filter.getMinPrice(),
                 filter.getMaxPrice(),
                 filter.getStartDate() == null ? null : filter.getStartDate().atStartOfDay(),
@@ -73,6 +76,9 @@ public class HistoryImportOrExportServiceImpl implements HistoryImportOrExportSe
         List<HistoryImportOrExportDto> returnValue = new ArrayList<>();
         for( HistoryImportOrExport historyImportOrExport : historyImportOrExportList ){
             HistoryImportOrExportDto historyImportOrExportDto = mapper.convertToHistoryImportOrExportDto(historyImportOrExport);
+            if( historyImportOrExport.getSourceId() != null ){
+                historyImportOrExportDto.setSource(mapper.convertToSourceDto(historyImportOrExport.getSourceId()));
+            }
             if( historyImportOrExport != null && historyImportOrExport.getHistoryIngredients() != null && !historyImportOrExport.getHistoryIngredients().isEmpty()){
                 historyImportOrExportDto.setHistoryIngredients(convertToHistoryIngredientsDto(historyImportOrExport.getHistoryIngredients()));
             }
@@ -85,12 +91,16 @@ public class HistoryImportOrExportServiceImpl implements HistoryImportOrExportSe
         List<HistoryIngredientsDto> returnValue = new ArrayList<>();
         for( HistoryIngredients historyIngredients : historyIngredientsList ){
             HistoryIngredientsDto historyIngredientsDto = mapper.convertToHistoryIngredientsDto(historyIngredients);
+
             if( historyIngredients != null){
                 if( historyIngredients.getErrors() != null && !historyIngredients.getErrors().isEmpty() ){
                     historyIngredientsDto.setErrors(convertToHistoryIngredientsErrorDto(historyIngredients.getErrors()));
                 }
                 if( historyIngredients.getUses() != null && !historyIngredients.getUses().isEmpty() ){
                     historyIngredientsDto.setUses(convertToHistoryIngredientsUseDto(historyIngredients.getUses()));
+                }
+                if( historyIngredients.getIngredientsId() != null ){
+                    historyIngredientsDto.setIngredients(mapper.convertToIngredientsDto(historyIngredients.getIngredientsId()));
                 }
             }
             returnValue.add(historyIngredientsDto);
@@ -116,7 +126,12 @@ public class HistoryImportOrExportServiceImpl implements HistoryImportOrExportSe
 
     @Override
     public HistoryImportOrExportDto createHistoryImportOrExport(HistoryImportOrExportDto historyImportOrExportDto) {
+        Optional<HistoryImportOrExport> historyImportOrExportOptional = historyImportOrExportRepository.getByBathCode(historyImportOrExportDto.getBathCode());
+        if( historyImportOrExportOptional.isPresent()){
+            throw new HistoryImportDuplicate();
+        }
         HistoryImportOrExport historyImportOrExport = mapper.convertToHistoryImportOrExport(historyImportOrExportDto);
+        historyImportOrExport.setIsActive(true);
 
         if(historyImportOrExportDto.getSource() == null || historyImportOrExportDto.getSource().getId() == null){
             throw new SourceNotFoundException();
@@ -127,10 +142,20 @@ public class HistoryImportOrExportServiceImpl implements HistoryImportOrExportSe
 
         if( historyImportOrExportDto.getHistoryIngredients() != null ){
             List<HistoryIngredients> historyIngredients = convertToHistoryIngredientsList(historyImportOrExportDto.getHistoryIngredients());
+            for( HistoryIngredients historyIngredient : historyIngredients ){
+                historyIngredient.setHistory(historyImportOrExport);
+            }
             historyImportOrExport.setHistoryIngredients(historyIngredients);
         }
         historyImportOrExport = historyImportOrExportRepository.save(historyImportOrExport);
         return convertToHistoryImportOrExportDto(historyImportOrExport);
+    }
+
+    @Override
+    public void updateHistoryImportOrExport(Integer id) {
+        HistoryImportOrExport historyImportOrExport = historyImportOrExportRepository.findById(id).orElseThrow(HistoryImportAndExportNotFound::new);
+        historyImportOrExport.setIsActive(false);
+        historyImportOrExportRepository.save(historyImportOrExport);
     }
 
     private List<Ingredients> getIngredientsByIds( List<Integer> ids ){
@@ -143,7 +168,7 @@ public class HistoryImportOrExportServiceImpl implements HistoryImportOrExportSe
 
     private List<HistoryIngredients> convertToHistoryIngredientsList(List<HistoryIngredientsDto> historyIngredientsDtos){
 
-        List<Integer> idsIngredients = historyIngredientsDtos.stream().map(HistoryIngredientsDto::getId).filter(Objects::nonNull).distinct().toList();
+        List<Integer> idsIngredients = historyIngredientsDtos.stream().map(i -> i.getIngredients().getId()).filter(Objects::nonNull).distinct().toList();
         List<Ingredients> ingredientsList = getIngredientsByIds(idsIngredients);
         List<HistoryIngredients> historyIngredientsList = new ArrayList<>();
         for( HistoryIngredientsDto historyIngredientsDto : historyIngredientsDtos ){

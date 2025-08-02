@@ -10,4 +10,6 @@ public interface HistoryImportOrExportService {
 
     HistoryImportOrExportDto createHistoryImportOrExport(HistoryImportOrExportDto historyImportOrExportDto);
 
+    void updateHistoryImportOrExport(Integer id);
+
 }
