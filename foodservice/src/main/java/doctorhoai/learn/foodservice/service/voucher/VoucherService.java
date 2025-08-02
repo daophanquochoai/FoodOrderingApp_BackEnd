@@ -1,6 +1,7 @@
 package doctorhoai.learn.foodservice.service.voucher;
 
 import doctorhoai.learn.basedomain.response.PageObject;
+import doctorhoai.learn.foodservice.dto.ExportVoucher;
 import doctorhoai.learn.foodservice.dto.VoucherDto;
 import doctorhoai.learn.foodservice.dto.filter.Filter;
 
@@ -21,4 +22,7 @@ public interface VoucherService {
     String updateRollbackVoucher( Integer id);
 
     List<VoucherDto> getVoucherByIds(List<Integer> ids);
+
+    void updateVoucher(VoucherDto voucherDto, Integer id);
+    void exportVoucher(ExportVoucher exportVoucher);
 }

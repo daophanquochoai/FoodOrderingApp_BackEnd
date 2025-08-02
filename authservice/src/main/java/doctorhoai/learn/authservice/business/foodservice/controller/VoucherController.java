@@ -1,6 +1,7 @@
 package doctorhoai.learn.authservice.business.foodservice.controller;
 
 
+import doctorhoai.learn.authservice.business.foodservice.model.ExportVoucher;
 import doctorhoai.learn.authservice.business.foodservice.model.Filter;
 import doctorhoai.learn.authservice.business.foodservice.model.VoucherDto;
 import doctorhoai.learn.authservice.business.foodservice.service.voucherservice.VoucherFeign;
@@ -43,5 +44,19 @@ public class VoucherController {
             @PathVariable String code
     ){
         return voucherFeign.getVoucherByCode(code);
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ResponseObject> updateVoucherById(
+            @PathVariable Integer id,
+            @RequestBody VoucherDto voucherDto
+    ){
+        return voucherFeign.updateVoucherById(id, voucherDto);
+    }
+    @PostMapping("/export/voucher")
+    public ResponseEntity<ResponseObject> exportVoucehr(
+            @RequestBody ExportVoucher exportVoucher
+    ){
+        return voucherFeign.exportVoucehr(exportVoucher);
     }
 }

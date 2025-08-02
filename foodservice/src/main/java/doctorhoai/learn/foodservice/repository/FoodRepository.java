@@ -16,6 +16,16 @@ import java.util.Optional;
 @Repository
 public interface FoodRepository extends JpaRepository<Food, Integer> {
 
+    @Query(
+            value = """
+            SELECT f from Food f 
+            WHERE 
+            (:status IS NULL OR :status = f.status) AND 
+            (:ids IS NULL OR f.id IN (:ids))
+            """
+    )
+    List<Food> getFoodByIds(List<Integer> ids, EStatusFood status);
+
     @EntityGraph(attributePaths = {
             "foodSizes",
             "foodSizes.size"

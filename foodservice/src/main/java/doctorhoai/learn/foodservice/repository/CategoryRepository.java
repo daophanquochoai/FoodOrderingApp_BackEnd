@@ -2,6 +2,7 @@ package doctorhoai.learn.foodservice.repository;
 
 import doctorhoai.learn.foodservice.model.Category;
 import doctorhoai.learn.foodservice.model.enums.EStatusCategory;
+import doctorhoai.learn.foodservice.model.enums.EStatusFood;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,16 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
+
+    @Query(
+            value = """
+            SELECT c FROM Category c
+            WHERE
+            (:ids IS NULL OR c.id IN (:ids)) AND 
+            (:status IS NULL OR c.status = :status)
+            """
+    )
+    List<Category> getCategoryByIds(List<Integer> ids, EStatusFood status);
 
     @Query(
             value = """

@@ -25,6 +25,7 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
             (:search IS NULL OR vu.voucher.code like CONCAT('%', :search, '%'))
             """
     )
+    @EntityGraph(attributePaths = {"voucherFoods", "voucherCategories"})
     List<Voucher> getVoucherOfUser(
             Integer id,
             List<EStatusVoucher> status,
@@ -38,7 +39,6 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
     (:status IS NULL OR v.status IN :status) AND 
     (:search IS NULL OR v.code LIKE CONCAT('%', :search, '%')) AND
     (:max IS NULL OR (:max = true AND v.maxUse = v.usedCount) OR (:max = false AND v.maxUse > v.usedCount)) AND 
-    (:forFood IS NULL OR :forFood = false OR (:forFood = true AND size(v.voucherFoods) > 0)) AND 
     (:forCategory IS NULL OR :forCategory = false OR (:forCategory = true AND size(v.voucherCategories) > 0)) AND 
     (
         (:foodIds IS NULL OR EXISTS (
@@ -52,7 +52,6 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
         ))
     )
 """)
-    @EntityGraph(attributePaths = {"voucherUsers", "voucherFoods", "voucherCategories"})
     Page<Voucher> getAllVouchers(
             @Param("userIds") List<Integer> userIds,
             @Param("max") Boolean max,
@@ -84,4 +83,22 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
             """
     )
     List<Voucher> getVoucherByIds(List<Integer> ids, Boolean isActive);
+
+    @Query("""
+    SELECT v FROM Voucher v
+    WHERE 
+        v.code = :code AND 
+        v.status = 'ACTIVE' AND 
+        v.endDate > CURRENT_DATE
+    """)
+    Optional<Voucher> findVoucherByCode(@Param("code") String code);
+
+    @Query(
+            value = """
+            SELECT v FROM Voucher v 
+            WHERE (:state IS TRUE OR v.status = 'ACTIVE')
+            """
+    )
+    List<Voucher> getVoucherForOption(Boolean state);
+
 }

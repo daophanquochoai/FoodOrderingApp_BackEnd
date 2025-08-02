@@ -10,6 +10,7 @@ public enum EMessageException {
     FOOD_SIZE_NOT_FOUND("Food Size not found"),
 
     NAME_SIZE_DUPLICATE("Name size duplicate"),
+    VOUCHER_DUPLICATE("Code duplicate"),
     ;
 
     private String message;

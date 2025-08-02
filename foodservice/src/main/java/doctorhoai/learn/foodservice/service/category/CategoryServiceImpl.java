@@ -27,6 +27,12 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
+    public List<CategoryDto> getCategoryByIds(List<Integer> ids) {
+        List<Category> categories = categoryRepository.getCategoryByIds(ids,null);
+        return categories.stream().map(mapper::covertToCategoryDto).toList();
+    }
+
+    @Override
     public PageObject getAllCategories(Filter filter) {
         Pageable pageable ;
         if( filter.getSort().equals("desc")){
