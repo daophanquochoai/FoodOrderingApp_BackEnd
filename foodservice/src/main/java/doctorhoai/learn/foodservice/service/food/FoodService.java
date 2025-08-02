@@ -7,6 +7,7 @@ import doctorhoai.learn.foodservice.dto.filter.Filter;
 import java.util.List;
 
 public interface FoodService {
+    List<FoodDto> getFoodByIds( List<Integer> ids);
     PageObject getFoodByFilter(Filter filter);
     FoodDto createFood(FoodDto food);
     FoodDto updateFood(FoodDto food, Integer id);

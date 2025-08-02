@@ -57,11 +57,11 @@ public class Voucher extends BaseModel implements Serializable {
 
     // list
     @OneToMany(mappedBy = "voucher")
-    private Set<VoucherFood> voucherFoods;
+    private List<VoucherFood> voucherFoods;
 
     @OneToMany(mappedBy = "voucher")
-    private Set<VoucherCategory> voucherCategories;
+    private List<VoucherCategory> voucherCategories;
 
     @OneToMany(mappedBy = "voucher")
-    private Set<VoucherUser> voucherUsers;
+    private List<VoucherUser> voucherUsers;
 }

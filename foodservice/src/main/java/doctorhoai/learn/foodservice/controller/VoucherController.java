@@ -1,6 +1,7 @@
 package doctorhoai.learn.foodservice.controller;
 
 import doctorhoai.learn.basedomain.response.ResponseObject;
+import doctorhoai.learn.foodservice.dto.ExportVoucher;
 import doctorhoai.learn.foodservice.dto.VoucherDto;
 import doctorhoai.learn.foodservice.dto.filter.Filter;
 import doctorhoai.learn.foodservice.model.Voucher;
@@ -86,6 +87,31 @@ public class VoucherController {
                 ResponseObject.builder()
                         .message(EMessageResponse.GET_VOUCHER.getMessage())
                         .data(voucherService.getVoucherByIds(ids))
+                        .build()
+        );
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ResponseObject> updateVoucherById(
+            @PathVariable Integer id,
+            @RequestBody VoucherDto voucherDto
+    ){
+        voucherService.updateVoucher(voucherDto,id);
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.GET_VOUCHER.getMessage())
+                        .build()
+        );
+    }
+
+    @PostMapping("/export/voucher")
+    public ResponseEntity<ResponseObject> exportVoucehr(
+            @RequestBody ExportVoucher exportVoucher
+            ){
+        voucherService.exportVoucher(exportVoucher);
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.UPDATE_VOUCHER.getMessage())
                         .build()
         );
     }

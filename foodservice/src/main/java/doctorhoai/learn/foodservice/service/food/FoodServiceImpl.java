@@ -42,6 +42,12 @@ public class FoodServiceImpl implements FoodService {
 
 
     @Override
+    public List<FoodDto> getFoodByIds(List<Integer> ids) {
+        List<Food> foods = foodRepository.getFoodByIds(ids, null);
+        return foods.stream().map(mapper::covertToFoodDto).toList();
+    }
+
+    @Override
     public PageObject getFoodByFilter(Filter filter) {
 
         Pageable pageable ;

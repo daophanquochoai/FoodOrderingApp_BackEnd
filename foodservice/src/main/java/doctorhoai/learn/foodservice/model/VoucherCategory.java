@@ -23,7 +23,7 @@ public class VoucherCategory extends BaseModel implements Serializable {
 
 
     @JoinColumn(name = "voucher_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Voucher voucher;
 
     @JoinColumn(name = "category_id")

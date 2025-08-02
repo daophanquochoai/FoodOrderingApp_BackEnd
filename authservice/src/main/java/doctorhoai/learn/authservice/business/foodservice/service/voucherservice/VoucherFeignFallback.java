@@ -1,5 +1,6 @@
 package doctorhoai.learn.authservice.business.foodservice.service.voucherservice;
 
+import doctorhoai.learn.authservice.business.foodservice.model.ExportVoucher;
 import doctorhoai.learn.authservice.business.foodservice.model.Filter;
 import doctorhoai.learn.authservice.business.foodservice.model.VoucherDto;
 import doctorhoai.learn.authservice.feign.function.HandleFallBack;
@@ -37,6 +38,16 @@ public class VoucherFeignFallback implements FallbackFactory<VoucherFeign> {
 
             @Override
             public ResponseEntity<ResponseObject> getVoucherByCode(String code) {
+                return fallBack.processFallback(cause);
+            }
+
+            @Override
+            public ResponseEntity<ResponseObject> updateVoucherById(Integer id, VoucherDto voucherDto) {
+                return fallBack.processFallback(cause);
+            }
+
+            @Override
+            public ResponseEntity<ResponseObject> exportVoucehr(ExportVoucher exportVoucher) {
                 return fallBack.processFallback(cause);
             }
         };

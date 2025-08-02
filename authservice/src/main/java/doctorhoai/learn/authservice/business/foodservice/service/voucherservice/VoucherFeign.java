@@ -1,5 +1,6 @@
 package doctorhoai.learn.authservice.business.foodservice.service.voucherservice;
 
+import doctorhoai.learn.authservice.business.foodservice.model.ExportVoucher;
 import doctorhoai.learn.authservice.business.foodservice.model.Filter;
 import doctorhoai.learn.authservice.business.foodservice.model.VoucherDto;
 import doctorhoai.learn.authservice.config.feign.FeignConfig;
@@ -7,10 +8,7 @@ import doctorhoai.learn.basedomain.response.ResponseObject;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,5 +36,14 @@ public interface VoucherFeign {
     @GetMapping("/{code}")
     ResponseEntity<ResponseObject> getVoucherByCode(
             @PathVariable String code
+    );
+    @PutMapping("/update/{id}")
+    ResponseEntity<ResponseObject> updateVoucherById(
+            @PathVariable Integer id,
+            @RequestBody VoucherDto voucherDto
+    );
+    @PostMapping("/export/voucher")
+    ResponseEntity<ResponseObject> exportVoucehr(
+            @RequestBody ExportVoucher exportVoucher
     );
 }
