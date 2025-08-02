@@ -18,7 +18,7 @@ public class HistoryImportOrExportController {
 
     @PostMapping("/add")
     public ResponseEntity<ResponseObject> addHistoryImportOrExport(
-            @RequestBody @Valid HistoryImportOrExportDto historyImportOrExportDto
+            @RequestBody HistoryImportOrExportDto historyImportOrExportDto
             ){
         return ResponseEntity.ok(
                 ResponseObject.builder()
@@ -28,7 +28,7 @@ public class HistoryImportOrExportController {
         );
     }
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     public ResponseEntity<ResponseObject> allHistoryImportOrExport(
             @RequestBody Filter filter
             ){
@@ -42,12 +42,12 @@ public class HistoryImportOrExportController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<ResponseObject> updateHistoryImportOrExport(
-            @PathVariable Integer id,
-            @RequestBody @Valid HistoryImportOrExportDto historyImportOrExportDto
+            @PathVariable Integer id
     ){
+        historyImportOrExportService.updateHistoryImportOrExport(id);
         return ResponseEntity.ok(
                 ResponseObject.builder()
-                        .message(null)
+                        .message(EMessageResponse.UPDATE_HISTORY_IMPORT_OR_EXPORT.getMessage())
                         .build()
         );
     }

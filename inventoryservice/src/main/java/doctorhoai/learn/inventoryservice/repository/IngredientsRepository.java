@@ -2,6 +2,7 @@ package doctorhoai.learn.inventoryservice.repository;
 
 import doctorhoai.learn.inventoryservice.model.FoodIngredients;
 import doctorhoai.learn.inventoryservice.model.Ingredients;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -58,4 +59,6 @@ public interface IngredientsRepository extends JpaRepository<Ingredients, Intege
             """
     )
     List<Ingredients> getFoodIngredientsByIds(@Param("ids") List<Integer> ids);
+
+    List<Ingredients> getIngredientsByIsActive(boolean isActive);
 }

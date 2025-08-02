@@ -8,6 +8,8 @@ public enum EMessageException {
     FOOD_NOT_FOUND("Food not found"),
     ORDER_ITEM_NOT_FOUND("Order item not found"),
     NOT_ENOUGH_INGREDIENTS("Not enough ingredients"),
+    HISTORY_IMPORT_NOT_FOUND("History import not found"),
+    HISTORY_IMPORT_DUPLICATE("History import duplicate"),
     ;
     private String message;
     EMessageException(String message) {

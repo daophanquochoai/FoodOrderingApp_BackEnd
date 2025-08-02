@@ -41,7 +41,7 @@ public class HistoryImportOrExport extends BaseModel implements Serializable {
     @Column(name = "create_by")
     private Integer createBy;
 
-    @OneToMany(mappedBy = "history")
+    @OneToMany(mappedBy = "history", cascade = CascadeType.ALL)
     private List<HistoryIngredients> historyIngredients;
 
 }
