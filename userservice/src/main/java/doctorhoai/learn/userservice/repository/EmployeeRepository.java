@@ -48,4 +48,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
             """
     )
     Optional<Employee> getEmployeeByFilter(Integer id, String email, String phoneNumber, String cccd, Boolean isActive);
+
+    @Query(
+            value = """
+            SELECT e FROM Employee e 
+            WHERE (:ids IS NULL OR e.id IN :ids)
+            """
+    )
+    List<Employee> getMulEmployee(List<Integer> ids);
 }

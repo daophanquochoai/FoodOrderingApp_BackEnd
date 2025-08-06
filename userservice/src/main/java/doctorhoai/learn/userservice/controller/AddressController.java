@@ -17,6 +17,18 @@ public class AddressController {
 
     private final AddressService addressService;
 
+    @PutMapping("/set_default/{id}/{userId}")
+    public ResponseEntity<ResponseObject> setDefault(@PathVariable Integer id,
+                                                     @PathVariable Integer userId
+    ) {
+        addressService.setDefaultAddress(id, userId);
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.UPDATE_ADDRESS.getMessage())
+                        .build()
+        );
+    }
+
     @PostMapping("/add")
     public ResponseEntity<ResponseObject> createAddress(
             @RequestBody @Valid AddressDto addressDto

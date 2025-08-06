@@ -1,7 +1,6 @@
 package doctorhoai.learn.foodservice.kafka.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import doctorhoai.learn.basedomain.kafka.order.EStatusOrder;
 import doctorhoai.learn.foodservice.dto.VoucherDto;
 import doctorhoai.learn.foodservice.dto.userservice.UserDto;
 import lombok.AllArgsConstructor;

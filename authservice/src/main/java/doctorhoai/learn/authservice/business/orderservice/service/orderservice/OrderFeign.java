@@ -2,11 +2,14 @@ package doctorhoai.learn.authservice.business.orderservice.service.orderservice;
 
 import doctorhoai.learn.authservice.business.orderservice.model.Filter;
 import doctorhoai.learn.authservice.business.orderservice.model.OrderDto;
+import doctorhoai.learn.authservice.business.orderservice.model.UpdateStatusOrder;
 import doctorhoai.learn.authservice.config.feign.FeignConfig;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
@@ -24,5 +27,10 @@ public interface OrderFeign {
     @PostMapping("/all")
     ResponseEntity<ResponseObject> all(
             @RequestBody Filter filter
+    );
+    @PutMapping("/order/{id}")
+    ResponseEntity<ResponseObject> changeStatusOrder(
+            @PathVariable Integer id,
+            @RequestBody UpdateStatusOrder statusOrder
     );
 }

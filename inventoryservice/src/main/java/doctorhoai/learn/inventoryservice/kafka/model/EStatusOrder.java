@@ -1,4 +1,4 @@
-package doctorhoai.learn.authservice.business.orderservice.model;
+package doctorhoai.learn.inventoryservice.kafka.model;
 
 public enum EStatusOrder {
     CREATING,

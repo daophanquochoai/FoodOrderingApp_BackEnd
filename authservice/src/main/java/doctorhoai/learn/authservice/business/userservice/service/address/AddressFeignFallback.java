@@ -32,6 +32,11 @@ public class AddressFeignFallback implements FallbackFactory<AddressFeign> {
             public ResponseEntity<ResponseObject> updateAddress(Integer id, AddressDto addressDto) {
                 return fallBack.processFallback(cause);
             }
+
+            @Override
+            public ResponseEntity<ResponseObject> setDefault(Integer id, Integer userId) {
+                return fallBack.processFallback(cause);
+            }
         };
     }
 }

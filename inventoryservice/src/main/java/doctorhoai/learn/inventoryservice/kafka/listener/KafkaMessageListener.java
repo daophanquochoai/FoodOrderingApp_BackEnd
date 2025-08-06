@@ -39,8 +39,8 @@ public class KafkaMessageListener {
     private final HistoryIngredientsRepository historyIngredientsRepository;
     private final IngredientsUseRepository ingredientsUseRepository;
     private final KafkaMessageSender kafkaMessageSender;
-    @Value("${spring.kafka.topic.point}")
-    private String pointTopic;
+    @Value("${spring.kafka.topic.order}")
+    private String orderTopic;
     @Value("${spring.kafka.topic.sender_rollback}")
     private String senderRollbackTopic;
 
@@ -97,6 +97,14 @@ public class KafkaMessageListener {
                     Float availableQuantity = historyIngredient.getQuantity();
                     // nguyen lieu da su dung
                     Float usedQuantity = historyIngredient.getUsedUnit();
+                    if( historyIngredient.getUses() != null && !historyIngredient.getUses().isEmpty()){
+                        for (IngredientsUse ingredientsUse : historyIngredient.getUses()) {
+                            if( !ingredientsUse.getIsActive()){
+                                continue;
+                            }
+                            usedQuantity += ingredientsUse.getQuantity();
+                        }
+                    }
 
                     if( ingredientsForFood.get(ingredientId) + usedQuantity >= availableQuantity ){
                         IngredientsUse ingredientsUse = IngredientsUse.builder()
@@ -140,8 +148,8 @@ public class KafkaMessageListener {
             }
             ingredientsUseRepository.saveAll(ingredientsUses);
             historyIngredientsRepository.saveAll(historyIngredientsNeedUpdate);
-            System.out.println("Send to Point ...");
-            kafkaMessageSender.sendTo(message, pointTopic);
+            System.out.println("Send to order ...");
+            kafkaMessageSender.sendTo(message, orderTopic);
         }catch( Exception ex ){
             System.out.println("Rollback ...");
             message.setMessage(ex.getMessage());

@@ -1,5 +1,7 @@
 package doctorhoai.learn.authservice.controller;
 
+import doctorhoai.learn.authservice.business.userservice.service.employee.EmployeeFeign;
+import doctorhoai.learn.authservice.business.userservice.service.user.UserFeign;
 import doctorhoai.learn.authservice.controller.message.EMessageResponse;
 import doctorhoai.learn.authservice.dto.RequestAuth;
 import doctorhoai.learn.authservice.dto.ResponseAuth;
@@ -26,6 +28,8 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final UserDetailsService userDetailsService;
+    private final UserFeign userFeign;
+    private final EmployeeFeign employeeFeign;
 
     @PostMapping("/login")
     public ResponseEntity<ResponseAuth> login(@RequestBody @Valid RequestAuth auth){
@@ -33,6 +37,15 @@ public class AuthController {
             Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(auth.getUsername(), auth.getPassword()));
             if( authenticate.isAuthenticated()){
                 UserDetails userDetails = (UserDetails) authenticate.getPrincipal();
+                if( userDetails.getAuthorities().stream().findFirst().isEmpty()){
+                    throw new BadException("Bad credentials");
+                }else{
+                    if( userDetails.getAuthorities().stream().findFirst().get().getAuthority().equals("ROLE_USER")){
+                        userFeign.updateLatestUpdateTime(userDetails.getUsername());
+                    }else{
+                        employeeFeign.getLateLoginEmployee(userDetails.getUsername());
+                    }
+                }
                 String accessToken = jwtService.generateToken(userDetails);
                 String refreshToken = jwtService.generateRefreshToken(userDetails);
                 tokenService.saveToken(accessToken, userDetails.getUsername());

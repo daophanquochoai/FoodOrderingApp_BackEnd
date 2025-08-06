@@ -7,6 +7,8 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class UserFeignFallback implements FallbackFactory<UserFeign> {
@@ -23,6 +25,11 @@ public class UserFeignFallback implements FallbackFactory<UserFeign> {
 
             @Override
             public ResponseEntity<ResponseObject> getUserByUsername(String username) {
+                return handleFallBack.processFallback(cause);
+            }
+
+            @Override
+            public ResponseEntity<ResponseObject> getMulUser(List<Integer> ids) {
                 return handleFallBack.processFallback(cause);
             }
         };

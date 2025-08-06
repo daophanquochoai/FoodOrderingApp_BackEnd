@@ -36,6 +36,7 @@ public class Filter {
 
     //food
     private List<EStatusFood> statusFoods;
+    private List<Integer> categoryId;
 
     private List<EStatusCategory> statusCategories;
 

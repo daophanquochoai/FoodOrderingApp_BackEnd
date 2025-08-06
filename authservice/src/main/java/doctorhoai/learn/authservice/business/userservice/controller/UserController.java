@@ -61,12 +61,6 @@ public class UserController {
         return userFeign.getListUserWithFilter(search, isActive, startDate, endDate);
     }
 
-    @PutMapping("/late_time/{id}")
-    ResponseEntity<ResponseObject> updateLatestUpdateTime(
-            @PathVariable Integer id
-    ){
-        return userFeign.updateLatestUpdateTime(id);
-    }
 
     @GetMapping("/username/{username}")
     public ResponseEntity<ResponseObject> getUserByUsername(

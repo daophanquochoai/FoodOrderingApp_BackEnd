@@ -35,6 +35,7 @@ public interface FoodRepository extends JpaRepository<Food, Integer> {
     WHERE
         (:ids IS NULL OR food.id IN :ids) AND 
         (:status IS NULL OR food.status IN :status) AND
+        (:categoryId IS NULL OR food.category.id IN :categoryId) AND
         (:search IS NULL OR food.name LIKE CONCAT('%',:search,'%') OR food.desc LIKE CONCAT('%',:search,'%')) AND 
         (
             :minDiscount IS NULL OR EXISTS (
@@ -83,6 +84,7 @@ public interface FoodRepository extends JpaRepository<Food, Integer> {
             @Param("minReady") Float minReady,
             @Param("maxReady") Float maxReady,
             @Param("sizeIds") List<Integer> sizeIds,
+            @Param("categoryId") List<Integer> categoryId,
             Pageable pageable
     );
 

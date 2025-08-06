@@ -16,7 +16,8 @@ public enum EMessageException {
     TOTAL_COST_NOT_CORRECT("Total Cost Not Correct"),
     ORDER_NOT_FOUND("Order Not Found"),
 
-    POINT_OF_USER_NOT_FOUND("Point of user not found")
+    POINT_OF_USER_NOT_FOUND("Point of user not found"),
+    ORDER_WAS_CANCEL("Order was cancel")
     ;
 
 

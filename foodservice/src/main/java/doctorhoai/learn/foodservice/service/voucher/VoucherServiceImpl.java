@@ -182,6 +182,7 @@ public class VoucherServiceImpl implements VoucherService {
 //            voucher.setVoucherCategories(voucherCategories);
 //        }
 
+        voucher.setUsedCount(0);
         // Lưu vào DB
         Voucher savedVoucher = voucherRepository.save(voucher);
         return convertVoucher(savedVoucher);
@@ -204,7 +205,7 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     public String updateVoucher(Integer id) {
         Voucher data = findVoucher(id);
-        if( data.getMaxDiscount() > data.getUsedCount() ){
+        if( data.getMaxUse() > data.getUsedCount() ){
             data.setUsedCount(data.getUsedCount() + 1);
             voucherRepository.save(data);
             return "";
@@ -224,7 +225,7 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     public String updateRollbackVoucher(Integer id) {
         Voucher data = findVoucher(id);
-        if( data.getUsedCount() - 1 > 0){
+        if( data.getUsedCount() - 1 >= 0){
             data.setUsedCount(data.getUsedCount() - 1);
             voucherRepository.save(data);
             return "";

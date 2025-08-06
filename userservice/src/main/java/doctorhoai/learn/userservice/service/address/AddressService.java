@@ -8,4 +8,5 @@ public interface AddressService {
     AddressDto createNewAddress(AddressDto addressDto);
     AddressDto updateAddress(AddressDto addressDto, Integer id);
     PageObject getAddress(Filter filter);
+    void setDefaultAddress(Integer addId, Integer userId);
 }

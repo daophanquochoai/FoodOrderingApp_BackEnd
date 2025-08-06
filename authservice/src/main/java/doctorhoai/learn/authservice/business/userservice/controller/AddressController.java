@@ -37,4 +37,11 @@ public class AddressController {
     ){
         return addressFeign.updateAddress(id, addressDto);
     }
+
+    @PutMapping("/set_default/{id}/{userId}")
+    public ResponseEntity<ResponseObject> setDefault(@PathVariable Integer id,
+                                                     @PathVariable Integer userId
+    ){
+        return addressFeign.setDefault(id, userId);
+    }
 }

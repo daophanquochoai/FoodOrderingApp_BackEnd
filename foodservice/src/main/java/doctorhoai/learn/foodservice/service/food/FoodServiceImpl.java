@@ -67,6 +67,7 @@ public class FoodServiceImpl implements FoodService {
                 filter.getMinReady(),
                 filter.getMaxReady(),
                 (filter.getSizeIds() == null || filter.getSizeIds().isEmpty()) ? null : filter.getSizeIds(),
+                filter.getCategoryId() == null || filter.getCategoryId().isEmpty() ? null : filter.getCategoryId(),
                 pageable
         );
         PageObject pageObject = PageObject.builder()

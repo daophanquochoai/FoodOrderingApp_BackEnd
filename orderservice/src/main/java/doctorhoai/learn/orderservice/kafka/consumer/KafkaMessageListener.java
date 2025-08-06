@@ -47,4 +47,23 @@ public class KafkaMessageListener {
             System.out.println(ex.getMessage());
         }
     }
+
+    @RetryableTopic(attempts = "4", backoff = @Backoff( delay = 3000, multiplier = 1.5, maxDelay = 15000))
+    @KafkaListener(topics = "order", groupId = "order")
+    public void acceptORder(EventOrder<OrderDto> message){
+        try{
+            EventOrder<OrderDto> eventOrder = objectMapper.convertValue(
+                    message,
+                    new TypeReference<EventOrder<OrderDto>>() {}
+            );
+            Optional<Order> orderOptional = orderRepository.findOrderByIdAndStatus(eventOrder.getOrder().getId(), EStatusOrder.CREATING);
+            if( !orderOptional.isPresent() ){
+                throw new OrderNotFoundException();
+            }
+            orderOptional.get().setStatus(EStatusOrder.PENDING);
+            orderRepository.save(orderOptional.get());
+        }catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
 }

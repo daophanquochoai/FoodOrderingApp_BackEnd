@@ -47,17 +47,17 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressDto updateAddress(AddressDto addressDto, Integer id) {
-        addressRepository.getAddressByIdAndIsActive(id, true).orElseThrow(() -> new UserNotFound("id", addressDto.getUserId().getId().toString()));
+        Address address = addressRepository.getAddressByIdAndIsActive(id, true).orElseThrow(() -> new UserNotFound("id", addressDto.getUserId().getId().toString()));
 
-        addressDto.setProvince(addressDto.getProvince());
-        addressDto.setCommune(addressDto.getCommune());
-        addressDto.setAddress(addressDto.getAddress());
-        addressDto.setIsDefault(addressDto.getIsDefault());
-        addressDto.setAddress(addressDto.getAddress());
-        Address address = mapper.convertToAddress(addressDto);
-        AddressDto addressReturn = mapper.convertToAddressDto(addressRepository.save(address));
-        addressReturn.setUserId(mapper.convertToUserDto(address.getUserId()));
-        return addressReturn;
+        address.setAddress(addressDto.getAddress());
+        address.setProvince(addressDto.getProvince());
+        address.setCommune(addressDto.getCommune());
+        address.setPhoneNumber(addressDto.getPhoneNumber());
+        address.setName(addressDto.getName());
+        address.setIsActive(addressDto.getIsActive());
+
+        Address addressSaved = addressRepository.save(address);
+        return mapper.convertToAddressDto(addressSaved);
     }
 
     @Override
@@ -83,6 +83,20 @@ public class AddressServiceImpl implements AddressService {
                                 addresses.getContent().stream().map( mapper::convertToAddressDto).toList()
                 )
                 .build();
+    }
+
+    @Override
+    public void setDefaultAddress(Integer addId, Integer userId) {
+        userRepository.findByIdAndIsActive(userId, true)
+                .orElseThrow(() -> new UserNotFound(userId.toString(), "id"));
+
+        List<Address> addresses = addressRepository.getAddressByUserId_IdAndIsActive(userId, true);
+
+        addresses.forEach(address -> {
+            address.setIsDefault(address.getId().equals(addId));
+        });
+
+        addressRepository.saveAll(addresses);
     }
 }
 

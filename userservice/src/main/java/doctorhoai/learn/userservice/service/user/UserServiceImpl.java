@@ -1,6 +1,5 @@
 package doctorhoai.learn.userservice.service.user;
 
-import doctorhoai.learn.basedomain.response.ResponseObject;
 import doctorhoai.learn.userservice.dto.Filter.Filter;
 import doctorhoai.learn.userservice.dto.Filter.FilterUser;
 import doctorhoai.learn.userservice.dto.UserDto;
@@ -8,7 +7,6 @@ import doctorhoai.learn.userservice.exception.exception.EmailDuplicate;
 import doctorhoai.learn.userservice.exception.exception.PhoneNumberDuplicate;
 import doctorhoai.learn.userservice.exception.exception.RoleNotFound;
 import doctorhoai.learn.userservice.exception.exception.UserNotFound;
-import doctorhoai.learn.userservice.feign.model.PointDto;
 import doctorhoai.learn.userservice.feign.orderservice.PointFeign;
 import doctorhoai.learn.userservice.model.Role;
 import doctorhoai.learn.userservice.model.User;
@@ -17,11 +15,9 @@ import doctorhoai.learn.userservice.repository.RoleRepository;
 import doctorhoai.learn.userservice.repository.UserRepository;
 import doctorhoai.learn.userservice.utils.Mapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.ErrorResponseException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -66,8 +62,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateLateLoginUser(Integer id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFound(id.toString(), "id"));
+    public UserDto updateLateLoginUser(String username) {
+        User user = userRepository.getUserByEmail(username).orElseThrow(() -> new UserNotFound(username.toString(), "username"));
         if( user.getLastLogin() != null) return null;
         user.setLastLogin(LocalDateTime.now());
         User userSaved = userRepository.save(user);
@@ -110,6 +106,13 @@ public class UserServiceImpl implements UserService {
         }
         return mapper.convertToUserDto(user);
     }
+
+    @Override
+    public List<UserDto> getMulUser(List<Integer> ids) {
+        List<User> userList = userRepository.getMulUser(ids);
+        return userList.stream().map(mapper::convertToUserDto).toList();
+    }
+
 
     public void checkInfoUser(UserDto userDto, User user) {
         if(

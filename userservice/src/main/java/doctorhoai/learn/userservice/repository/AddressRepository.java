@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -29,4 +30,6 @@ public interface AddressRepository extends JpaRepository<Address, Integer> {
     );
 
     Optional<Address> getAddressByIdAndIsActive(Integer id, Boolean isActive);
+
+    List<Address> getAddressByUserId_IdAndIsActive(Integer userId, Boolean isActive);
 }

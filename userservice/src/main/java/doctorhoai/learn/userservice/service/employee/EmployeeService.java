@@ -11,9 +11,10 @@ import java.util.List;
 public interface EmployeeService {
     EmployeeDto addEmployee(EmployeeDto employeeDto);
     EmployeeDto updateEmployee(EmployeeDto employeeDto, Integer id);
-    EmployeeDto updateLateLoginEmployee(Integer id);
+    EmployeeDto updateLateLoginEmployee(String username);
     EmployeeDto getEmployeeByUsername(String username);
     EmployeeDto getEmployeeByFilter(FilterUser filterUser);
     PageObject getAllEmployees(Filter employeeDto);
     void updatePassword( String username, ChangePassword password);
+    List<EmployeeDto> getMulEmployee(List<Integer> ids);
 }

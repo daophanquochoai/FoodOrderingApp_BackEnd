@@ -52,9 +52,9 @@ public interface UserFeign {
             @RequestParam(required = false) LocalDate endDate
     );
 
-    @PutMapping("/late_time/{id}")
+    @PutMapping("/late_time/{username}")
     ResponseEntity<ResponseObject> updateLatestUpdateTime(
-            @PathVariable Integer id
+            @PathVariable String username
     );
     @GetMapping("/username/{username}")
     ResponseEntity<ResponseObject> getUserByUsername(

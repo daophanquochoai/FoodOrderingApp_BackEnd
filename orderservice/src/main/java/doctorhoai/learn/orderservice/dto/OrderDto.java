@@ -1,5 +1,6 @@
 package doctorhoai.learn.orderservice.dto;
 
+import doctorhoai.learn.orderservice.dto.userservice.EmployeeDto;
 import doctorhoai.learn.orderservice.dto.userservice.UserDto;
 import doctorhoai.learn.orderservice.dto.voucherservice.VoucherDto;
 import doctorhoai.learn.orderservice.model.enums.EStatusOrder;
@@ -31,7 +32,7 @@ public class OrderDto {
     private String address;
     private EStatusOrder status;
     private Integer tableNumber;
-    private UserDto shipperId;
+    private EmployeeDto shipperId;
     private String name;
     private String phoneNumber;
 

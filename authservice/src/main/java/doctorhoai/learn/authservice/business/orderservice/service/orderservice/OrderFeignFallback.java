@@ -2,6 +2,7 @@ package doctorhoai.learn.authservice.business.orderservice.service.orderservice;
 
 import doctorhoai.learn.authservice.business.orderservice.model.Filter;
 import doctorhoai.learn.authservice.business.orderservice.model.OrderDto;
+import doctorhoai.learn.authservice.business.orderservice.model.UpdateStatusOrder;
 import doctorhoai.learn.authservice.feign.function.HandleFallBack;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,11 @@ public class OrderFeignFallback implements FallbackFactory<OrderFeign> {
 
             @Override
             public ResponseEntity<ResponseObject> all(Filter filter) {
+                return fallBack.processFallback(cause);
+            }
+
+            @Override
+            public ResponseEntity<ResponseObject> changeStatusOrder(Integer id, UpdateStatusOrder statusOrder) {
                 return fallBack.processFallback(cause);
             }
         };
