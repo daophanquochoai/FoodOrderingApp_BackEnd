@@ -2,18 +2,22 @@ package doctorhoai.learn.orderservice.service.orderservice;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import doctorhoai.learn.basedomain.exception.BadException;
 import doctorhoai.learn.basedomain.kafka.order.EventOrder;
 import doctorhoai.learn.basedomain.response.PageObject;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import doctorhoai.learn.orderservice.dto.OrderDto;
 import doctorhoai.learn.orderservice.dto.OrderItemDto;
+import doctorhoai.learn.orderservice.dto.UpdateStatusOrder;
 import doctorhoai.learn.orderservice.dto.filter.Filter;
 import doctorhoai.learn.orderservice.dto.foodservice.FoodSizeDto;
+import doctorhoai.learn.orderservice.dto.userservice.EmployeeDto;
 import doctorhoai.learn.orderservice.dto.userservice.UserDto;
 import doctorhoai.learn.orderservice.dto.voucherservice.VoucherDto;
 import doctorhoai.learn.orderservice.exception.exception.*;
-import doctorhoai.learn.orderservice.feign.foodservice.FoodSizeFeign;
 import doctorhoai.learn.orderservice.feign.foodservice.VoucherFeign;
+import doctorhoai.learn.orderservice.feign.inventory.ingredient_use.IngredientUseFeign;
+import doctorhoai.learn.orderservice.feign.userservice.EmployeeFeign;
 import doctorhoai.learn.orderservice.feign.userservice.UserFeign;
 import doctorhoai.learn.orderservice.kafka.sender.KafkaMessageSender;
 import doctorhoai.learn.orderservice.model.*;
@@ -35,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +48,7 @@ public class OrderServiceImpl implements OrderService{
     private final OrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
     private final PaymentRepository paymentRepository;
+    private final EmployeeFeign employeeFeign;
     private final UserFeign userFeign;
     private final VoucherFeign voucherFeign;
     private final CartServiceImpl cartService;
@@ -52,6 +56,7 @@ public class OrderServiceImpl implements OrderService{
     private final KafkaMessageSender sender;
     private final OrderItemRepository orderItemRepository;
     private final ObjectMapper objectMapper;
+    private final IngredientUseFeign ingredientUseFeign;
     @Value("${spring.kafka.topic.food}")
     private String foodTopic;
     @Value("${spring.kafka.topic.inventory}")
@@ -123,7 +128,7 @@ public class OrderServiceImpl implements OrderService{
                     .orderId(order)
                     .foodId(orderItemDto.getFoodId().getId())
                     .quantity(orderItemDto.getQuantity())
-                    .priceAtTime( foodSizeDto.getPrice() * (100 - foodSizeDto.getDiscount()) )
+                    .priceAtTime( foodSizeDto.getPrice() * (100 - foodSizeDto.getDiscount())/100 )
                     .isActive(true)
                     .build();
             orderItems.add(orderItem);
@@ -145,7 +150,7 @@ public class OrderServiceImpl implements OrderService{
             sender.sendTo(
                     EventOrder.<OrderDto>builder()
                             .order(kafkaOrder)
-                            .cart(cartItems.stream().map(i -> i.getId()).toList())
+                            .cart(cartItems.stream().map(CartItem::getId).toList())
                             .voucher(order.getDiscountApplied())
                             .status(doctorhoai.learn.basedomain.kafka.order.EStatusOrder.CREATE)
                             .build(),
@@ -275,11 +280,13 @@ public class OrderServiceImpl implements OrderService{
             pageable = PageRequest.of(filter.getPageNo(), filter.getPageSize(), Sort.by(filter.getOrder()));
         }
         Page<Order> orderPage = orderRepository.getOrderByFilter(
+                filter.getId() == null || filter.getId().isEmpty() ? null : filter.getId(),
                 filter.getSearch(),
                 filter.getStartDate() == null ? null : filter.getStartDate().atStartOfDay(),
                 filter.getEndDate() == null ? null : filter.getEndDate().plusDays(1).atStartOfDay(),
                 filter.getStatusOrders() == null || filter.getStatusOrders().isEmpty() ? null : filter.getStatusOrders(),
                 filter.getType(),
+                filter.getShipperId(),
                 pageable
         );
 
@@ -304,6 +311,10 @@ public class OrderServiceImpl implements OrderService{
 
         List<VoucherDto> voucherDtos = getVoucherByIds(idsVoucher);
 
+        List<Integer> employeeIds = orderPage.getContent().stream().map(Order::getShipperId).distinct().filter(Objects::nonNull).toList();
+
+        List<EmployeeDto> employeeDtos = getEmployeeByIds(employeeIds);
+
         List<OrderDto> order = orderPage.getContent().stream().map( (item) -> {
             OrderDto orderDto = mapper.convertToOrderDto(item);
             List<OrderItemDto> orderItemDto = new ArrayList<>();
@@ -312,6 +323,10 @@ public class OrderServiceImpl implements OrderService{
                         getOrderItemInList(orderItemDtos, orderItem.getId())
                 );
             }
+            if( item.getShipperId() != null){
+                orderDto.setShipperId(getEmployeeById(employeeDtos, item.getShipperId()));
+            }
+
             if( item.getPaymentId() != null){
                 orderDto.setPaymentId(mapper.convertToPaymentDto(item.getPaymentId()));
             }
@@ -330,6 +345,23 @@ public class OrderServiceImpl implements OrderService{
                 .build();
     }
 
+    @Override
+    public void updateStatusOrder(Integer orderId, UpdateStatusOrder statusOrder) {
+        Order order = orderRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
+        if( statusOrder.getStatus() == EStatusOrder.CANCEL){
+            order.setMessage(statusOrder.getMessage());
+            ingredientUseFeign.updateIngredientsInOrder(orderId);
+        }
+        if( order.getStatus() == EStatusOrder.CANCEL){
+            throw new BadException(EMessageException.ORDER_WAS_CANCEL.getMessage());
+        }
+        if( statusOrder.getStatus() == EStatusOrder.SHIPPING){
+            order.setShipperId(statusOrder.getShipperId());
+        }
+        order.setStatus(statusOrder.getStatus());
+        orderRepository.save(order);
+    }
+
     public VoucherDto getVoucherByIds( List<VoucherDto> voucherDtos, Integer id){
         for(VoucherDto voucherDto : voucherDtos){
             if(voucherDto.getId() == id){
@@ -337,6 +369,24 @@ public class OrderServiceImpl implements OrderService{
             }
         }
         return null;
+    }
+
+    public EmployeeDto getEmployeeById(List<EmployeeDto> employeeDtos, Integer id){
+        for(EmployeeDto employeeDto : employeeDtos){
+            if(employeeDto.getId() == id){
+                return employeeDto;
+            }
+        }
+        return null;
+    }
+
+    public List<EmployeeDto> getEmployeeByIds(List<Integer> ids){
+        ResponseEntity<ResponseObject> responseEmployee = employeeFeign.getMulEmployee(ids);
+        List<EmployeeDto> employeeDtos = new ArrayList<>();
+        if( responseEmployee.getStatusCode().is2xxSuccessful()){
+            employeeDtos = objectMapper.convertValue(responseEmployee.getBody().getData(), new TypeReference<List<EmployeeDto>>() {});
+        }
+        return employeeDtos;
     }
 
     public List<VoucherDto> getVoucherByIds( List<Integer> ids){

@@ -35,4 +35,8 @@ public interface AddressFeign {
             @PathVariable Integer id,
             @RequestBody @Valid AddressDto addressDto
     );
+    @PutMapping("/set_default/{id}/{userId}")
+    ResponseEntity<ResponseObject> setDefault(@PathVariable Integer id,
+                                                     @PathVariable Integer userId
+    );
 }

@@ -45,4 +45,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     );
 
     Optional<User> getUserByEmail(String email);
+
+    @Query(
+            value = """
+            SELECT u FROM User u WHERE 
+            (:ids IS NULL OR u.id IN :ids) 
+            """
+    )
+    List<User> getMulUser(List<Integer> ids);
+
 }

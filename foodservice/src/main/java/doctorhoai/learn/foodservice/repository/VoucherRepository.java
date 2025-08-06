@@ -39,7 +39,8 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
     (:status IS NULL OR v.status IN :status) AND 
     (:search IS NULL OR v.code LIKE CONCAT('%', :search, '%')) AND
     (:max IS NULL OR (:max = true AND v.maxUse = v.usedCount) OR (:max = false AND v.maxUse > v.usedCount)) AND 
-    (:forCategory IS NULL OR :forCategory = false OR (:forCategory = true AND size(v.voucherCategories) > 0)) AND 
+    (:forCategory IS NULL OR :forCategory = false OR (:forCategory = true AND size(v.voucherCategories) > 0)) AND
+    (v.endDate > NOW()) AND 
     (
         (:foodIds IS NULL OR EXISTS (
             SELECT 1 FROM VoucherFood vf WHERE vf.voucher = v AND vf.food.id IN :foodIds AND vf.isActive = true

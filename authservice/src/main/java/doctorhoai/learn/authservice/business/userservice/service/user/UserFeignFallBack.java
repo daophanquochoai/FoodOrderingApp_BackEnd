@@ -45,7 +45,7 @@ public class UserFeignFallBack implements FallbackFactory<UserFeign> {
             }
 
             @Override
-            public ResponseEntity<ResponseObject> updateLatestUpdateTime(Integer id) {
+            public ResponseEntity<ResponseObject> updateLatestUpdateTime(String username) {
                 return fallBack.processFallback(cause);
             }
 

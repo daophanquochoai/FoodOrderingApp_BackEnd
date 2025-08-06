@@ -21,6 +21,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             value = """
             SELECT o FROM Order o
             WHERE 
+            (:id IS NULL OR o.userId IN :id) AND
             (:search IS NULL 
                 OR o.name LIKE CONCAT('%',:search,'%') 
                 OR o.address LIKE CONCAT('%',:search,'%') 
@@ -29,15 +30,18 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             (:start IS NULL OR o.createdAt >= :start) AND 
             (:end IS NULL OR o.createdAt <= :end) AND 
             (:statusOrders IS NULL OR o.status IN (:statusOrders)) AND 
-            (:type IS NULL OR ( :type is false AND o.tableNumber IS NOT NULL ) OR (:type IS TRUE AND o.tableNumber IS NULL) )
+            (:type IS NULL OR ( :type is false AND o.tableNumber IS NOT NULL ) OR (:type IS TRUE AND o.tableNumber IS NULL) ) AND 
+            (:shipperId IS NULL OR o.shipperId = :shipperId)
             """
     )
     Page<Order> getOrderByFilter(
+            List<Integer> id,
             String search,
             LocalDateTime start,
             LocalDateTime end,
             List<EStatusOrder> statusOrders,
             Boolean type,
+            Integer shipperId,
             Pageable pageable
     );
 }

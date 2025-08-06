@@ -17,6 +17,8 @@ public enum EMessageResponse {
 
     GET_POINT_SUCCESSFUL("Get point successful"),
     CREATE_POINT_SUCCESSFUL("Create point successful"),
+
+    CHANGE_ORDER_SUCCESSFUL("Change order successful"),
     ;
 
     private String message;

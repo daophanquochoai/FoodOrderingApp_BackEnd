@@ -16,4 +16,5 @@ public class IngredientsUseDto {
     private Float quantity;
     private Integer orderId;
     private Boolean isActive;
+    private IngredientsDto ingredients;
 }

@@ -26,5 +26,6 @@ public class Filter {
     private Boolean isActive;
 
     private List<EStatusOrder> statusOrders;
+    private Integer shipperId;
     private Boolean type;
 }

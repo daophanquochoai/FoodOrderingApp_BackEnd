@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/employee")
@@ -87,14 +88,14 @@ public class EmployeeController {
         );
     }
     
-    @PutMapping("/late_login/{id}")
+    @PutMapping("/late_login/{username}")
     public ResponseEntity<ResponseObject> getLateLoginEmployee(
-            @PathVariable Integer id
+            @PathVariable String username
     ){
         return ResponseEntity.ok(
                 ResponseObject.builder()
                         .message(EMessageResponse.UPDATE_EMPLOYEE.getMessage())
-                        .data(employeeService.updateLateLoginEmployee(id))
+                        .data(employeeService.updateLateLoginEmployee(username))
                         .build()
         );
     }
@@ -108,6 +109,18 @@ public class EmployeeController {
         return ResponseEntity.ok(
                 ResponseObject.builder()
                         .message(EMessageResponse.UPDATE_EMPLOYEE.getMessage())
+                        .build()
+        );
+    }
+
+    @PostMapping("/get/mul")
+    public ResponseEntity<ResponseObject> getMulEmployee(
+            @RequestBody List<Integer> ids
+            ){
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.GET_EMPLOYEE.getMessage())
+                        .data(employeeService.getMulEmployee(ids))
                         .build()
         );
     }

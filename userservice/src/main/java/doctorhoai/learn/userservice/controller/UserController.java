@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -117,14 +118,14 @@ public class UserController {
         );
     }
 
-    @PutMapping("/late_time/{id}")
+    @PutMapping("/late_time/{username}")
     public ResponseEntity<ResponseObject> updateLatestUpdateTime(
-            @PathVariable Integer id
+            @PathVariable String username
     ){
         return ResponseEntity.ok(
                 ResponseObject.builder()
                         .message(EMessageResponse.UPDATE_USER.getMessage())
-                        .data(userService.updateLateLoginUser(id))
+                        .data(userService.updateLateLoginUser(username))
                         .build()
         );
     }
@@ -137,6 +138,18 @@ public class UserController {
                 ResponseObject.builder()
                         .message(EMessageResponse.GET_USER.getMessage())
                         .data(userService.getUserByUsername(username))
+                        .build()
+        );
+    }
+
+    @PostMapping("/get/mul")
+    public ResponseEntity<ResponseObject> getMulUser(
+            @RequestBody List<Integer> ids
+            ){
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.GET_USER.getMessage())
+                        .data(userService.getMulUser(ids))
                         .build()
         );
     }

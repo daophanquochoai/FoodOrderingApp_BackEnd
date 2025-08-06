@@ -20,7 +20,7 @@ spring:
     properties:
       security.protocol: PLAINTEXT
     topic:
-      point : point
+      order : order
       sender_rollback : food_rollback
 server:
   port: 9003

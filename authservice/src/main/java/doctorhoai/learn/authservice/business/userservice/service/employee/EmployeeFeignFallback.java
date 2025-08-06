@@ -47,7 +47,7 @@ public class EmployeeFeignFallback implements FallbackFactory<EmployeeFeign> {
             }
 
             @Override
-            public ResponseEntity<ResponseObject> getLateLoginEmployee(Integer id) {
+            public ResponseEntity<ResponseObject> getLateLoginEmployee(String username) {
                 return fallBack.processFallback(cause);
             }
 

@@ -10,9 +10,10 @@ public interface UserService {
 
     UserDto addUser(UserDto userDto);
     UserDto updateUser(UserDto userDto, Integer id);
-    UserDto updateLateLoginUser(Integer id);
+    UserDto updateLateLoginUser(String username);
     UserDto getUserById(Integer id);
     UserDto getUserByFilter(FilterUser filter);
     List<UserDto> getAllUsers(Filter filter);
     UserDto getUserByUsername(String username);
+    List<UserDto> getMulUser(List<Integer> ids);
 }

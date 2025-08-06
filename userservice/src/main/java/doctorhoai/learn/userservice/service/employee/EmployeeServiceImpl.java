@@ -60,11 +60,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDto updateLateLoginEmployee(Integer id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(EmployeeNotFound::new);
-        if( employee.getLastLogin() != null ) {
-            return null;
-        }
+    public EmployeeDto updateLateLoginEmployee(String username) {
+        Employee employee = employeeRepository.findByEmailAndIsActive(username, true).orElseThrow(EmployeeNotFound::new);
         employee.setLastLogin(LocalDateTime.now());
         Employee savedEmployee = employeeRepository.save(employee);
         return mapper.convertToEmployeeDto(savedEmployee);
@@ -119,6 +116,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         }else{
             throw new PasswordNotCorrect();
         }
+    }
+
+    @Override
+    public List<EmployeeDto> getMulEmployee(List<Integer> ids) {
+        List<Employee> employeeList = employeeRepository.getMulEmployee(ids);
+        return employeeList.stream().map(mapper::convertToEmployeeDto).toList();
     }
 
     private void checkInfoEmployee(EmployeeDto employeeDto, Employee employee){

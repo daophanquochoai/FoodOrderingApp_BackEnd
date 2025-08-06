@@ -1,5 +1,6 @@
 package doctorhoai.learn.orderservice.dto.userservice;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 public class UserDto {
     @NotNull(message = "Id can't empty")
@@ -22,6 +24,5 @@ public class UserDto {
     private String password;
     private String email;
     private Boolean isActive;
-    private LocalDateTime lastLogin;
     private RoleDto role;
 }

@@ -4,6 +4,8 @@ import doctorhoai.learn.basedomain.response.PageObject;
 import doctorhoai.learn.inventoryservice.dto.IngredientsDto;
 import doctorhoai.learn.inventoryservice.dto.filter.Filter;
 
+import java.util.List;
+
 
 public interface IngredientsService {
 
@@ -11,4 +13,5 @@ public interface IngredientsService {
     PageObject getAllIngredients(Filter filter);
     IngredientsDto getIngredients(Integer id);
     IngredientsDto updateIngredients(IngredientsDto ingredientsDto, Integer id);
+    List<IngredientsDto> getIngredientsList(Integer orderId);
 }

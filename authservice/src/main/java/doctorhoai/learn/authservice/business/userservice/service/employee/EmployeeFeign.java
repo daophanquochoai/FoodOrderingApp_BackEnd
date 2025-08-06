@@ -51,9 +51,9 @@ public interface EmployeeFeign {
             @RequestBody Filter filter
     );
 
-    @PutMapping("/late_login/{id}")
+    @PutMapping("/late_login/{username}")
     ResponseEntity<ResponseObject> getLateLoginEmployee(
-            @PathVariable Integer id
+            @PathVariable String username
     );
 
     @PutMapping("/update/password/{username}")

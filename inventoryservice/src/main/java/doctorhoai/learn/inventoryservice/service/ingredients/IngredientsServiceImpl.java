@@ -77,4 +77,9 @@ public class IngredientsServiceImpl implements IngredientsService {
 
         return mapper.convertToIngredientsDto(ingredients);
     }
+
+    @Override
+    public List<IngredientsDto> getIngredientsList(Integer orderId) {
+        return List.of();
+    }
 }
