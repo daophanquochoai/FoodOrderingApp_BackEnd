@@ -11,7 +11,8 @@ public enum EMessageException {
 
     NAME_SIZE_DUPLICATE("Name size duplicate"),
     VOUCHER_DUPLICATE("Code duplicate"),
-    ;
+    CATEGORY_HOMEPAGE_NOT_FOUND("Category homepage not found"),
+    FOOD_HOMEPAGE_NOT_FOUND("Food homepage not found");
 
     private String message;
     EMessageException(String message) {

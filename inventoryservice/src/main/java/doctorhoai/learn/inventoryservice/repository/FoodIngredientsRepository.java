@@ -14,6 +14,8 @@ public interface FoodIngredientsRepository extends JpaRepository<FoodIngredients
 
     List<FoodIngredients> getFoodIngredientsByFoodId(@Param("foodId") Integer foodId);
 
+    List<FoodIngredients> getFoodIngredientsByFoodIdAndIsActive(@Param("foodId") Integer foodId, @Param("isActive") Boolean isActive);
+
 
     @Query(
             value = """

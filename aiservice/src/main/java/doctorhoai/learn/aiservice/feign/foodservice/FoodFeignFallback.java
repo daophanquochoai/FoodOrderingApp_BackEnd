@@ -19,7 +19,7 @@ public class FoodFeignFallback implements FallbackFactory<FoodFeign> {
     public FoodFeign create(Throwable cause) {
         return new FoodFeign() {
             @Override
-            public ResponseEntity<ResponseObject> getAllFoodNoFilter() {
+            public ResponseEntity<ResponseObject> getAllIdsFood(List<Integer> ids) {
                 return fallBack.processFallback(cause);
             }
         };

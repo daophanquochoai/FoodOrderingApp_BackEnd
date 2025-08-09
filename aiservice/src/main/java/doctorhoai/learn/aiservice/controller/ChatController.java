@@ -1,38 +1,34 @@
 package doctorhoai.learn.aiservice.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import doctorhoai.learn.aiservice.service.chatbot.AiChatService;
-//import doctorhoai.learn.aiservice.service.chatbot.AiChatWithToolService;
 import doctorhoai.learn.aiservice.service.chatbot.RagService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 @RequestMapping("/chat")
-@CrossOrigin(origins = "*")
 @Slf4j
+@RequiredArgsConstructor
 public class ChatController {
 
-//    private final AiChatWithToolService chatService;
-    private final AiChatService aiChatService;
+    private final AiChatService chatService;
     private final RagService ragService;
 
-    public ChatController(RagService ragService, AiChatService aiChatService) {
-//        this.chatService = chatService;
-        this.aiChatService = aiChatService;
-        this.ragService = ragService;
-    }
-
-    @GetMapping
+    @GetMapping()
     public Flux<String> rag(@RequestParam(defaultValue = "Hello") String message) {
-        // Simple chat endpoint:
-        // - Handles basic questions without document context
-        // - Returns streaming response
-        return aiChatService.chat(message);
+
+        return chatService.chat(message);
     }
 
     @PostMapping("/load")
@@ -42,7 +38,7 @@ public class ChatController {
         // 1. Check if file is provided
         if(file == null || file.isEmpty()) {
             log.info("File is empty");
-            return aiChatService.chat(message);
+            return chatService.chat(message);
         }
 
         // 2. Process uploaded document
@@ -56,6 +52,6 @@ public class ChatController {
         log.info("Segments saved");
 
         // 4. Generate response using document context
-        return aiChatService.chat(message);
+        return chatService.chat(message);
     }
 }

@@ -10,6 +10,7 @@ import doctorhoai.learn.foodservice.dto.filter.Filter;
 import doctorhoai.learn.foodservice.exception.CategoryNotFoundException;
 import doctorhoai.learn.foodservice.exception.FoodNotFoundException;
 import doctorhoai.learn.foodservice.exception.SizeNotFoundException;
+import doctorhoai.learn.foodservice.kafka.proceducer.KafkaMessageSender;
 import doctorhoai.learn.foodservice.model.Category;
 import doctorhoai.learn.foodservice.model.Food;
 import doctorhoai.learn.foodservice.model.FoodSize;
@@ -39,6 +40,7 @@ public class FoodServiceImpl implements FoodService {
     private final CategoryRepository categoryRepository;
     private final Mapper mapper;
     private final SizeRepository sizeRepository;
+    private final KafkaMessageSender kafkaMessageSender;
 
 
     @Override
@@ -126,6 +128,7 @@ public class FoodServiceImpl implements FoodService {
         }
         food = foodRepository.save(food);
         FoodDto foodDto = convertListFood(food);
+        kafkaMessageSender.sendEventToSearchAI(MessageTemplate.<FoodDto>builder().data(foodDto).messageType(EMessageType.CREATE_FOOD).build());
         return foodDto;
     }
 
@@ -174,8 +177,9 @@ public class FoodServiceImpl implements FoodService {
         }
         food = foodRepository.save(food);
         if( food.getStatus() == EStatusFood.DELETE || food.getStatus() == EStatusFood.OUT_STOCK){
-            // TODO semantic search
+            kafkaMessageSender.sendEventToSearchAI(MessageTemplate.<FoodDto>builder().data(foodDto).messageType(EMessageType.DELETE_FOOD).build());
         }else{
+            kafkaMessageSender.sendEventToSearchAI(MessageTemplate.<FoodDto>builder().data(foodDto).messageType(EMessageType.UPDATE_FOOD).build());
         }
         return convertListFood(food);
     }
@@ -221,20 +225,6 @@ public class FoodServiceImpl implements FoodService {
         List<Food> foods = foodRepository.getAllFood( EStatusFood.ACTIVE);
         return foods.stream().map(this::convertListFood).toList();
     }
-
-
-//    private List<FoodSizeDto> convertListFoodSize(List<FoodSize> foodSizes){
-//        List<FoodSizeDto> foodSizeDtos = new ArrayList<>();
-//        for( FoodSize fs : foodSizes){
-//            FoodSizeDto foodSizeDto = mapper.convertToFoodSizeDto(fs);
-//            if( fs.getSize() != null && fs.getSize().getId() != null){
-//                SizeDto sizeDto = mapper.convertToSizeDto(fs.getSize());
-//                foodSizeDto.setSizeId(sizeDto);
-//            }
-//            foodSizeDtos.add(foodSizeDto);
-//        }
-//        return foodSizeDtos;
-//    }
 
     private FoodDto convertListFood(Food food){
         FoodDto foodDto = mapper.covertToFoodDto(food);

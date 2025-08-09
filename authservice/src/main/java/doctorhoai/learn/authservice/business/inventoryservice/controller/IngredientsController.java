@@ -51,4 +51,10 @@ public class IngredientsController {
     ){
         return ingredientFeign.getHistoryIngredients(id, filter);
     }
+    @PostMapping("/food_size/{id}")
+    ResponseEntity<ResponseObject> getIngredientsFoodSize(
+            @PathVariable Integer id
+    ){
+        return ingredientFeign.getIngredientsFoodSize(id);
+    }
 }
