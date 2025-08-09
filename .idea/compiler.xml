@@ -27,11 +27,12 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
         </processorPath>
-        <module name="inventoryservice" />
         <module name="aiservice" />
-        <module name="foodservice" />
         <module name="authservice" />
         <module name="userservice" />
+        <module name="inventoryservice" />
+        <module name="dashboardservice" />
+        <module name="foodservice" />
         <module name="orderservice" />
       </profile>
     </annotationProcessing>
@@ -43,6 +44,7 @@
       <module name="apigateway" options="-parameters" />
       <module name="authservice" options="-parameters" />
       <module name="configserver" options="-parameters" />
+      <module name="dashboardservice" options="-parameters" />
       <module name="eureka" options="-parameters" />
       <module name="foodservice" options="-parameters" />
       <module name="inventoryservice" options="-parameters" />
