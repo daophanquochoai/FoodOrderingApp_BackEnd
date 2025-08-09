@@ -41,7 +41,7 @@ public class IngredientsErrorController {
         );
     }
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     public ResponseEntity<ResponseObject> getAllIngredients(
             @RequestBody Filter filter
             ) {
@@ -49,6 +49,16 @@ public class IngredientsErrorController {
                 ResponseObject.builder()
                         .message(EMessageResponse.GET_INGREDIENTS_ERROR_SUCCESSFUL.getMessage())
                         .data(ingredientsErrorService.getIngredientsErrorPage(filter))
+                        .build()
+        );
+    }
+
+    @GetMapping("/get_ingredients/{historyId}")
+    public ResponseEntity<ResponseObject> getHistoryIngredientsByHistoryId(@PathVariable Integer historyId) {
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message("Get History Ingredients successful")
+                        .data(ingredientsErrorService.getHistoryIngredientsByHistoryId(historyId))
                         .build()
         );
     }

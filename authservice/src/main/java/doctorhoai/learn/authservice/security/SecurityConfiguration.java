@@ -27,11 +27,11 @@ public class SecurityConfiguration {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests( auth -> auth
+                        .requestMatchers("/ingredients_use/**", "/ingredients_error/**", "/employee/**").hasAnyRole("ADMIN", "CHEF", "SHIPPER")
+                        .requestMatchers("/point/**","/user/**", "/order/all", "/employee/**", "history_import_or_export/**", "dashboard/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/document/**","/search/**", "/chat/**","/shipping_fee_config/**","/order/**","voucher/**","/payment/**","/source/**","/auth/**", "/healthcheck", "/user/add", "/food/**", "/size/**", "/category/**", "/upload","/cart/**", "/filter/**", "/food_size/**", "/ingredients/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/food-homepage/**", "/category-homepage/**").permitAll()
-                        .requestMatchers("/ingredients_use/**", "/employee/**").hasAnyRole("ADMIN", "CHEF", "SHIPPER")
                         .requestMatchers("/food-homepage/**", "/category-homepage").hasAnyRole("ADMIN")
-                        .requestMatchers("/point/**","/user/**", "/order/all", "/employee/**", "history_import_or_export/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling( exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint)

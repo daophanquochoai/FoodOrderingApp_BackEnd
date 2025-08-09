@@ -24,4 +24,6 @@ public interface HistoryIngredientsRepository extends JpaRepository<HistoryIngre
     List<HistoryIngredients> getIngredientsInInventory(
         List<Integer> ingredientIds
     );
+
+    List<HistoryIngredients> findByHistoryId(Integer historyId);
 }

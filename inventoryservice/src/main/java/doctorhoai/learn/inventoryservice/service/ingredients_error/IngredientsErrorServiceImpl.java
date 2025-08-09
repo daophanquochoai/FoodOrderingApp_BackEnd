@@ -1,14 +1,18 @@
 package doctorhoai.learn.inventoryservice.service.ingredients_error;
 
 import doctorhoai.learn.basedomain.response.PageObject;
-import doctorhoai.learn.inventoryservice.dto.IngredientsErrorDto;
+import doctorhoai.learn.inventoryservice.dto.*;
 import doctorhoai.learn.inventoryservice.dto.filter.Filter;
 import doctorhoai.learn.inventoryservice.exception.exception.IngredientsErrorNotFoundException;
 import doctorhoai.learn.inventoryservice.mapper.Mapper;
+import doctorhoai.learn.inventoryservice.model.HistoryImportOrExport;
 import doctorhoai.learn.inventoryservice.model.HistoryIngredients;
 import doctorhoai.learn.inventoryservice.model.IngredientError;
+import doctorhoai.learn.inventoryservice.model.enums.EUnitType;
+import doctorhoai.learn.inventoryservice.repository.HistoryImportOrExportRepository;
 import doctorhoai.learn.inventoryservice.repository.HistoryIngredientsRepository;
 import doctorhoai.learn.inventoryservice.repository.IngredientsErrorRepository;
+import doctorhoai.learn.inventoryservice.service.history_import_or_export.HistoryImportOrExportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -38,6 +43,14 @@ public class IngredientsErrorServiceImpl implements IngredientsErrorService {
 
         HistoryIngredients historyIngredients = historyIngredientsRepository.findById(ingredientsErrorDto.getHistoryIngredients().getId()).orElseThrow(IngredientsErrorNotFoundException::new);
 
+        if (ingredientError.getQuantity() < historyIngredients.getQuantity()) {
+            historyIngredients.setQuantity(historyIngredients.getQuantity() - ingredientError.getQuantity());
+        } else {
+            ingredientError.setQuantity(Math.round(historyIngredients.getQuantity()));
+            historyIngredients.setQuantity(0.0F);
+        }
+        historyIngredients = historyIngredientsRepository.save(historyIngredients);
+
         ingredientError.setHistoryIngredients(historyIngredients);
         ingredientError = ingredientsErrorRepository.save(ingredientError);
         return mapper.convertToIngredientsErrorDto(ingredientError);
@@ -46,10 +59,24 @@ public class IngredientsErrorServiceImpl implements IngredientsErrorService {
     @Override
     public IngredientsErrorDto updateIngredientsError(IngredientsErrorDto ingredientsErrorDto, Integer id) {
         IngredientError ingredientError = ingredientsErrorRepository.findById(id).orElseThrow(IngredientsErrorNotFoundException::new);
+
+        HistoryIngredients historyIngredients = historyIngredientsRepository.findById(ingredientsErrorDto.getHistoryIngredients().getId()).orElseThrow(IngredientsErrorNotFoundException::new);
+
+        historyIngredients.setQuantity(historyIngredients.getQuantity() + ingredientError.getQuantity());
+        if (ingredientsErrorDto.getIsActive() == true) {
+            if (historyIngredients.getQuantity() > ingredientsErrorDto.getQuantity()) {
+                historyIngredients.setQuantity(historyIngredients.getQuantity() - ingredientsErrorDto.getQuantity());
+            } else {
+                ingredientError.setQuantity(Math.round(historyIngredients.getQuantity()));
+                historyIngredients.setQuantity(0.0F);
+            }
+        }
+        historyIngredientsRepository.save(historyIngredients);
+
+        ingredientError.setIsActive(ingredientsErrorDto.getIsActive());
         ingredientError.setUnit(ingredientsErrorDto.getUnit());
         ingredientError.setQuantity(ingredientsErrorDto.getQuantity());
         ingredientError.setReason(ingredientsErrorDto.getReason());
-        ingredientError.setIsActive(ingredientsErrorDto.getIsActive());
 
         ingredientError = ingredientsErrorRepository.save(ingredientError);
         return mapper.convertToIngredientsErrorDto(ingredientError);
@@ -74,12 +101,53 @@ public class IngredientsErrorServiceImpl implements IngredientsErrorService {
 
         List<IngredientError> iError = ingredientErrors.getContent();
 
-        List<IngredientsErrorDto> iErrorDto = iError.stream().map(mapper::convertToIngredientsErrorDto).toList();
+        List<IngredientsErrorResponseDto> iErrorDto = iError.stream().map(ie ->{
+            HistoryImportOrExportDto batchCode = null;
+            String name = null;
+            Integer historyId = null;
+            EUnitType unit = ie.getUnit();
+            Integer quantity = ie.getQuantity();
+            String reason = ie.getReason();
+            Boolean isActive = ie.getIsActive();
+            Integer id = ie.getId();
+
+            if (ie.getHistoryIngredients() != null) {
+                HistoryIngredients hi = ie.getHistoryIngredients();
+                historyId = hi.getId();
+
+                if (hi.getHistory() != null) {
+                    batchCode = mapper.convertToHistoryImportOrExportDto(hi.getHistory());
+                }
+
+                if (ie.getHistoryIngredients().getIngredientsId() != null) {
+                    name = ie.getHistoryIngredients().getIngredientsId().getName();
+                }
+            }
+            return new IngredientsErrorResponseDto(id, unit, quantity, reason, isActive, batchCode, name, historyId);
+        }).toList();
 
         return PageObject.builder()
                 .totalPage(ingredientErrors.getTotalPages())
                 .page(filter.getPageNo())
                 .data(iErrorDto)
                 .build();
+    }
+
+    @Override
+    public List<HistoryIngredientsDto> getHistoryIngredientsByHistoryId(Integer historyId) {
+        List<HistoryIngredients> historyIngredients = historyIngredientsRepository.findByHistoryId(historyId);
+        List<HistoryIngredientsDto> historyIngredientsDtos = historyIngredients.stream().map(mapper::convertToHistoryIngredientsDto).toList();
+
+        for (int i = 0; i < historyIngredientsDtos.size(); i++) {
+            HistoryIngredients hi = historyIngredients.get(i);
+            HistoryIngredientsDto hiDto = historyIngredientsDtos.get(i);
+
+            if (hi.getIngredientsId() != null) {
+                IngredientsDto iDto = mapper.convertToIngredientsDto(hi.getIngredientsId());
+                hiDto.setIngredients(iDto);
+            }
+        }
+
+        return historyIngredientsDtos;
     }
 }
