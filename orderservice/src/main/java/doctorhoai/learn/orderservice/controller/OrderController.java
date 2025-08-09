@@ -1,5 +1,6 @@
 package doctorhoai.learn.orderservice.controller;
 
+import com.stripe.exception.StripeException;
 import doctorhoai.learn.basedomain.response.ResponseObject;
 import doctorhoai.learn.orderservice.dto.OrderDto;
 import doctorhoai.learn.orderservice.dto.UpdateStatusOrder;
@@ -20,8 +21,7 @@ public class OrderController {
     @PostMapping("/order")
     public ResponseEntity<ResponseObject> order(
             @RequestBody OrderDto orderDto
-            )
-    {
+            ) throws StripeException {
         return ResponseEntity.ok(
                 ResponseObject.builder()
                         .message(EMessageResponse.ORDER_SUCCESSFUL.getMessage())

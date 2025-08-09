@@ -22,6 +22,7 @@ spring:
     topic:
       inventory : inventory
       order_rollback : order_rollback
+      name: apisearch
     bootstrap-servers: ${SPRING_URL_KAFKA:localhost:9092}
 server:
   port: 9002

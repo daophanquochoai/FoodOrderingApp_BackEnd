@@ -7,6 +7,7 @@ import dev.langchain4j.data.document.loader.FileSystemDocumentLoader;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -36,6 +37,11 @@ public class RagService {
         this.embeddingStoreIngestor = embeddingStoreIngestor;
         this.embeddingStore = embeddingStore;
     }
+
+//    @PostConstruct
+//    public void initOnStartup() {
+//        handleUploadAndSegment();
+//    }
 
     public void saveSegments(Resource resource) throws IOException {
         // Process and store document segments:
@@ -72,7 +78,7 @@ public class RagService {
             }
 
             // 3. Generate unique filename and save
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
             Path filePath = Paths.get(UPLOAD_DIR, fileName);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
@@ -81,5 +87,24 @@ public class RagService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void handleUploadAndSegment() {
+        try {
+            Path mergedFilePath = Paths.get("uploads/merged/" + getFirstPdfFileName("uploads/merged"));
+            Resource resource = new UrlResource(mergedFilePath.toUri());
+            saveSegments(resource);
+        } catch (Exception e) {
+            log.error("Error while processing uploaded file: {}", e.getMessage());
+        }
+    }
+
+    public String getFirstPdfFileName(String dirPath) {
+        File dir = new File(dirPath);
+        File[] pdfFiles = dir.listFiles((d, name) -> name.toLowerCase().endsWith(".pdf"));
+        if (pdfFiles != null && pdfFiles.length > 0) {
+            return pdfFiles[0].getName(); // Tên file, ví dụ: "restaurant-2025.pdf"
+        }
+        return null; // Không tìm thấy file PDF nào
     }
 }

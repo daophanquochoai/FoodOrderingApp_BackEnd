@@ -51,14 +51,30 @@ public interface IngredientsRepository extends JpaRepository<Ingredients, Intege
 
     @Query(
             value = """
-            SELECT i FROM FoodIngredients fi
-           JOIN fi.ingredients i
+            SELECT i FROM Ingredients i
             WHERE
-            (i IS NOT NULL AND (:ids IS NULL OR i.id in :ids)) AND 
+             (:ids IS NULL OR i.id in :ids) AND 
             i.isActive = TRUE
             """
     )
     List<Ingredients> getFoodIngredientsByIds(@Param("ids") List<Integer> ids);
 
     List<Ingredients> getIngredientsByIsActive(boolean isActive);
+
+    @Query(
+            value = """
+            SELECT i FROM FoodIngredients i 
+            WHERE i.isActive = TRUE 
+            AND i.foodId = :foodSizeId
+            """
+    )
+    List<FoodIngredients> getIngredientByFoodSizeId(Integer foodSizeId);
+
+    @Query(
+            value = """
+            SELECT i FROM Ingredients i 
+            WHERE i.isActive = TRUE
+            """
+    )
+    List<Ingredients> getIngredients();
 }

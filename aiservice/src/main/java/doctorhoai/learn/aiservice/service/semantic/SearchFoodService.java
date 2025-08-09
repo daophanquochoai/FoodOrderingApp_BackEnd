@@ -10,4 +10,5 @@ public interface SearchFoodService {
     void removeFood(FoodDto dto);
     void updateFood(FoodDto dto);
     List<Integer> searchFood(String search);
+    List<FoodDto> searchFoodDto(String search);
 }

@@ -1,0 +1,21 @@
+package doctorhoai.learn.authservice.business.foodservice.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serial;
+import java.io.Serializable;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class CategoryHomepageDto implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private Integer id;
+    private CategoryDto category;
+}

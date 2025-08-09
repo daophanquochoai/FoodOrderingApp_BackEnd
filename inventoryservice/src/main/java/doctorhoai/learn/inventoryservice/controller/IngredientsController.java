@@ -83,4 +83,27 @@ public class IngredientsController {
                         .build()
         );
     }
+
+    @PostMapping("/food_size/{id}")
+    public ResponseEntity<ResponseObject> getIngredientsFoodSize(
+            @PathVariable Integer id
+    )
+    {
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.GET_FOOD_INGREDIENTS_SUCCESSFUL.getMessage())
+                        .data(ingredientsService.getIngredientsListByFoodSizeId(id))
+                        .build()
+        );
+    }
+
+    @GetMapping("/ingredients")
+    public ResponseEntity<ResponseObject> getIngredients(){
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.GET_INGREDIENTS_SUCCESSFUL.getMessage())
+                        .data(ingredientsService.getIngredients())
+                        .build()
+        );
+    }
 }

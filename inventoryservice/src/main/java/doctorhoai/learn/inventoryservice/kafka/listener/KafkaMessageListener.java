@@ -62,7 +62,6 @@ public class KafkaMessageListener {
             );
 
             List<Integer> foodSizeIds = new ArrayList<>();
-            orderItems.stream().map(item -> item.getFoodId().getId()).toList();
             Map<Integer, Float> ingredientsForFood = new HashMap<>();
             Map<Integer, Integer> ingredientsOrderItems = new HashMap<>();
 
@@ -72,9 +71,7 @@ public class KafkaMessageListener {
             }
 
             List<FoodIngredients> foodIngredients = foodIngredientsRepository.getFoodIngredientOfFood(foodSizeIds, List.of(true));
-            if( foodIngredients.isEmpty()){
-                throw new IngredientsNotFoundException();
-            }
+
             for (FoodIngredients ingredient : foodIngredients) {
                 if( ingredient.getIngredients() != null ){
                     Integer id = ingredient.getIngredients().getId();

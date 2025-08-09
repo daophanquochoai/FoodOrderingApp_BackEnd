@@ -2,6 +2,7 @@ package doctorhoai.learn.orderservice.kafka.consumer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stripe.model.PaymentIntent;
 import doctorhoai.learn.basedomain.kafka.order.EventOrder;
 import doctorhoai.learn.orderservice.dto.OrderDto;
 import doctorhoai.learn.orderservice.exception.exception.OrderNotFoundException;
@@ -17,6 +18,10 @@ import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -42,6 +47,10 @@ public class KafkaMessageListener {
             }
             orderOptional.get().setStatus(EStatusOrder.CANCEL);
             orderOptional.get().setMessage(eventOrder.getMessage());
+            if( orderOptional.get().getPaymentId().getCode().equals("CARD")){
+                PaymentIntent paymentIntent = PaymentIntent.retrieve(orderOptional.get().getTransactionCode());
+                paymentIntent.cancel();
+            }
             orderRepository.save(orderOptional.get());
         }catch (Exception ex){
             System.out.println(ex.getMessage());

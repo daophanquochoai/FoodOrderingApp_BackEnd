@@ -1,10 +1,12 @@
 package doctorhoai.learn.inventoryservice.service.ingredients;
 
 import doctorhoai.learn.basedomain.response.PageObject;
+import doctorhoai.learn.inventoryservice.dto.FoodIngredientsDto;
 import doctorhoai.learn.inventoryservice.dto.IngredientsDto;
 import doctorhoai.learn.inventoryservice.dto.filter.Filter;
 import doctorhoai.learn.inventoryservice.exception.exception.IngredientsNotFoundException;
 import doctorhoai.learn.inventoryservice.mapper.Mapper;
+import doctorhoai.learn.inventoryservice.model.FoodIngredients;
 import doctorhoai.learn.inventoryservice.model.Ingredients;
 import doctorhoai.learn.inventoryservice.repository.IngredientsRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -81,5 +84,25 @@ public class IngredientsServiceImpl implements IngredientsService {
     @Override
     public List<IngredientsDto> getIngredientsList(Integer orderId) {
         return List.of();
+    }
+
+    @Override
+    public List<FoodIngredientsDto> getIngredientsListByFoodSizeId(Integer id) {
+        List<FoodIngredients> ingredients = ingredientsRepository.getIngredientByFoodSizeId(id);
+        List<FoodIngredientsDto> foodIngredientsDtos = new ArrayList<>();
+        for( FoodIngredients foodIngredients : ingredients){
+            FoodIngredientsDto foodIngredientsDto = mapper.convertToFoodIngredientsDto(foodIngredients);
+            if( foodIngredients.getIngredients() != null ){
+                foodIngredientsDto.setIngredients(mapper.convertToIngredientsDto(foodIngredients.getIngredients()));
+            }
+            foodIngredientsDtos.add(foodIngredientsDto);
+        }
+        return foodIngredientsDtos;
+    }
+
+    @Override
+    public List<IngredientsDto> getIngredients() {
+        List<Ingredients> ingredients = ingredientsRepository.getIngredients();
+        return ingredients.stream().map(mapper::convertToIngredientsDto).toList();
     }
 }

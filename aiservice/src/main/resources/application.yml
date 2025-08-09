@@ -1,8 +1,12 @@
 spring:
   application:
     name: aiservice
+  config:
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8071}
+  profiles:
+    active: dev
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://14.225.254.190:5432/postgres
     username: my_user
     password: my_password
     driver-class-name: org.postgresql.Driver
@@ -27,14 +31,15 @@ spring:
             trusted:
               packages: "*"
     topic:
-      name: food
-  config:
-    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8071}
-  profiles:
-    active: dev
+      name: apisearch
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2GB
+      max-request-size: 2GB
 server:
   port: 8081
-logging:
-  level:
-    dev:
-      langchain4j: DEBUG
+app:
+  upload:
+    dir: uploads
