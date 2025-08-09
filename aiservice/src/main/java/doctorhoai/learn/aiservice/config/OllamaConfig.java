@@ -9,13 +9,14 @@ import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaStreamingChatModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import java.time.Duration;
 
 @Configuration
 public class OllamaConfig {
-    private static final String BASE_URL = "http://localhost:11434";
-    private static final String MODEL_NAME = "mistral:latest";
-    private static final String MODE_EMBEDDING = "nomic-embed-text:latest";
+    private static final String BASE_URL = "http://14.225.254.190:11434";
+    private static final String MODEL_NAME = "qwen3:4b";
+    private static final String MODE_EMBEDDING = "nomic-embed-text";
 
     @Bean
     public ChatLanguageModel chatLanguageModel() {
@@ -26,7 +27,7 @@ public class OllamaConfig {
         return OllamaChatModel.builder()
                 .baseUrl(BASE_URL)
                 .timeout(Duration.ofMinutes(10))
-                .temperature(0.6)  // Deterministic responses
+                .temperature(0.0)  // Deterministic responses
                 .modelName(MODEL_NAME)
                 .build();
     }
@@ -41,7 +42,6 @@ public class OllamaConfig {
                 .baseUrl(BASE_URL)
                 .timeout(Duration.ofMinutes(10)) // Increased timeout for streaming
                 .temperature(0.0)
-                .topK(10)
                 .modelName(MODEL_NAME)
                 .build();
     }
@@ -58,5 +58,4 @@ public class OllamaConfig {
                 .timeout(Duration.ofMinutes(10)) // Increased timeout for embedding requests
                 .build();
     }
-
 }

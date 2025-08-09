@@ -42,6 +42,11 @@ public class IngredientsFeignFallBack implements FallbackFactory<IngredientFeign
             public ResponseEntity<ResponseObject> getHistoryIngredients(Integer id, Filter filter) {
                 return fallBack.processFallback(cause);
             }
+
+            @Override
+            public ResponseEntity<ResponseObject> getIngredientsFoodSize(Integer id) {
+                return fallBack.processFallback(cause);
+            }
         };
     }
 }

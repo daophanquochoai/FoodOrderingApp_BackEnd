@@ -118,5 +118,28 @@ public class Mapper {
                 .id(foodSize.getId())
                 .build();
     }
+    public CategoryHomepageDto covertToCategoryHomepageDto(CategoryHomepage categoryHomepage) {
+        return CategoryHomepageDto.builder()
+                .id(categoryHomepage.getId())
+                .category(covertToCategoryDto(categoryHomepage.getCategory()))
+                .build();
+    }
 
+    public CategoryHomepage covertToCategoryHomepage(CategoryHomepageDto categoryHomepageDto) {
+        return CategoryHomepage.builder().build();
+    }
+
+    public FoodHomepageDto  covertToFoodHomepageDto(FoodHomepage foodHomepage) {
+        return  FoodHomepageDto.builder()
+                .id(foodHomepage.getId())
+                .food(covertToFoodDto(foodHomepage.getFood()))
+                .feature(foodHomepage.getFeature())
+                .build();
+    }
+
+    public FoodHomepage convertToFoodHomepage(FoodHomepageDto foodHomepageDto) {
+        return FoodHomepage.builder()
+                .feature(foodHomepageDto.getFeature())
+                .build();
+    }
 }

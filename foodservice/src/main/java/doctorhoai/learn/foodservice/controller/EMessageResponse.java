@@ -24,7 +24,12 @@ public enum EMessageResponse {
     GET_FOOD_SIZE_SUCCESSFUL("Get food size successful"),
 
     GET_FILTER("Get filter successful"),
-    ;
+    GET_FOOD_HOMEPAGE("Get food homepage successful"),
+    GET_CATEGORY_HOMEPAGE("Get category homepage successful"),
+    CREATE_CATEGORY_HOMEPAGE("Create category homepage successful"),
+    CREATE_FOOD_HOMEPAGE("Create food homepage successful"),
+    DELETE_CATEGORY_HOMEPAGE("Delete category homepage successful"),
+    DELETE_FOOD_HOMEPAGE("Delete food homepage successful");
     private String message;
     EMessageResponse(String message) {
         this.message = message;

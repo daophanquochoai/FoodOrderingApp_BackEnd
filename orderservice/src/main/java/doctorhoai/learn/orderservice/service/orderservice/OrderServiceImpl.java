@@ -2,6 +2,9 @@ package doctorhoai.learn.orderservice.service.orderservice;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
 import doctorhoai.learn.basedomain.exception.BadException;
 import doctorhoai.learn.basedomain.kafka.order.EventOrder;
 import doctorhoai.learn.basedomain.response.PageObject;
@@ -25,6 +28,7 @@ import doctorhoai.learn.orderservice.model.enums.EStatusOrder;
 import doctorhoai.learn.orderservice.repository.*;
 import doctorhoai.learn.orderservice.service.cartservice.CartServiceImpl;
 import doctorhoai.learn.orderservice.utils.mapper.Mapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,11 +38,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
+import com.stripe.Stripe;
 
 @Service
 @RequiredArgsConstructor
@@ -61,10 +67,34 @@ public class OrderServiceImpl implements OrderService{
     private String foodTopic;
     @Value("${spring.kafka.topic.inventory}")
     private String inventoryTopic;
+    @Value(value = "${apikey}")
+    private String apiKey;
+
+    @PostConstruct
+    public void init() {
+        Stripe.apiKey = apiKey;
+    }
 
     @Override
-    @Transactional
-    public OrderDto save(OrderDto orderDto) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public OrderDto save(OrderDto orderDto) throws StripeException {
+        PaymentIntent paymentIntent = null;
+        if( orderDto.getPaymentId().getCode().equals("CARD")){
+            String currency = "USD";
+            BigDecimal totalPrice = BigDecimal.valueOf(orderDto.getTotalPrice());
+            long amount = totalPrice.multiply(BigDecimal.valueOf(100))
+                    .setScale(0, RoundingMode.HALF_UP)
+                    .longValue();
+            Map<String, Object> params = new HashMap<>();
+            params.put("amount", amount);
+            params.put("currency", currency);
+            params.put("description", "Payment ticket");
+            params.put("payment_method", orderDto.getTransactionCode());
+            params.put("confirmation_method", "manual"); // Chưa xác nhận ngay
+            params.put("capture_method", "manual"); // Chưa trừ tiền ngay
+
+            paymentIntent = PaymentIntent.create(params);
+        }
 
         Order order = new Order();
 
@@ -85,8 +115,10 @@ public class OrderServiceImpl implements OrderService{
         //set total price
         order.setTotalPrice(orderDto.getTotalPrice());
 
-        // set transaction code
-        order.setTransactionCode(orderDto.getTransactionCode());
+        if( orderDto.getPaymentId().getCode().equals("CARD")){
+            // set transaction code
+            order.setTransactionCode(paymentIntent.getId());
+        }
 
         // check voucher
         if( orderDto.getDiscountApplied() != null && orderDto.getDiscountApplied().getId() != null ){
@@ -142,6 +174,9 @@ public class OrderServiceImpl implements OrderService{
         cartItems.forEach(cartItem -> cartItem.setIsActive(false));
         cartItemRepository.saveAll(cartItems);
 
+        if( orderDto.getPaymentId().getCode().equals("CARD")){
+            paymentIntent.confirm();
+        }
 
         log.info("Send to food service...");
         OrderDto kafkaOrder = mapper.convertToOrderDto(order);
@@ -167,108 +202,7 @@ public class OrderServiceImpl implements OrderService{
                     inventoryTopic
             );
         }
-
         return kafkaOrder;
-
-
-
-
-
-//        EDiscountType type = null;
-//        Double priceDown = null;
-//        List<Integer> category = new ArrayList<>();
-//        List<Integer> food = new ArrayList<>();
-//        VoucherDto voucherDto = new VoucherDto();
-//        // check voucher
-//        if( orderDto.getDiscountApplied() != null && orderDto.getDiscountApplied().getId() != null){
-//            ResponseEntity<ResponseObject> responseVoucher = voucherFeign.getVoucherById(orderDto.getDiscountApplied().getId());
-//
-//            if( responseVoucher.getStatusCode().is2xxSuccessful() ){
-//                 voucherDto = objectMapper.convertValue(responseVoucher.getBody().getData(), VoucherDto.class);
-//                // check voucher cant apply
-//                if( voucherDto.getUsers() == null || orderDto.getUserId() == null || orderDto.getUserId().getId() == null){
-//                    throw new UserNotFoundException();
-//                }else{
-//                    List<Integer> userIds = voucherDto.getUsers().stream().map(UserDto::getId).toList();
-//                    if( !userIds.contains(orderDto.getUserId().getId())){
-//                        throw new VoucherCantApplyException(EMessageException.USER_NOT_HAVE_VOUCHER.getMessage());
-//                    }
-//                }
-//                if( voucherDto.getMaxUse() == voucherDto.getUsedCount()){
-//                    throw new VoucherCantApplyException(EMessageException.VOUCHER_CANT_USE.getMessage());
-//                }
-//                if( voucherDto.getCategories() != null ){
-//                    category = voucherDto.getCategories().stream().map(CategoryDto::getId).toList();
-//                }
-//                if( voucherDto.getFoods() != null ){
-//                    food = voucherDto.getFoods().stream().map(FoodDto::getId).toList();
-//                }
-//                switch (orderDto.getDiscountApplied().getDiscountType()){
-//                    case CASH -> {
-//                        type = EDiscountType.CASH;
-//                        priceDown = voucherDto.getMaxDiscount();
-//                    }
-//                    case PERCENT -> {
-//                        priceDown = voucherDto.getMaxDiscount();
-//                        type = EDiscountType.PERCENT;
-//                    }
-//                    case FREESHIP -> {
-//                        type = EDiscountType.FREESHIP;
-//                        calculateCostShip -= voucherDto.getMaxDiscount();
-//                    }
-//                }
-//            }
-//        }
-//
-//        // calculate total
-//        for( FoodSizeDto foodSizeDto :foodSizeDtos){
-//            if( foodSizeDto.getFoodId() != null && foodSizeDto.getFoodId().getCategory() != null && foodSizeDto.getFoodId().getCategory().getId() != null){
-//                if( category.contains(foodSizeDto.getFoodId().getCategory().getId())){
-//                    switch (type){
-//                        case CASH -> {
-//                            totalCost += (float) (foodSizeDto.getPrice()*(100 -foodSizeDto.getDiscount()) - priceDown);
-//                        }
-//                        case PERCENT -> {
-//                            totalCost += (float) ((foodSizeDto.getPrice()*(100 -foodSizeDto.getDiscount()))*(100-priceDown));
-//                        }
-//                    }
-//                    continue;
-//                }
-//            }
-//
-//            if( foodSizeDto.getFoodId() != null && foodSizeDto.getFoodId().getId() != null){
-//                if( food.contains(foodSizeDto.getFoodId().getId())){
-//                    switch (type){
-//                        case CASH -> {
-//                            totalCost += (float) (foodSizeDto.getPrice()*(100 -foodSizeDto.getDiscount()) - priceDown);
-//                        }
-//                        case PERCENT -> {
-//                            totalCost += (float) ((foodSizeDto.getPrice()*(100 -foodSizeDto.getDiscount()))*(100-priceDown));
-//                        }
-//                    }
-//                    continue;
-//                }
-//            }
-//            throw new FoodNotFoundException();
-//        }
-//
-//        if( totalCost != orderDto.getTotalPrice() ){
-//            throw new ErrorException(EMessageException.TOTAL_COST_NOT_CORRECT.getMessage());
-//        }
-//
-//        // create order
-//        Order orderSave = Order.builder()
-//                .userId(orderDto.getUserId().getId())
-//                .paymentId(payment)
-//                .transactionCode(null)
-//                .discountApplied(orderDto.getDiscountApplied().getId())
-//                .address(orderDto.getAddress())
-//                .totalPrice(totalCost)
-//                .shipFee( totalCost >= shippingFeeConfig.getMinOrderForFeeShipping() ? 0 : Math.max(0, calculateCostShip))
-//                .tableNumber( orderDto.getTableNumber())
-//                .status(EStatusOrder.PENDING)
-//                .build();
-
     }
 
     @Override

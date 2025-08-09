@@ -21,7 +21,7 @@ public class MemoryConfig {
     //store history of chat messages
     @Bean
     public ChatMemoryProvider chatMemoryProvider() {
-        return chatId -> MessageWindowChatMemory.withMaxMessages(100);
+        return chatId -> MessageWindowChatMemory.withMaxMessages(10);
     }
 
 
@@ -29,7 +29,7 @@ public class MemoryConfig {
     @Bean
     public EmbeddingStore<TextSegment> embeddingStore() {
         return PgVectorEmbeddingStore.builder()
-                .host("localhost")
+                .host("14.225.254.190")
                 .port(5432)
                 .database("postgres")
                 .user("my_user")

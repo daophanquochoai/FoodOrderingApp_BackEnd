@@ -39,8 +39,13 @@ public interface IngredientFeign {
             @PathVariable Integer id
     );
     @PostMapping("/history/{id}")
-    public ResponseEntity<ResponseObject> getHistoryIngredients(
+    ResponseEntity<ResponseObject> getHistoryIngredients(
             @PathVariable Integer id,
             @RequestBody Filter filter
+    );
+
+    @PostMapping("/food_size/{id}")
+    ResponseEntity<ResponseObject> getIngredientsFoodSize(
+            @PathVariable Integer id
     );
 }

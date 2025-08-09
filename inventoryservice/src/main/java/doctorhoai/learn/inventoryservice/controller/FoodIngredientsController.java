@@ -46,7 +46,7 @@ public class FoodIngredientsController {
     @PutMapping("/update/{id}")
     public ResponseEntity<ResponseObject> updateFoodIngredients(
             @PathVariable Integer id,
-            @RequestBody @Valid List<FoodIngredientsDto> foodIngredientsDtos
+            @RequestBody List<FoodIngredientsDto> foodIngredientsDtos
     ){
         foodIngredientsService.updateFoodIngredients(foodIngredientsDtos, id);
         return ResponseEntity.ok(

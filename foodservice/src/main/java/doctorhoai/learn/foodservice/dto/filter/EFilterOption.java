@@ -4,5 +4,6 @@ public enum EFilterOption {
     CATEGORY,
     SIZE,
     FOOD,
-    VOUCHER
+    VOUCHER,
+    INGREDIENTS
 }

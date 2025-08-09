@@ -6,6 +6,7 @@ import doctorhoai.learn.inventoryservice.exception.contanst.EMessageException;
 import doctorhoai.learn.inventoryservice.exception.exception.FoodNotFoundException;
 import doctorhoai.learn.inventoryservice.exception.exception.IngredientsNotFoundException;
 import doctorhoai.learn.inventoryservice.feign.foodservice.FoodFeign;
+import doctorhoai.learn.inventoryservice.feign.foodservice.FoodSizeFeign;
 import doctorhoai.learn.inventoryservice.mapper.Mapper;
 import doctorhoai.learn.inventoryservice.model.FoodIngredients;
 import doctorhoai.learn.inventoryservice.model.Ingredients;
@@ -26,14 +27,14 @@ public class FoodIngredientsServiceImpl implements FoodIngredientsService {
 
     private final FoodIngredientsRepository foodIngredientsRepository;
     private final IngredientsRepository ingredientsRepository;
-    private final FoodFeign foodFeign;
+    private final FoodSizeFeign foodSizeFeign;
     private final Mapper mapper;
 
 
     @Override
     public List<FoodIngredientsDto> getFoodIngredientsDtoByFoodId(Integer foodId) {
         //get food (check)
-        ResponseEntity<ResponseObject> responseFood = foodFeign.getFood(foodId);
+        ResponseEntity<ResponseObject> responseFood = foodSizeFeign.getFoodSize(foodId);
        if (!responseFood.getStatusCode().is2xxSuccessful() || responseFood.getBody() == null) {
            throw new RuntimeException(EMessageException.SERVICE_DOWN.getMessage());
        }
@@ -49,33 +50,29 @@ public class FoodIngredientsServiceImpl implements FoodIngredientsService {
     public void createFoodIngredients(List<FoodIngredientsDto> foodIngredientsDtos, Integer id) {
         //get null
         for( FoodIngredientsDto foodIngredientsDto : foodIngredientsDtos){
-            if( foodIngredientsDto.getFoodId() == null){
-                throw new FoodNotFoundException();
-            }
             if( foodIngredientsDto.getIngredients() == null || foodIngredientsDto.getIngredients().getId() == null){
                 throw new IngredientsNotFoundException();
             }
         }
 
         // check food
-        List<Integer> idsFood = List.of(id);
-        foodFeign.checkFood(idsFood);
+        foodSizeFeign.getFoodSize(id);
 
         // check ingredients
         List<Integer> idsIngredients = foodIngredientsDtos.stream().map(i -> i.getIngredients().getId()).distinct().toList();
         List<Ingredients> ingredients = ingredientsRepository.getFoodIngredientsByIds(idsIngredients);
 
 
-        List<FoodIngredients> foodIngredients = convertToFoodIngredients(foodIngredientsDtos,ingredients);
+        List<FoodIngredients> foodIngredients = convertToFoodIngredients(foodIngredientsDtos,ingredients, id);
         foodIngredientsRepository.saveAll(foodIngredients);
     }
 
     @Override
     @Transactional
     public void updateFoodIngredients(List<FoodIngredientsDto> foodIngredientsDto, Integer foodId) {
-        List<Integer> ids = foodIngredientsDto.stream().map(FoodIngredientsDto::getFoodId).filter(Objects::nonNull).distinct().toList();
+        List<Integer> ids = foodIngredientsDto.stream().map(i -> i.getIngredients().getId()).filter(Objects::nonNull).distinct().toList();
 
-        List<FoodIngredients> foodIngredients = foodIngredientsRepository.getFoodIngredientsByFoodId(foodId);
+        List<FoodIngredients> foodIngredients = foodIngredientsRepository.getFoodIngredientsByFoodIdAndIsActive(foodId, true);
         List<Integer> idsRepo = foodIngredients.stream().map(i -> {
             if( i.getIngredients() == null || i.getIngredients().getId() == null){
                 return null;
@@ -102,10 +99,10 @@ public class FoodIngredientsServiceImpl implements FoodIngredientsService {
         //update
         List<FoodIngredients> fInfredientsNeedUpdate = new ArrayList<>();
         for( FoodIngredients f : foodIngredients){
-            if( ids.contains(f.getId())){
+            if( ids.contains(f.getIngredients().getId())){
                 FoodIngredients fUpdate = f;
-                fUpdate.setQuantityPerUnit(foodIngredientsDto.stream().filter(i -> i.getId() == f.getId()).findFirst().get().getQuantityPerUnit());
-                fIngredientsUpdate.add(fUpdate);
+                fUpdate.setQuantityPerUnit(foodIngredientsDto.stream().filter(i -> i.getIngredients().getId() == f.getIngredients().getId()).findFirst().get().getQuantityPerUnit());
+                fInfredientsNeedUpdate.add(fUpdate);
             }
         } // TODO : Chua cap nhat lai du lieu cu
 
@@ -130,11 +127,13 @@ public class FoodIngredientsServiceImpl implements FoodIngredientsService {
         return foodIngredientsDtos;
     }
 
-    private List<FoodIngredients> convertToFoodIngredients(List<FoodIngredientsDto> foodIngredientsDtos, List<Ingredients> ingredients) {
+    private List<FoodIngredients> convertToFoodIngredients(List<FoodIngredientsDto> foodIngredientsDtos, List<Ingredients> ingredients, Integer id) {
         List<FoodIngredients> foodIngredients = new ArrayList<>();
         for (FoodIngredientsDto foodIngredientsDto : foodIngredientsDtos) {
             FoodIngredients foodIngredient = mapper.convertToFoodIngredients(foodIngredientsDto);
             foodIngredient.setIngredients(getIngredientsById(foodIngredientsDto.getIngredients().getId(), ingredients));
+            foodIngredient.setFoodId(id);
+            foodIngredient.setIsActive(true);
             foodIngredients.add(foodIngredient);
         }
         return foodIngredients;
