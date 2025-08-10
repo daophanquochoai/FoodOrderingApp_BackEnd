@@ -22,5 +22,6 @@ spring:
     topic:
       order : order
       sender_rollback : food_rollback
+      order_rollback : order_rollback
 server:
   port: 9003

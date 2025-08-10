@@ -38,11 +38,6 @@ public class RagService {
         this.embeddingStore = embeddingStore;
     }
 
-//    @PostConstruct
-//    public void initOnStartup() {
-//        handleUploadAndSegment();
-//    }
-
     public void saveSegments(Resource resource) throws IOException {
         // Process and store document segments:
         // 1. Clear existing segments to avoid duplicates
