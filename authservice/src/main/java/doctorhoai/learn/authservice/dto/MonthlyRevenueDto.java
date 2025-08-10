@@ -1,4 +1,4 @@
-package doctorhoai.learn.authservice.business.dashboardservice.model;
+package doctorhoai.learn.authservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

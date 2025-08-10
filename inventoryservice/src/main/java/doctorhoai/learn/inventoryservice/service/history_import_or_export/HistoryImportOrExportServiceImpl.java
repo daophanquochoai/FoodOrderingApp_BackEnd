@@ -10,6 +10,7 @@ import doctorhoai.learn.inventoryservice.exception.exception.SourceNotFoundExcep
 import doctorhoai.learn.inventoryservice.mapper.Mapper;
 import doctorhoai.learn.inventoryservice.model.*;
 import doctorhoai.learn.inventoryservice.repository.HistoryImportOrExportRepository;
+import doctorhoai.learn.inventoryservice.repository.HistoryIngredientsRepository;
 import doctorhoai.learn.inventoryservice.repository.IngredientsRepository;
 import doctorhoai.learn.inventoryservice.repository.SourceRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class HistoryImportOrExportServiceImpl implements HistoryImportOrExportSe
     private final IngredientsRepository ingredientsRepository;
     private final SourceRepository sourceRepository;
     private final Mapper mapper;
+    private final HistoryIngredientsRepository historyIngredientsRepository;
 
     @Override
     public PageObject getHistoryImportOrExportByFilter(Filter filter) {
@@ -87,7 +89,7 @@ public class HistoryImportOrExportServiceImpl implements HistoryImportOrExportSe
         return returnValue;
     }
 
-    private List<HistoryIngredientsDto> convertToHistoryIngredientsDto( List<HistoryIngredients> historyIngredientsList){
+    public List<HistoryIngredientsDto> convertToHistoryIngredientsDto( List<HistoryIngredients> historyIngredientsList){
         List<HistoryIngredientsDto> returnValue = new ArrayList<>();
         for( HistoryIngredients historyIngredients : historyIngredientsList ){
             HistoryIngredientsDto historyIngredientsDto = mapper.convertToHistoryIngredientsDto(historyIngredients);
@@ -170,6 +172,7 @@ public class HistoryImportOrExportServiceImpl implements HistoryImportOrExportSe
 
         List<Integer> idsIngredients = historyIngredientsDtos.stream().map(i -> i.getIngredients().getId()).filter(Objects::nonNull).distinct().toList();
         List<Ingredients> ingredientsList = getIngredientsByIds(idsIngredients);
+        List<HistoryIngredients> history = historyIngredientsRepository.getIngredientsInInventory(idsIngredients);
         List<HistoryIngredients> historyIngredientsList = new ArrayList<>();
         for( HistoryIngredientsDto historyIngredientsDto : historyIngredientsDtos ){
             HistoryIngredients historyIngredients = mapper.convertToHistoryIngredients(historyIngredientsDto);
@@ -177,6 +180,18 @@ public class HistoryImportOrExportServiceImpl implements HistoryImportOrExportSe
                 Ingredients ingredients = ingredientsList.stream().filter(i -> i.getId() == historyIngredientsDto.getIngredients().getId()).findFirst().orElseThrow(IngredientsNotFoundException::new);
                 historyIngredients.setIngredientsId(ingredients);
             }
+            // TODO : can luu them lan nhap de tinh nhanh hon
+            if( history != null ){
+                List<HistoryIngredients> temp = history.stream()
+                        .filter(i -> i.getIngredientsId().getId().equals(historyIngredientsDto.getIngredients().getId()))
+                        .toList();
+                double sum = temp.stream()
+                        .mapToDouble(HistoryIngredients::getPricePerUnit)
+                        .sum();
+                double avgPrice = (sum + historyIngredientsDto.getPricePerUnit()) / (temp.size() + 1);
+                historyIngredients.setAvgPrice((float) avgPrice);
+            }
+            historyIngredients.setIsActive(true);
             historyIngredientsList.add(historyIngredients);
         }
         return historyIngredientsList;

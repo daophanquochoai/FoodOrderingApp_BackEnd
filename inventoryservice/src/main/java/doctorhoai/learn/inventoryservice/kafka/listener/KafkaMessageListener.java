@@ -10,6 +10,7 @@ import doctorhoai.learn.inventoryservice.kafka.model.OrderItemDto;
 import doctorhoai.learn.inventoryservice.kafka.sender.KafkaMessageSender;
 import doctorhoai.learn.inventoryservice.model.FoodIngredients;
 import doctorhoai.learn.inventoryservice.model.HistoryIngredients;
+import doctorhoai.learn.inventoryservice.model.IngredientError;
 import doctorhoai.learn.inventoryservice.model.IngredientsUse;
 import doctorhoai.learn.inventoryservice.model.enums.EUnitType;
 import doctorhoai.learn.inventoryservice.repository.FoodIngredientsRepository;
@@ -42,7 +43,9 @@ public class KafkaMessageListener {
     @Value("${spring.kafka.topic.order}")
     private String orderTopic;
     @Value("${spring.kafka.topic.sender_rollback}")
-    private String senderRollbackTopic;
+    private String senderRollbackFoodTopic;
+    @Value("${spring.kafka.topic.order_rollback}")
+    private String senderRollbackOrderTopic;
 
     @RetryableTopic(attempts = "4", backoff = @Backoff( delay = 3000, multiplier = 1.5, maxDelay = 15000))
     @KafkaListener(topics = "inventory", groupId = "inventory")
@@ -102,8 +105,15 @@ public class KafkaMessageListener {
                             usedQuantity += ingredientsUse.getQuantity();
                         }
                     }
-
-                    if( ingredientsForFood.get(ingredientId) + usedQuantity >= availableQuantity ){
+                    if( historyIngredient.getErrors() != null && !historyIngredient.getErrors().isEmpty()){
+                        for (IngredientError ingredientError : historyIngredient.getErrors()) {
+                            if( !ingredientError.getIsActive()){
+                                continue;
+                            }
+                            usedQuantity += ingredientError.getQuantity();
+                        }
+                    }
+                    if( ingredientsForFood.get(ingredientId) + usedQuantity > availableQuantity ){
                         IngredientsUse ingredientsUse = IngredientsUse.builder()
                                 .historyIngredients(historyIngredient)
                                 .unit(EUnitType.KG)
@@ -112,10 +122,10 @@ public class KafkaMessageListener {
                                 .isActive(true)
                                 .build();
                         ingredientsUses.add(ingredientsUse);
-                        historyIngredient.setUsedUnit(availableQuantity);
-                        historyIngredientsNeedUpdate.add(historyIngredient);
+//                        historyIngredient.setUsedUnit(availableQuantity);
+//                        historyIngredientsNeedUpdate.add(historyIngredient);
 
-                        ingredientsForFood.put(ingredientId, ingredientsForFood.get(ingredientId) - availableQuantity - usedQuantity);
+                        ingredientsForFood.put(ingredientId, ingredientsForFood.get(ingredientId) - (availableQuantity - usedQuantity));
                         if( ingredientsForFood.get(ingredientId) == 0 ){
                             ingredientsForFood.remove(ingredientId);
                         }
@@ -128,9 +138,9 @@ public class KafkaMessageListener {
                                 .isActive(true)
                                 .build();
                         ingredientsUses.add(ingredientsUse);
-                        historyIngredient.setUsedUnit(ingredientsForFood.get(ingredientId) + usedQuantity);
+//                        historyIngredient.setUsedUnit(ingredientsForFood.get(ingredientId) + usedQuantity);
                         ingredientsForFood.remove(ingredientId);
-                        historyIngredientsNeedUpdate.add(historyIngredient);
+//                        historyIngredientsNeedUpdate.add(historyIngredient);
                     }
                     if(ingredientsForFood.keySet().isEmpty()){
                         break;
@@ -141,17 +151,22 @@ public class KafkaMessageListener {
             }
 
             if( !ingredientsForFood.keySet().isEmpty() ){
-                throw new IngredientsNotFoundException();
+                message.setMessage("Not enough ingredient?");
+                throw new RuntimeException("Not enough ingredient?");
             }
             ingredientsUseRepository.saveAll(ingredientsUses);
-            historyIngredientsRepository.saveAll(historyIngredientsNeedUpdate);
+//            historyIngredientsRepository.saveAll(historyIngredientsNeedUpdate);
             System.out.println("Send to order ...");
             kafkaMessageSender.sendTo(message, orderTopic);
         }catch( Exception ex ){
             System.out.println("Rollback ...");
             message.setMessage(ex.getMessage());
             message.setStatus(EStatusOrder.ROLL_BACK);
-            kafkaMessageSender.sendTo(message, senderRollbackTopic);
+            if( message.getVoucher() == null){
+                kafkaMessageSender.sendTo(message, senderRollbackOrderTopic);
+            }else{
+                kafkaMessageSender.sendTo(message, senderRollbackFoodTopic);
+            }
         }
     }
 

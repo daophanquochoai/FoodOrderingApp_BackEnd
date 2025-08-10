@@ -21,7 +21,7 @@ public class EmbeddingConfig {
                 .embeddingStore(embeddingStore)
                 .build();
     }
-    
+
     @Bean
     public EmbeddingStoreContentRetriever embeddingStoreContentRetriever(
             EmbeddingStore<TextSegment> embeddingStore,

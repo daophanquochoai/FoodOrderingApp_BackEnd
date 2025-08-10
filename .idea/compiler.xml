@@ -9,7 +9,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="apigateway" />
         <module name="configserver" />
-        <module name="BaseDomain" />
       </profile>
       <profile name="Annotation profile for eureka" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -17,24 +16,25 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
         <module name="eureka" />
       </profile>
-      <profile name="Annotation profile for userservice" enabled="true">
+      <profile name="Annotation profile for BaseDomain" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
         </processorPath>
-        <module name="userservice" />
+        <module name="BaseDomain" />
       </profile>
-      <profile name="Annotation profile for aiservice" enabled="true">
+      <profile name="Annotation profile for foodservice" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
         </processorPath>
         <module name="aiservice" />
@@ -43,9 +43,6 @@
         <module name="inventoryservice" />
         <module name="dashboardservice" />
         <module name="foodservice" />
-        <module name="inventoryservice" />
-        <module name="foodservice" />
-        <module name="authservice" />
         <module name="orderservice" />
       </profile>
     </annotationProcessing>

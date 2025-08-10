@@ -13,6 +13,7 @@ import doctorhoai.learn.inventoryservice.repository.HistoryImportOrExportReposit
 import doctorhoai.learn.inventoryservice.repository.HistoryIngredientsRepository;
 import doctorhoai.learn.inventoryservice.repository.IngredientsErrorRepository;
 import doctorhoai.learn.inventoryservice.service.history_import_or_export.HistoryImportOrExportService;
+import doctorhoai.learn.inventoryservice.service.history_import_or_export.HistoryImportOrExportServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +32,7 @@ public class IngredientsErrorServiceImpl implements IngredientsErrorService {
     private final IngredientsErrorRepository ingredientsErrorRepository;
     private final HistoryIngredientsRepository historyIngredientsRepository;
     private final Mapper mapper;
+    private final HistoryImportOrExportServiceImpl historyImportOrExportService;
 
     @Override
     public IngredientsErrorDto createIngredientsError(IngredientsErrorDto ingredientsErrorDto) {
@@ -43,13 +45,13 @@ public class IngredientsErrorServiceImpl implements IngredientsErrorService {
 
         HistoryIngredients historyIngredients = historyIngredientsRepository.findById(ingredientsErrorDto.getHistoryIngredients().getId()).orElseThrow(IngredientsErrorNotFoundException::new);
 
-        if (ingredientError.getQuantity() < historyIngredients.getQuantity()) {
-            historyIngredients.setQuantity(historyIngredients.getQuantity() - ingredientError.getQuantity());
-        } else {
-            ingredientError.setQuantity(Math.round(historyIngredients.getQuantity()));
-            historyIngredients.setQuantity(0.0F);
-        }
-        historyIngredients = historyIngredientsRepository.save(historyIngredients);
+//        if (ingredientError.getQuantity() < historyIngredients.getQuantity()) {
+//            historyIngredients.setQuantity(historyIngredients.getQuantity() - ingredientError.getQuantity());
+//        } else {
+//            ingredientError.setQuantity(Math.round(historyIngredients.getQuantity()));
+//            historyIngredients.setQuantity(0.0F);
+//        }
+//        historyIngredients = historyIngredientsRepository.save(historyIngredients);
 
         ingredientError.setHistoryIngredients(historyIngredients);
         ingredientError = ingredientsErrorRepository.save(ingredientError);
@@ -60,18 +62,18 @@ public class IngredientsErrorServiceImpl implements IngredientsErrorService {
     public IngredientsErrorDto updateIngredientsError(IngredientsErrorDto ingredientsErrorDto, Integer id) {
         IngredientError ingredientError = ingredientsErrorRepository.findById(id).orElseThrow(IngredientsErrorNotFoundException::new);
 
-        HistoryIngredients historyIngredients = historyIngredientsRepository.findById(ingredientsErrorDto.getHistoryIngredients().getId()).orElseThrow(IngredientsErrorNotFoundException::new);
+        historyIngredientsRepository.findById(ingredientsErrorDto.getHistoryIngredients().getId()).orElseThrow(IngredientsErrorNotFoundException::new);
 
-        historyIngredients.setQuantity(historyIngredients.getQuantity() + ingredientError.getQuantity());
-        if (ingredientsErrorDto.getIsActive() == true) {
-            if (historyIngredients.getQuantity() > ingredientsErrorDto.getQuantity()) {
-                historyIngredients.setQuantity(historyIngredients.getQuantity() - ingredientsErrorDto.getQuantity());
-            } else {
-                ingredientError.setQuantity(Math.round(historyIngredients.getQuantity()));
-                historyIngredients.setQuantity(0.0F);
-            }
-        }
-        historyIngredientsRepository.save(historyIngredients);
+//        historyIngredients.setQuantity(historyIngredients.getQuantity() + ingredientError.getQuantity());
+//        if (ingredientsErrorDto.getIsActive() == true) {
+//            if (historyIngredients.getQuantity() > ingredientsErrorDto.getQuantity()) {
+//                historyIngredients.setQuantity(historyIngredients.getQuantity() - ingredientsErrorDto.getQuantity());
+//            } else {
+//                ingredientError.setQuantity(Math.round(historyIngredients.getQuantity()));
+//                historyIngredients.setQuantity(0.0F);
+//            }
+//        }
+//        historyIngredientsRepository.save(historyIngredients);
 
         ingredientError.setIsActive(ingredientsErrorDto.getIsActive());
         ingredientError.setUnit(ingredientsErrorDto.getUnit());
@@ -136,18 +138,6 @@ public class IngredientsErrorServiceImpl implements IngredientsErrorService {
     @Override
     public List<HistoryIngredientsDto> getHistoryIngredientsByHistoryId(Integer historyId) {
         List<HistoryIngredients> historyIngredients = historyIngredientsRepository.findByHistoryId(historyId);
-        List<HistoryIngredientsDto> historyIngredientsDtos = historyIngredients.stream().map(mapper::convertToHistoryIngredientsDto).toList();
-
-        for (int i = 0; i < historyIngredientsDtos.size(); i++) {
-            HistoryIngredients hi = historyIngredients.get(i);
-            HistoryIngredientsDto hiDto = historyIngredientsDtos.get(i);
-
-            if (hi.getIngredientsId() != null) {
-                IngredientsDto iDto = mapper.convertToIngredientsDto(hi.getIngredientsId());
-                hiDto.setIngredients(iDto);
-            }
-        }
-
-        return historyIngredientsDtos;
+        return historyImportOrExportService.convertToHistoryIngredientsDto(historyIngredients);
     }
 }
