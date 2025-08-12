@@ -6,6 +6,7 @@ spring:
   profiles:
     active: dev
   kafka:
+    bootstrap-servers: ${SPRING_URL_KAFKA:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -23,7 +24,6 @@ spring:
       inventory : inventory
       order_rollback : order_rollback
       name: apisearch
-    bootstrap-servers: ${SPRING_URL_KAFKA:localhost:9092}
 server:
   port: 9002
 

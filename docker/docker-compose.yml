@@ -1,0 +1,272 @@
+services:
+  zookeeper:
+    container_name: zookeeper
+    image: "docker.io/bitnami/zookeeper:3"
+    ports:
+      - "2181:2181"
+    volumes:
+      - "zookeeper_data:/bitnami"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    healthcheck:
+      test: [ "CMD", "echo", "ruok", "|", "nc", "localhost", "2181" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tttn
+
+  kafka:
+    container_name: kafka
+    image: "docker.io/bitnami/kafka:2-debian-10"
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    volumes:
+      - "kafka_data:/bitnami"
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    depends_on:
+      - zookeeper
+    healthcheck:
+      test: [ "CMD", "kafka-topics.sh", "--list", "--bootstrap-server", "localhost:9092" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tttn
+
+  configserver:
+    image: doctorhoai/tttn_configserver:v1
+    container_name: configserver
+    ports:
+      - "8071:8071"
+    healthcheck:
+      test: "curl --fail --silent http://localhost:8071/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    environment:
+      - SPRING_ZIPKIN_BASE_URL=http://14.225.254.190:9411/api/v2/spans
+    networks:
+      - tttn
+
+  eurekaservice:
+    image: doctorhoai/tttn_eurekaservice:v1
+    container_name: eurekaservice
+    ports:
+      - "8070:8070"
+    healthcheck:
+      test: "curl --fail --silent http://localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      kafka:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+    environment:
+      - SPRING_ZIPKIN_BASE_URL=http://14.225.254.190:9411/api/v2/spans
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://configserver:8071
+    networks:
+      - tttn
+
+  foodservice:
+    image: doctorhoai/tttn_foodservice:v1
+    container_name: foodservice
+    ports:
+      - "9002:9002"
+    healthcheck:
+      test: "curl --fail --silent http://localhost:9002/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      kafka:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+      eurekaservice:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://14.225.254.190:3307/ThucTapTotNghiep?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=Rw3UXVo4jxlq24fSgA0t
+      - SPRING_ZIPKIN_BASE_URL=http://14.225.254.190:9411/api/v2/spans
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eurekaservice:8070/eureka/
+      - SENTRY_ENV=dev
+      - SENTRY_DSN=https://a95701bd885c17f6070f1369551276a2@o4509342987911168.ingest.de.sentry.io/4509342990401616
+      - SPRING_URL_KAFKA=kafka:29092
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://configserver:8071
+    networks:
+      - tttn
+
+  inventoryservice:
+    image: doctorhoai/tttn_inventory:v1
+    container_name: inventoryservice
+    ports:
+      - "9003:9003"
+    healthcheck:
+      test: "curl --fail --silent http://localhost:9003/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      kafka:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+      eurekaservice:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://14.225.254.190:3307/ThucTapTotNghiep?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=Rw3UXVo4jxlq24fSgA0t
+      - SPRING_ZIPKIN_BASE_URL=http://14.225.254.190:9411/api/v2/spans
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eurekaservice:8070/eureka/
+      - SENTRY_ENV=dev
+      - SENTRY_DSN=https://a95701bd885c17f6070f1369551276a2@o4509342987911168.ingest.de.sentry.io/4509342990401616
+      - SPRING_URL_KAFKA=kafka:29092
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://configserver:8071
+    networks:
+      - tttn
+
+  orderservice:
+    image: doctorhoai/tttn_orderservice:v1
+    container_name: orderservice
+    ports:
+      - "9004:9004"
+    healthcheck:
+      test: "curl --fail --silent http://localhost:9004/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      kafka:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+      eurekaservice:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://14.225.254.190:3307/ThucTapTotNghiep?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=Rw3UXVo4jxlq24fSgA0t
+      - SPRING_ZIPKIN_BASE_URL=http://14.225.254.190:9411/api/v2/spans
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eurekaservice:8070/eureka/
+      - SENTRY_ENV=dev
+      - SENTRY_DSN=https://a95701bd885c17f6070f1369551276a2@o4509342987911168.ingest.de.sentry.io/4509342990401616
+      - SPRING_URL_KAFKA=kafka:29092
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://configserver:8071
+    networks:
+      - tttn
+
+  userservice:
+    image: doctorhoai/tttn_userservice:v1
+    container_name: userservice
+    ports:
+      - "9000:9000"
+    healthcheck:
+      test: "curl --fail --silent http://localhost:9000/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      configserver:
+        condition: service_healthy
+      eurekaservice:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://14.225.254.190:3307/ThucTapTotNghiep?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=Rw3UXVo4jxlq24fSgA0t
+      - SPRING_ZIPKIN_BASE_URL=http://14.225.254.190:9411/api/v2/spans
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eurekaservice:8070/eureka/
+      - SENTRY_ENV=dev
+      - SENTRY_DSN=https://a95701bd885c17f6070f1369551276a2@o4509342987911168.ingest.de.sentry.io/4509342990401616
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://configserver:8071
+    networks:
+      - tttn
+
+  auth:
+    image: doctorhoai/tttn_auth:v1
+    container_name: auth
+    ports:
+      - "9001:9001"
+    healthcheck:
+      test: "curl --fail --silent http://localhost:9001/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      configserver:
+        condition: service_healthy
+      eurekaservice:
+        condition: service_healthy
+      userservice:
+        condition: service_healthy
+      foodservice:
+        condition: service_healthy
+      orderservice:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://14.225.254.190:3307/ThucTapTotNghiep?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=Rw3UXVo4jxlq24fSgA0t
+      - SPRING_ZIPKIN_BASE_URL=http://14.225.254.190:9411/api/v2/spans
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eurekaservice:8070/eureka/
+      - SENTRY_ENV=dev
+      - SENTRY_DSN=https://a95701bd885c17f6070f1369551276a2@o4509342987911168.ingest.de.sentry.io/4509342990401616
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://configserver:8071
+      - SPRING_REDIS_HOST=14.225.254.190
+      - SPRING_REDIS_PORT=6379
+    networks:
+      - tttn
+
+  apigateway:
+    image: doctorhoai/tttn_api:v1
+    container_name: apigateway
+    ports:
+      - "6380:6380"
+    healthcheck:
+      test: "curl --fail --silent http://localhost:6380/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      auth:
+        condition: service_healthy
+    environment:
+      - SPRING_ZIPKIN_BASE_URL=http://14.225.254.190:9411/api/v2/spans
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eurekaservice:8070/eureka/
+      - SENTRY_ENV=dev
+      - SENTRY_DSN=https://a95701bd885c17f6070f1369551276a2@o4509342987911168.ingest.de.sentry.io/4509342990401616
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://configserver:8071
+    networks:
+      - tttn
+
+volumes:
+  mysql_data:
+    driver: local
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
+
+networks:
+  tttn:
+    driver: bridge

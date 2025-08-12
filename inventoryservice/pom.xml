@@ -159,7 +159,7 @@
                 <version>3.4.1</version>
                 <configuration>
                     <to>
-                        <image>doctorhoai/tttn_inventory:f1</image>
+                        <image>doctorhoai/tttn_inventory:v1</image>
                     </to>
                 </configuration>
             </plugin>
