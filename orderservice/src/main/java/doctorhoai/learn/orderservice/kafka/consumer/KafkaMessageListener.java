@@ -69,6 +69,7 @@ public class KafkaMessageListener {
             if( !orderOptional.isPresent() ){
                 throw new OrderNotFoundException();
             }
+            orderOptional.get().setCogs(eventOrder.getOrder().getCogs());
             orderOptional.get().setStatus(EStatusOrder.PENDING);
             orderRepository.save(orderOptional.get());
         }catch (Exception ex){

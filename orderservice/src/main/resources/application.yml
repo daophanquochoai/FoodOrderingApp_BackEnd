@@ -26,3 +26,4 @@ spring:
     bootstrap-servers: ${SPRING_URL_KAFKA:localhost:9092}
 server:
   port: 9004
+apiKey: ${STRIPE_KEY}

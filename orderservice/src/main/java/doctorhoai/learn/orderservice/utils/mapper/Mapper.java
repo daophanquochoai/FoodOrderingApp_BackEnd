@@ -96,6 +96,7 @@ public class Mapper {
                 .name(order.getName())
                 .phoneNumber(order.getPhoneNumber())
                 .createTime(order.getCreatedAt())
+                .cogs(order.getCogs())
                 .build();
     }
 

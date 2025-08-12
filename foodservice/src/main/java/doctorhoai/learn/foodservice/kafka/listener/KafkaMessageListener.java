@@ -1,6 +1,6 @@
 package doctorhoai.learn.foodservice.kafka.listener;
 
-import doctorhoai.learn.basedomain.kafka.order.EStatusOrder;
+import doctorhoai.learn.basedomain.kafka.order.EStatusOrderKafka;
 import doctorhoai.learn.basedomain.kafka.order.EventOrder;
 import doctorhoai.learn.foodservice.kafka.model.OrderDto;
 import doctorhoai.learn.foodservice.kafka.proceducer.KafkaMessageSender;
@@ -39,12 +39,12 @@ public class KafkaMessageListener {
                 return;
             }
             System.out.println("Roll back...");
-            eventOrder.setStatus(EStatusOrder.ROLL_BACK);
+            eventOrder.setStatus(EStatusOrderKafka.ROLL_BACK);
             eventOrder.setMessage("Voucher not found");
             kafkaMessageSender.sendRollBackOrder(eventOrder, rollback);
         } catch ( Exception e){
             System.out.println("Roll back...");
-            eventOrder.setStatus(EStatusOrder.ROLL_BACK);
+            eventOrder.setStatus(EStatusOrderKafka.ROLL_BACK);
             eventOrder.setMessage(e.getMessage());
             kafkaMessageSender.sendRollBackOrder(eventOrder, rollback);
         }
@@ -60,7 +60,7 @@ public class KafkaMessageListener {
             kafkaMessageSender.sendRollBackOrder(eventOrder, rollback);
         } catch ( Exception e){
             System.out.println("Roll back...");
-            eventOrder.setStatus(EStatusOrder.ROLL_BACK);
+            eventOrder.setStatus(EStatusOrderKafka.ROLL_BACK);
             eventOrder.setMessage(e.getMessage());
             kafkaMessageSender.sendRollBackOrder(eventOrder, rollback);
         }

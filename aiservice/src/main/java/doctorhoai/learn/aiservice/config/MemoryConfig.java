@@ -21,7 +21,7 @@ public class MemoryConfig {
     //store history of chat messages
     @Bean
     public ChatMemoryProvider chatMemoryProvider() {
-        return chatId -> MessageWindowChatMemory.withMaxMessages(10);
+        return chatId -> MessageWindowChatMemory.withMaxMessages(2);
     }
 
 
