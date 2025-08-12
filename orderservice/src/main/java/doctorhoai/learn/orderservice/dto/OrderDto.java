@@ -44,4 +44,5 @@ public class OrderDto {
     private LocalDateTime updateTime;
     private String nameUpdated;
     private String message;
+    private Double cogs;
 }

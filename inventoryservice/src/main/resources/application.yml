@@ -23,5 +23,6 @@ spring:
       order : order
       sender_rollback : food_rollback
       order_rollback : order_rollback
+    bootstrap-servers: ${SPRING_URL_KAFKA:localhost:9092}
 server:
   port: 9003

@@ -2,7 +2,7 @@ package doctorhoai.learn.inventoryservice.kafka.listener;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import doctorhoai.learn.basedomain.kafka.order.EStatusOrder;
+import doctorhoai.learn.basedomain.kafka.order.EStatusOrderKafka;
 import doctorhoai.learn.basedomain.kafka.order.EventOrder;
 import doctorhoai.learn.inventoryservice.exception.exception.IngredientsNotFoundException;
 import doctorhoai.learn.inventoryservice.kafka.model.OrderDto;
@@ -58,7 +58,7 @@ public class KafkaMessageListener {
                     message,
                     new TypeReference<EventOrder<OrderDto>>() {}
             );
-
+            OrderDto orderDto = objectMapper.convertValue(eventOrder.getOrder(), OrderDto.class);
             List<OrderItemDto> orderItems = objectMapper.convertValue(
                     eventOrder.getOrder().getOrderItems(),
                     new TypeReference<List<OrderItemDto>>() {}
@@ -75,6 +75,7 @@ public class KafkaMessageListener {
 
             List<FoodIngredients> foodIngredients = foodIngredientsRepository.getFoodIngredientOfFood(foodSizeIds, List.of(true));
 
+            Double cogs = 0.0;
             for (FoodIngredients ingredient : foodIngredients) {
                 if( ingredient.getIngredients() != null ){
                     Integer id = ingredient.getIngredients().getId();
@@ -89,7 +90,6 @@ public class KafkaMessageListener {
             List<HistoryIngredients> historyIngredients = historyIngredientsRepository.getIngredientsInInventory(ingredientsForFood.keySet().stream().toList());
             List<IngredientsUse> ingredientsUses = new ArrayList<>();
 
-            List<HistoryIngredients> historyIngredientsNeedUpdate = new ArrayList<>();
             for(HistoryIngredients historyIngredient : historyIngredients){
                 Integer ingredientId = historyIngredient.getIngredientsId().getId();
                 if( ingredientsForFood.get(ingredientId) != null ){
@@ -121,6 +121,7 @@ public class KafkaMessageListener {
                                 .orderId(eventOrder.getOrder().getId())
                                 .isActive(true)
                                 .build();
+                        cogs += (availableQuantity - usedQuantity) * historyIngredient.getAvgPrice();
                         ingredientsUses.add(ingredientsUse);
 //                        historyIngredient.setUsedUnit(availableQuantity);
 //                        historyIngredientsNeedUpdate.add(historyIngredient);
@@ -137,6 +138,7 @@ public class KafkaMessageListener {
                                 .orderId(eventOrder.getOrder().getId())
                                 .isActive(true)
                                 .build();
+                        cogs += (ingredientsForFood.get(ingredientId)) * historyIngredient.getAvgPrice();
                         ingredientsUses.add(ingredientsUse);
 //                        historyIngredient.setUsedUnit(ingredientsForFood.get(ingredientId) + usedQuantity);
                         ingredientsForFood.remove(ingredientId);
@@ -149,7 +151,8 @@ public class KafkaMessageListener {
                     throw new IngredientsNotFoundException();
                 }
             }
-
+            orderDto.setCogs(cogs);
+            message.setOrder(orderDto);
             if( !ingredientsForFood.keySet().isEmpty() ){
                 message.setMessage("Not enough ingredient?");
                 throw new RuntimeException("Not enough ingredient?");
@@ -161,7 +164,7 @@ public class KafkaMessageListener {
         }catch( Exception ex ){
             System.out.println("Rollback ...");
             message.setMessage(ex.getMessage());
-            message.setStatus(EStatusOrder.ROLL_BACK);
+            message.setStatus(EStatusOrderKafka.ROLL_BACK);
             if( message.getVoucher() == null){
                 kafkaMessageSender.sendTo(message, senderRollbackOrderTopic);
             }else{

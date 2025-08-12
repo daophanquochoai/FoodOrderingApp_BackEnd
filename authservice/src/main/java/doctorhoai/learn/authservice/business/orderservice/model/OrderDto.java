@@ -32,6 +32,7 @@ public class OrderDto {
     private UserDto shipperId;
     private String name;
     private String phoneNumber;
+    private Double cogs;
 
     private List<OrderItemDto> orderItems;
 }

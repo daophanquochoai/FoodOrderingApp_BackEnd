@@ -6,6 +6,7 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import doctorhoai.learn.basedomain.exception.BadException;
+import doctorhoai.learn.basedomain.kafka.order.EStatusOrderKafka;
 import doctorhoai.learn.basedomain.kafka.order.EventOrder;
 import doctorhoai.learn.basedomain.response.PageObject;
 import doctorhoai.learn.basedomain.response.ResponseObject;
@@ -187,7 +188,7 @@ public class OrderServiceImpl implements OrderService{
                             .order(kafkaOrder)
                             .cart(cartItems.stream().map(CartItem::getId).toList())
                             .voucher(order.getDiscountApplied())
-                            .status(doctorhoai.learn.basedomain.kafka.order.EStatusOrder.CREATE)
+                            .status(EStatusOrderKafka.CREATE)
                             .build(),
                     foodTopic
             );
@@ -197,7 +198,7 @@ public class OrderServiceImpl implements OrderService{
                             .order(kafkaOrder)
                             .cart(cartItems.stream().map(CartItem::getId).toList())
                             .voucher(order.getDiscountApplied())
-                            .status(doctorhoai.learn.basedomain.kafka.order.EStatusOrder.CREATE)
+                            .status(EStatusOrderKafka.CREATE)
                             .build(),
                     inventoryTopic
             );
@@ -274,7 +275,7 @@ public class OrderServiceImpl implements OrderService{
 
         return PageObject.builder()
                 .page(filter.getPageNo())
-                .totalPage(orderPage.getTotalPages())
+                .totalPage((int) orderPage.getTotalElements())
                 .data(order)
                 .build();
     }

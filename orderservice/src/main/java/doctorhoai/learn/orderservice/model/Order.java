@@ -64,6 +64,8 @@ public class Order extends BaseModel implements Serializable {
 
     private String message;
 
+    private Double cogs;
+
 
     @OneToMany(mappedBy = "orderId", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;

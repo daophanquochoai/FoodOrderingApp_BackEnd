@@ -23,6 +23,7 @@ public class OrderDto {
     private Integer tableNumber;
     private String name;
     private String phoneNumber;
+    private Double cogs;
 
     private List<OrderItemDto> orderItems;
 }

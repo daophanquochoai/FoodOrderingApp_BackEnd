@@ -14,5 +14,5 @@ public class EventOrder<T> {
     private Integer voucher;
     private Integer point;
     private String message;
-    private EStatusOrder status;
+    private EStatusOrderKafka status;
 }
