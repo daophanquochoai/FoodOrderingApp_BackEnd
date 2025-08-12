@@ -8,7 +8,7 @@ public enum EMessageException {
     USER_NOT_FOUND("User not found"),
     SIZE_NOT_FOUND("Size not found"),
     FOOD_SIZE_NOT_FOUND("Food Size not found"),
-
+    FILE_NOT_FOUND("File not found"),
     NAME_SIZE_DUPLICATE("Name size duplicate"),
     VOUCHER_DUPLICATE("Code duplicate"),
     ;

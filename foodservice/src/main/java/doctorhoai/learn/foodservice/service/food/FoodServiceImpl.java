@@ -126,6 +126,7 @@ public class FoodServiceImpl implements FoodService {
             }
             food.setFoodSizes(foodSizes);
         }
+        food.setStatus(EStatusFood.ACTIVE);
         food = foodRepository.save(food);
         FoodDto foodDto = convertListFood(food);
         kafkaMessageSender.sendEventToSearchAI(MessageTemplate.<FoodDto>builder().data(foodDto).messageType(EMessageType.CREATE_FOOD).build());
@@ -217,7 +218,25 @@ public class FoodServiceImpl implements FoodService {
     @Override
     public List<FoodDto> getAllIdsFood(List<Integer> ids) {
         List<Food> foods = foodRepository.checkFood(ids, EStatusFood.ACTIVE);
-        return foods.stream().map(this::convertListFood).toList();
+        List<FoodDto> foodDtos = new ArrayList<>();
+        for( Food food : foods ){
+            FoodDto foodDto = convertListFood(food);
+            if( food.getFoodSizes() != null && !food.getFoodSizes().isEmpty() ){
+                List<FoodSizeDto> foodSizesDto = new ArrayList<>();
+                for( FoodSize foodSize : food.getFoodSizes()){
+                    FoodSizeDto dto = mapper.convertToFoodSizeDto(foodSize);
+                    if( foodSize.getSize() != null ){
+                        dto.setSizeId(mapper.convertToSizeDto(foodSize.getSize()));
+                    }else{
+                        throw new SizeNotFoundException();
+                    }
+                    foodSizesDto.add(dto);
+                }
+                foodDto.setFoodSizes(foodSizesDto);
+            }
+            foodDtos.add(foodDto);
+        }
+        return foodDtos;
     }
 
     @Override

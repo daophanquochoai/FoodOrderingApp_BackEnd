@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(
         name = "aiservice",
-        path = "/api/search",
+        path = "/search",
         contextId = "searchSemanticFeignBusiness",
         fallbackFactory = SearchFeignFallback.class,
         configuration = FeignConfig.class

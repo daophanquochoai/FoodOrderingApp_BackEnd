@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/document")
+@RequestMapping("/document")
 @RequiredArgsConstructor
 public class DocumentController {
     private final DocumentService documentService;

@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @FeignClient(
         name = "aiservice",
-        path = "/api/document",
+        path = "/document",
         contextId = "aiDocumentFeignBusiness",
         fallbackFactory = DocumentFeignFallback.class,
         configuration = FeignConfig.class

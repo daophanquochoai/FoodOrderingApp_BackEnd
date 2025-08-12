@@ -14,7 +14,7 @@ import java.time.Duration;
 
 @Configuration
 public class OllamaConfig {
-    private static final String BASE_URL = "https://e2bf521c930a.ngrok-free.app";
+    private static final String BASE_URL = "https://18184932427b.ngrok-free.app";
     private static final String MODEL_NAME = "qwen3:4b";
     private static final String MODE_EMBEDDING = "nomic-embed-text";
 
