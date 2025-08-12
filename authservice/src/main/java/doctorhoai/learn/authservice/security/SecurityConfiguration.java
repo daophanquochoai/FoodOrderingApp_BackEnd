@@ -12,8 +12,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.List;
-
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfiguration {
@@ -27,7 +25,7 @@ public class SecurityConfiguration {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests( auth -> auth
-                        .requestMatchers("/document/**","/search/**", "/chat/**","/shipping_fee_config/**","/order/**","voucher/**","/payment/**","/source/**","/auth/**", "/healthcheck", "/user/add", "/food/**", "/size/**", "/category/**", "/upload","/cart/**", "/filter/**", "/food_size/**", "/ingredients/**").permitAll()
+                        .requestMatchers("/document/**","/actuator/**","/search/**", "/chat/**","/shipping_fee_config/**","/order/**","voucher/**","/payment/**","/source/**","/auth/**", "/healthcheck", "/user/add", "/food/**", "/size/**", "/category/**", "/upload","/cart/**", "/filter/**", "/food_size/**", "/ingredients/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/food-homepage/**", "/category-homepage/**").permitAll()
                         .requestMatchers("/ingredients_use/**", "/ingredients_error/**", "/employee/**").hasAnyRole("ADMIN", "CHEF", "SHIPPER")
                         .requestMatchers("/point/**","/user/**", "/order/all", "/employee/**", "history_import_or_export/**", "dashboard/**").hasAnyRole("USER", "ADMIN")

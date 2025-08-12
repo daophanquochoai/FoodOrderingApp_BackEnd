@@ -92,7 +92,7 @@
                 <version>3.4.1</version>
                 <configuration>
                     <to>
-                        <image>doctorhoai/tttn_api:f1</image>
+                        <image>doctorhoai/tttn_api:v1</image>
                     </to>
                 </configuration>
             </plugin>

@@ -36,6 +36,7 @@ public class SizeServiceImpl implements SizeService{
         }
 
         Size size = mapper.convertToSize(dto);
+        size.setIsActive(true);
         size = sizeRepository.save(size);
         return mapper.convertToSizeDto(size);
     }
