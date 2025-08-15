@@ -4,15 +4,19 @@ import doctorhoai.learn.basedomain.response.ResponseObject;
 import doctorhoai.learn.userservice.controller.contanst.EMessageResponse;
 import doctorhoai.learn.userservice.dto.Filter.Filter;
 import doctorhoai.learn.userservice.dto.Filter.FilterUser;
+import doctorhoai.learn.userservice.dto.UpdatePassword;
 import doctorhoai.learn.userservice.dto.UserDto;
 import doctorhoai.learn.userservice.feign.model.PointDto;
 import doctorhoai.learn.userservice.feign.orderservice.CartFeign;
 import doctorhoai.learn.userservice.feign.orderservice.PointFeign;
 import doctorhoai.learn.userservice.repository.UserRepository;
+import doctorhoai.learn.userservice.service.mail.MailService;
 import doctorhoai.learn.userservice.service.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.RetryConfiguration;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -27,6 +31,7 @@ public class UserController {
     private final PointFeign pointFeign;
     private final UserRepository userRepository;
     private final CartFeign cartFeign;
+    private final MailService mailService;
 
     @PostMapping("/add")
     public ResponseEntity<ResponseObject> addUserIntoDb(
@@ -150,6 +155,33 @@ public class UserController {
                 ResponseObject.builder()
                         .message(EMessageResponse.GET_USER.getMessage())
                         .data(userService.getMulUser(ids))
+                        .build()
+        );
+    }
+
+    @PutMapping("/update/passoword/{id}")
+    public ResponseEntity<ResponseObject> getUpdatePassword(
+            @PathVariable Integer id,
+            @RequestBody @Valid UpdatePassword updatePassword
+            )
+    {
+        userService.updatePassword(updatePassword, id);
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message(EMessageResponse.UPDATE_PASSWORD_SUCCESSFUL.getMessage())
+                        .build()
+        );
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<ResponseObject> getSendEmail(
+            @PathVariable String email,
+            HttpServletRequest request
+    ){
+        mailService.checkEmail(email, request);
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message("Send to Email")
                         .build()
         );
     }

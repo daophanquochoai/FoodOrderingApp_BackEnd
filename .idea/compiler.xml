@@ -28,12 +28,20 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
         </processorPath>
         <module name="aiservice" />
-        <module name="authservice" />
-        <module name="userservice" />
         <module name="BaseDomain" />
         <module name="inventoryservice" />
         <module name="foodservice" />
         <module name="orderservice" />
+      </profile>
+      <profile name="Annotation profile for authservice" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
+        </processorPath>
+        <module name="authservice" />
+        <module name="userservice" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

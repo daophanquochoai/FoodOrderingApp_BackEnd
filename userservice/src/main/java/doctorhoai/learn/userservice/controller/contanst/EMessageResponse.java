@@ -9,6 +9,7 @@ public enum EMessageResponse {
     GET_USER("Get user successful"),
     UPDATE_USER("Update user successful"),
     ADD_USER("Save user successful"),
+    UPDATE_PASSWORD_SUCCESSFUL("Update password successful"),
 
     //employee
     GET_EMPLOYEE("Get employee successful"),

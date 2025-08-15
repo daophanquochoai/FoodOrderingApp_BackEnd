@@ -83,7 +83,7 @@
                 <version>3.4.1</version>
                 <configuration>
                     <to>
-                        <image>doctorhoai/tttn_configserver:v1</image>
+                        <image>doctorhoai/tttn_configserver:v3</image>
                     </to>
                 </configuration>
             </plugin>

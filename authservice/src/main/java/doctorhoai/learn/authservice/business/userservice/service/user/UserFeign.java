@@ -1,5 +1,6 @@
 package doctorhoai.learn.authservice.business.userservice.service.user;
 
+import doctorhoai.learn.authservice.business.userservice.model.UpdatePassword;
 import doctorhoai.learn.authservice.config.feign.FeignConfig;
 import doctorhoai.learn.authservice.feign.userservice.model.UserDto;
 import doctorhoai.learn.basedomain.response.ResponseObject;
@@ -59,5 +60,10 @@ public interface UserFeign {
     @GetMapping("/username/{username}")
     ResponseEntity<ResponseObject> getUserByUsername(
             @PathVariable String username
+    );
+    @PutMapping("/update/passoword/{id}")
+    ResponseEntity<ResponseObject> getUpdatePassword(
+            @PathVariable Integer id,
+            @RequestBody @Valid UpdatePassword updatePassword
     );
 }

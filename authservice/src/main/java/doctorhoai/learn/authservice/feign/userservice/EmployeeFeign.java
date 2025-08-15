@@ -14,23 +14,23 @@ import java.time.LocalDate;
 @FeignClient(name = "userservice", contextId = "authEmployee", path = "/employee", fallback = EmployeeFeignFallBack.class)
 public interface EmployeeFeign {
     @PostMapping("/add")
-    public ResponseEntity<ResponseObject> addEmployeeIntoDb(
+    ResponseEntity<ResponseObject> addEmployeeIntoDb(
             @RequestBody @Valid EmployeeDto employeeDto
     );
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseObject> getEmployeeById(
+    ResponseEntity<ResponseObject> getEmployeeById(
             @PathVariable Integer id
     );
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ResponseObject> updateEmployee(
+    ResponseEntity<ResponseObject> updateEmployee(
             @PathVariable Integer id,
             @RequestBody @Valid EmployeeDto employeeDto
     );
 
     @GetMapping("/filter")
-    public ResponseEntity<ResponseObject> getEmployeeWithFilter(
+    ResponseEntity<ResponseObject> getEmployeeWithFilter(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String phoneNumber,
@@ -39,7 +39,7 @@ public interface EmployeeFeign {
     );
 
     @GetMapping("/all")
-    public ResponseEntity<ResponseObject> getListEmployeeWithFilter(
+    ResponseEntity<ResponseObject> getListEmployeeWithFilter(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Boolean isActive,
             @RequestParam(required = false) LocalDate startDate,
@@ -47,7 +47,7 @@ public interface EmployeeFeign {
     );
 
     @PutMapping("/late_login/{id}")
-    public ResponseEntity<ResponseObject> getLateLoginEmployee(
+    ResponseEntity<ResponseObject> getLateLoginEmployee(
             @PathVariable Integer id
     );
 }

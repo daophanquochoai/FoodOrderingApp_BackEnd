@@ -61,7 +61,8 @@ info:
 
 pattern:
   level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
-
+server:
+  port: 9000
 sentry:
   traces-sample-rat: 1.0
   exception-resolver-order: -2147483647

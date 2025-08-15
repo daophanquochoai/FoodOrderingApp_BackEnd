@@ -105,3 +105,6 @@ resilience4j:
         timeoutDuration: 1000
         limitRefreshPeriod: 5000
         limitForPeriod: 1
+
+server:
+  port: 9002

@@ -2,6 +2,7 @@ package doctorhoai.learn.userservice.service.user;
 
 import doctorhoai.learn.userservice.dto.Filter.Filter;
 import doctorhoai.learn.userservice.dto.Filter.FilterUser;
+import doctorhoai.learn.userservice.dto.UpdatePassword;
 import doctorhoai.learn.userservice.dto.UserDto;
 
 import java.util.List;
@@ -16,4 +17,5 @@ public interface UserService {
     List<UserDto> getAllUsers(Filter filter);
     UserDto getUserByUsername(String username);
     List<UserDto> getMulUser(List<Integer> ids);
+    void updatePassword( UpdatePassword updatePassword, Integer id);
 }
