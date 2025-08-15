@@ -1,5 +1,6 @@
 package doctorhoai.learn.authservice.business.userservice.service.user;
 
+import doctorhoai.learn.authservice.business.userservice.model.UpdatePassword;
 import doctorhoai.learn.authservice.feign.function.HandleFallBack;
 import doctorhoai.learn.authservice.feign.userservice.model.UserDto;
 import doctorhoai.learn.basedomain.response.ResponseObject;
@@ -51,6 +52,11 @@ public class UserFeignFallBack implements FallbackFactory<UserFeign> {
 
             @Override
             public ResponseEntity<ResponseObject> getUserByUsername(String username) {
+                return fallBack.processFallback(cause);
+            }
+
+            @Override
+            public ResponseEntity<ResponseObject> getUpdatePassword(Integer id, UpdatePassword updatePassword) {
                 return fallBack.processFallback(cause);
             }
         };

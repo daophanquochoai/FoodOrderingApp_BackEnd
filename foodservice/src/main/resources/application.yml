@@ -24,8 +24,6 @@ spring:
       inventory : inventory
       order_rollback : order_rollback
       name: apisearch
-server:
-  port: 9002
 
 logging:
   level:

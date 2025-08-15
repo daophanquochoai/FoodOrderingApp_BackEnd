@@ -24,6 +24,4 @@ spring:
       inventory : inventory
       rollback : rollback
     bootstrap-servers: ${SPRING_URL_KAFKA:localhost:9092}
-server:
-  port: 9004
 apiKey: ${STRIPE_KEY:sk_test_51QuPM5BcNft3NmLQIaQ2LrDY86NNOoBnFpaNysptacRccKpa0S2zkyXDg8a7EhPUDCvu1ylbwBjWcD0K7YaFQNoN00ZGbBZc0L}

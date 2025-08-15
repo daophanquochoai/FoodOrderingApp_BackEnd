@@ -46,6 +46,10 @@
             <version>2.8.2</version>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
@@ -97,7 +101,7 @@
                 <version>3.4.1</version>
                 <configuration>
                     <to>
-                        <image>doctorhoai/tttn_api:v1</image>
+                        <image>doctorhoai/tttn_api:v2</image>
                     </to>
                 </configuration>
             </plugin>

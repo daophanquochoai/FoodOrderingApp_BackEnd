@@ -1,7 +1,9 @@
 package doctorhoai.learn.userservice.service.user;
 
+import doctorhoai.learn.basedomain.exception.BadException;
 import doctorhoai.learn.userservice.dto.Filter.Filter;
 import doctorhoai.learn.userservice.dto.Filter.FilterUser;
+import doctorhoai.learn.userservice.dto.UpdatePassword;
 import doctorhoai.learn.userservice.dto.UserDto;
 import doctorhoai.learn.userservice.exception.exception.EmailDuplicate;
 import doctorhoai.learn.userservice.exception.exception.PhoneNumberDuplicate;
@@ -113,6 +115,17 @@ public class UserServiceImpl implements UserService {
         return userList.stream().map(mapper::convertToUserDto).toList();
     }
 
+    @Override
+    public void updatePassword(UpdatePassword updatePassword, Integer id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFound(id.toString(), "id"));
+        if( passwordEncoder.matches(updatePassword.getPasswordOld(), user.getPassword()) ){
+            user.setPassword(passwordEncoder.encode(updatePassword.getPasswordNew()));
+            userRepository.save(user);
+        }else{
+            throw new BadException("Password not match");
+        }
+    }
+
 
     public void checkInfoUser(UserDto userDto, User user) {
         if(
@@ -133,7 +146,6 @@ public class UserServiceImpl implements UserService {
         ){
             throw new PhoneNumberDuplicate();
         };
-
         if(userDto.getRole() == null ){
             throw new RoleNotFound();
         }

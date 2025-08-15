@@ -15,6 +15,21 @@ spring:
     multipart:
       max-file-size: 2GB
       max-request-size: 2GB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: dpquochoai@gmail.com
+    password: haas dmfz dscz ppgi # App Password, không phải password Gmail thường
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp.gmail.com
+    email: dpquochoai@gmail.com
 server:
   port: 9001
 

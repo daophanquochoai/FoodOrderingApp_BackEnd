@@ -5,5 +5,3 @@ spring:
     import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8071}
   profiles:
     active: dev
-server:
-  port: 9000

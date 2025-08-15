@@ -7,7 +7,11 @@ import doctorhoai.learn.authservice.dto.RequestAuth;
 import doctorhoai.learn.authservice.dto.ResponseAuth;
 import doctorhoai.learn.authservice.jwt.service.jwt.JwtService;
 import doctorhoai.learn.authservice.jwt.service.token.TokenService;
+import doctorhoai.learn.authservice.jwt.utils.JwtUtil;
+import doctorhoai.learn.authservice.service.mail.MailService;
 import doctorhoai.learn.basedomain.exception.BadException;
+import doctorhoai.learn.basedomain.response.ResponseObject;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +22,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/auth")
@@ -30,6 +36,8 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
     private final UserFeign userFeign;
     private final EmployeeFeign employeeFeign;
+    private final JwtUtil jwtUtil;
+    private final MailService mailService;
 
     @PostMapping("/login")
     public ResponseEntity<ResponseAuth> login(@RequestBody @Valid RequestAuth auth){
@@ -91,5 +99,18 @@ public class AuthController {
         tokenService.deleteToken(accessToken);
         tokenService.deleteToken(refreshToken);
         return ResponseEntity.ok(EMessageResponse.LOGOUT_SUCCESSFUL.getMessage());
+    }
+
+    @GetMapping("/forget/{email}")
+    public ResponseEntity<Void> forget(@PathVariable String email, HttpServletRequest request){
+        try{
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            String token = jwtUtil.generateToken(userDetails, TimeUnit.MINUTES.toMillis(30));
+            String origin = request.getHeader("Origin");
+            mailService.sendMail(email, "Change Password - GRILLFOOD", token, origin);
+            return ResponseEntity.ok(null);
+        }catch (Exception ex){
+            throw new BadException("Account not found?");
+        }
     }
 }
