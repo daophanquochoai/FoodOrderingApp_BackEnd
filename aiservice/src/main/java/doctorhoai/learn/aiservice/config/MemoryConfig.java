@@ -6,6 +6,7 @@ import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,6 +14,18 @@ import org.springframework.context.annotation.Configuration;
 public class MemoryConfig {
 
     private EmbeddingModel embeddingModel;
+    @Value("${memory.domain}")
+    private String domain;
+    @Value("${memory.port}")
+    private Integer port;
+    @Value("${memory.db}")
+    private String db;
+    @Value("${memory.username}")
+    private String username;
+    @Value("${memory.password}")
+    private String password;
+    @Value("${memory.table}")
+    private String table;
 
     public MemoryConfig(EmbeddingModel embeddingModel) {
         this.embeddingModel = embeddingModel;
@@ -29,12 +42,12 @@ public class MemoryConfig {
     @Bean
     public EmbeddingStore<TextSegment> embeddingStore() {
         return PgVectorEmbeddingStore.builder()
-                .host("14.225.254.190")
-                .port(5432)
-                .database("postgres")
-                .user("my_user")
-                .password("my_password")
-                .table("my_embeddings")
+                .host(domain)
+                .port(port)
+                .database(db)
+                .user(username)
+                .password(password)
+                .table(table)
                 .dimension(embeddingModel.dimension())  // Automatically matches model's embedding size
                 .createTable(true)  // Creates table if it doesn't exist
                 .build();

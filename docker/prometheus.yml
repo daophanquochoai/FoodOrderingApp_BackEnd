@@ -1,0 +1,33 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Tự giám sát Prometheus
+  - job_name: prometheus
+    static_configs:
+      - targets: ['prometheus:9090']
+
+  # Lấy metrics Spring Boot (Micrometer Prometheus)
+  - job_name: spring-boot
+    metrics_path: /actuator/prometheus
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - userservice:9000
+          - auth:9001
+          - apigateway:6380
+          - foodservice:9002
+          - inventoryservice:9003
+          - orderservice:9004
+          - aiservice:8081
+          - eurekaservice:8070
+          - configserver:8071
+
+  # cAdvisor (container-level metrics) - chỉ Linux host
+  - job_name: cadvisor
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+rule_files:
+  - /etc/prometheus/alerts.yml

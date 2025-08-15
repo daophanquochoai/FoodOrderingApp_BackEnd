@@ -1,12 +1,12 @@
 spring:
   application:
     name: aiservice
-  profiles:
-    active: dev
+  zipkin:
+    baseUrl: ${SPRING_ZIPKIN_BASE_URL:http://14.225.254.190:9411/api/v2/spans}
   datasource:
-    url: jdbc:postgresql://14.225.254.190:5432/postgres
-    username: my_user
-    password: my_password
+    url: ${SPRING_DB:jdbc:postgresql://14.225.254.190:5432/postgres}
+    username: ${SPRING_DB_USER:my_user}
+    password: ${SPRING_DB_PASSWORD:my_password}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -49,3 +49,43 @@ eureka:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8070/eureka/}
     register-with-eureka: true
     fetch-registry: true
+ai:
+  text : ${MODEL_TEXT:qwen3:4b}
+  embed : ${MODEL_EMBED:nomic-embed-text}
+  host : ${MODEL_HOST:https://18184932427b.ngrok-free.app}
+
+memory:
+  domain : ${MEMORY_DOMAIN:14.225.254.190}
+  port : ${MEMORY_PORT:5432}
+  db : ${MEMORY_DB:postgres}
+  username : ${MEMORY_USER_NAME:my_user}
+  password : ${MEMORY_PASSWORD:my_password}
+  table : ${MEMORY_TABLE:my_embeddings}
+
+# cau hinh actuator
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  zipkin:
+    tracing:
+      endpoint: ${SPRING_ZIPKIN_BASE_URL:http://14.225.254.190:9411/api/v2/spans}
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+    circuitbreakers:
+      enabled: true
+  info:
+    env:
+      enabled: true
