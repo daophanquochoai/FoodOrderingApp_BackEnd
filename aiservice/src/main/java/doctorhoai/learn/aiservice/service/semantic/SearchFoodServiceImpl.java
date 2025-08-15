@@ -94,7 +94,7 @@ public class SearchFoodServiceImpl implements SearchFoodService{
         String prompt = "Tìm món ăn liên quan đến: " + search;
         Embedding embedding = embeddingModel.embed(prompt).content();
 
-        List<Integer> ids = searchFoodRepository.searchSimilarFoods(embedding.vector(),0.3f, 100).stream().map(SearchFood::getFoodId).toList();
+        List<Integer> ids = searchFoodRepository.searchSimilarFoods(embedding.vector(),0.6f, 100).stream().map(SearchFood::getFoodId).toList();
         return getFoodsByIds(ids);
     }
 

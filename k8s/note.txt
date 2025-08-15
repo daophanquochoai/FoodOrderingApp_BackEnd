@@ -1,0 +1,13 @@
+kubectl apply -f 1.kafka.yaml,1.zookeeper.yaml
+
+kubectl apply -f 2.configserver.yaml
+
+kubectl apply -f 3.eureka.yaml
+
+kubectl apply -f 4.ai.yaml,4.food.yaml,4.inventory.yaml,4.order.yaml,4.user.yaml
+
+kubectl apply -f 5.auth.yaml
+
+kubectl apply -f 6.api.yaml
+
+kubectl apply -f 7.hpa.yaml

@@ -200,6 +200,41 @@ services:
     networks:
       - tttn
 
+  aiservice:
+    image: doctorhoai/tttn_aiservice:v1
+    container_name: aiservice
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: "curl --fail --silent http://localhost:8081/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      configserver:
+        condition: service_healthy
+      eurekaservice:
+        condition: service_healthy
+    environment:
+      - SPRING_ZIPKIN_BASE_URL=http://14.225.254.190:9411/api/v2/spans
+      - SPRING_DB=jdbc:postgresql://14.225.254.190:5432/postgres
+      - SPRING_DB_USER=my_user
+      - SPRING_DB_PASSWORD=my_password
+      - SPRING_URL_KAFKA=kafka:29092
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eurekaservice:8070/eureka/
+      - MODEL_TEXT=qwen3:4b
+      - MODEL_EMBED=nomic-embed-text
+      - MODEL_HOST=https://eb3b51c9dcb0.ngrok-free.app
+      - MEMORY_DOMAIN=14.225.254.190
+      - MEMORY_PORT=5432
+      - MEMORY_DB=postgres
+      - MEMORY_USER_NAME=my_user
+      - MEMORY_PASSWORD=my_password
+      - MEMORY_TABLE=my_embeddings
+    networks:
+      - tttn
+
   auth:
     image: doctorhoai/tttn_auth:v1
     container_name: auth

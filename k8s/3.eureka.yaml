@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: eurekaservice
+  name: eurekaservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: eurekaservice
+  template:
+    metadata:
+      labels:
+        io.kompose.service: eurekaservice
+    spec:
+      containers:
+        - env:
+            - name: SPRING_CONFIG_IMPORT
+              value: configserver:http://configserver:8071
+            - name: SPRING_ZIPKIN_BASE_URL
+              value: http://14.225.254.190:9411/api/v2/spans
+          image: doctorhoai/tttn_eurekaservice:v1
+          livenessProbe:
+            exec:
+              command:
+                - curl --fail --silent http://localhost:8070/actuator/health/readiness | grep UP || exit 1
+            failureThreshold: 20
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8070
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: eurekaservice
+          ports:
+            - containerPort: 8070
+              protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: eurekaservice
+  name: eurekaservice
+spec:
+  ports:
+    - name: "8070"
+      port: 8070
+      targetPort: 8070
+  selector:
+    io.kompose.service: eurekaservice

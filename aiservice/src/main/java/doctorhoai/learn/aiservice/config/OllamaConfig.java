@@ -7,6 +7,7 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaStreamingChatModel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,9 +15,12 @@ import java.time.Duration;
 
 @Configuration
 public class OllamaConfig {
-    private static final String BASE_URL = "https://18184932427b.ngrok-free.app";
-    private static final String MODEL_NAME = "qwen3:4b";
-    private static final String MODE_EMBEDDING = "nomic-embed-text";
+    @Value("${ai.host}")
+    private String BASE_URL;
+    @Value("${ai.text}")
+    private String MODEL_NAME;
+    @Value("${ai.embed}")
+    private String MODE_EMBEDDING;
 
     @Bean
     public ChatLanguageModel chatLanguageModel() {

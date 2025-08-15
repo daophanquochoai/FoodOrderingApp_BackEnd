@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: orderservice
+  name: orderservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: orderservice
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  template:
+    metadata:
+      labels:
+        io.kompose.service: orderservice
+    spec:
+      containers:
+        - env:
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eurekaservice:8070/eureka/
+            - name: SENTRY_DSN
+              value: https://a95701bd885c17f6070f1369551276a2@o4509342987911168.ingest.de.sentry.io/4509342990401616
+            - name: SENTRY_ENV
+              value: dev
+            - name: SPRING_CONFIG_IMPORT
+              value: optional:configserver:http://configserver:8071
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: Rw3UXVo4jxlq24fSgA0t
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://14.225.254.190:3307/ThucTapTotNghiep?allowPublicKeyRetrieval=true&useSSL=false
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_URL_KAFKA
+              value: kafka:29092
+            - name: SPRING_ZIPKIN_BASE_URL
+              value: http://14.225.254.190:9411/api/v2/spans
+          image: doctorhoai/tttn_orderservice:v1
+          livenessProbe:
+            exec:
+              command:
+                - curl --fail --silent http://localhost:9004/actuator/health/readiness | grep UP || exit 1
+            failureThreshold: 20
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 9004
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: orderservice
+          ports:
+            - containerPort: 9004
+              protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: orderservice
+  name: orderservice
+spec:
+  ports:
+    - name: "9004"
+      port: 9004
+      targetPort: 9004
+  selector:
+    io.kompose.service: orderservice

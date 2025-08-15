@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: configserver
+  name: configserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: configserver
+  template:
+    metadata:
+      labels:
+        io.kompose.service: configserver
+    spec:
+      containers:
+        - env:
+            - name: SPRING_ZIPKIN_BASE_URL
+              value: http://14.225.254.190:9411/api/v2/spans
+          image: doctorhoai/tttn_configserver:v1
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8071
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8071
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: configserver
+          ports:
+            - containerPort: 8071
+              protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: configserver
+  name: configserver
+spec:
+  ports:
+    - name: "8071"
+      port: 8071
+      targetPort: 8071
+  selector:
+    io.kompose.service: configserver
