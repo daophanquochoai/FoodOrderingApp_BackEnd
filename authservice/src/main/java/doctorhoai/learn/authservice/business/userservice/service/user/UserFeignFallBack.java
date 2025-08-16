@@ -59,6 +59,11 @@ public class UserFeignFallBack implements FallbackFactory<UserFeign> {
             public ResponseEntity<ResponseObject> getUpdatePassword(Integer id, UpdatePassword updatePassword) {
                 return fallBack.processFallback(cause);
             }
+
+            @Override
+            public ResponseEntity<ResponseObject> getForgetPassword(UpdatePassword updatePassword, String email) {
+                return fallBack.processFallback(cause);
+            }
         };
     }
 }

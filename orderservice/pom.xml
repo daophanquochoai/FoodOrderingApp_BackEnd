@@ -169,7 +169,7 @@
                 <version>3.4.1</version>
                 <configuration>
                     <to>
-                        <image>doctorhoai/tttn_orderservice:v1</image>
+                        <image>doctorhoai/tttn_orderservice:v3</image>
                     </to>
                 </configuration>
             </plugin>

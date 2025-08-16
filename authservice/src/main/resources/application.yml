@@ -18,8 +18,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: dpquochoai@gmail.com
-    password: haas dmfz dscz ppgi # App Password, không phải password Gmail thường
+    username: ${SPRING_EMAI_USERNAME:dpquochoai@gmail.com}
+    password: ${SPRING_EMAIL_PASSWORD:haas dmfz dscz ppgi}
     properties:
       mail:
         smtp:
@@ -29,7 +29,7 @@ spring:
             required: true
           ssl:
             trust: smtp.gmail.com
-    email: dpquochoai@gmail.com
+    email: ${SPRING_EMAI_USERNAME:dpquochoai@gmail.com}
 server:
   port: 9001
 
