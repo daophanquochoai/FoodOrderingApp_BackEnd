@@ -58,7 +58,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             response.getWriter().write("Too many requests - Rate limit exceeded");
             return; // Không tiếp tục xử lý request nếu bị chặn
         }
-        if (request.getServletPath().contains("/api/authenticate")) {
+        log.info(request.getServletPath());
+        if (request.getServletPath().contains("/api/authenticate") || request.getServletPath().contains("actuator")) {
+            log.info("No secutiry path");
             filterChain.doFilter(request, response);
             return;
         }

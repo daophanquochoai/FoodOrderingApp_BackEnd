@@ -1,5 +1,6 @@
 package doctorhoai.learn.authservice.controller;
 
+import doctorhoai.learn.authservice.business.userservice.model.UpdatePassword;
 import doctorhoai.learn.authservice.business.userservice.service.employee.EmployeeFeign;
 import doctorhoai.learn.authservice.business.userservice.service.user.UserFeign;
 import doctorhoai.learn.authservice.controller.message.EMessageResponse;
@@ -106,11 +107,26 @@ public class AuthController {
         try{
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
             String token = jwtUtil.generateToken(userDetails, TimeUnit.MINUTES.toMillis(30));
+            tokenService.saveToken(token, userDetails.getUsername());
             String origin = request.getHeader("Origin");
-            mailService.sendMail(email, "Change Password - GRILLFOOD", token, origin);
+            mailService.sendMail(email, "Change Password - GRILLFOOD", token + "&email=" + email, origin);
             return ResponseEntity.ok(null);
         }catch (Exception ex){
             throw new BadException("Account not found?");
         }
     }
+
+    @PutMapping("/update/{email}")
+    public ResponseEntity<Void> updatePassword(
+            @PathVariable String email,
+            @RequestBody UpdatePassword updatePassword
+            ){
+        try{
+            userFeign.getForgetPassword(updatePassword, email);
+                return ResponseEntity.ok(null);
+        }catch(Exception ex){
+            throw new BadException("Update was error");
+        }
+    }
+
 }

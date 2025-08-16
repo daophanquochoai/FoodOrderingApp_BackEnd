@@ -18,4 +18,5 @@ public interface UserService {
     UserDto getUserByUsername(String username);
     List<UserDto> getMulUser(List<Integer> ids);
     void updatePassword( UpdatePassword updatePassword, Integer id);
+    void updatePassword(UpdatePassword updatePassword, String email);
 }

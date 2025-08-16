@@ -155,7 +155,7 @@ public class FoodServiceImpl implements FoodService {
         food.setStatus(foodDto.getStatus());
         if( foodDto.getCategory() != null){
             if( foodDto.getCategory().getId() != null && !foodDto.getCategory().getId().equals(foodDto.getId()) ){
-                Category category = categoryRepository.findByIdAndStatus(food.getCategory().getId(), EStatusCategory.ACTIVE).orElseThrow(CategoryNotFoundException::new);
+                Category category = categoryRepository.findByIdAndStatus(foodDto.getCategory().getId(), EStatusCategory.ACTIVE).orElseThrow(CategoryNotFoundException::new);
                 food.setCategory(category);
             } else if( foodDto.getCategory().getId() == null){
                 throw new CategoryNotFoundException();

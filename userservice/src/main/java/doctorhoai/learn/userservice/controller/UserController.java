@@ -10,13 +10,11 @@ import doctorhoai.learn.userservice.feign.model.PointDto;
 import doctorhoai.learn.userservice.feign.orderservice.CartFeign;
 import doctorhoai.learn.userservice.feign.orderservice.PointFeign;
 import doctorhoai.learn.userservice.repository.UserRepository;
-import doctorhoai.learn.userservice.service.mail.MailService;
 import doctorhoai.learn.userservice.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.retry.annotation.RetryConfiguration;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -31,7 +29,6 @@ public class UserController {
     private final PointFeign pointFeign;
     private final UserRepository userRepository;
     private final CartFeign cartFeign;
-    private final MailService mailService;
 
     @PostMapping("/add")
     public ResponseEntity<ResponseObject> addUserIntoDb(
@@ -173,15 +170,16 @@ public class UserController {
         );
     }
 
-    @GetMapping("/email/{email}")
-    public ResponseEntity<ResponseObject> getSendEmail(
-            @PathVariable String email,
-            HttpServletRequest request
-    ){
-        mailService.checkEmail(email, request);
+    @PutMapping("/forget/{email}")
+    public ResponseEntity<ResponseObject> getForgetPassword(
+        @RequestBody @Valid UpdatePassword updatePassword,
+        @PathVariable String email
+    )
+    {
+        userService.updatePassword(updatePassword, email);
         return ResponseEntity.ok(
                 ResponseObject.builder()
-                        .message("Send to Email")
+                        .message(EMessageResponse.UPDATE_PASSWORD_SUCCESSFUL.getMessage())
                         .build()
         );
     }

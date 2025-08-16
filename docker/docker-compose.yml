@@ -42,7 +42,7 @@ services:
       - tttn
 
   configserver:
-    image: doctorhoai/tttn_configserver:v1
+    image: doctorhoai/tttn_configserver:v3
     container_name: configserver
     ports:
       - "8071:8071"
@@ -58,7 +58,7 @@ services:
       - tttn
 
   eurekaservice:
-    image: doctorhoai/tttn_eurekaservice:v1
+    image: doctorhoai/tttn_eurekaservice:v3
     container_name: eurekaservice
     ports:
       - "8070:8070"
@@ -80,7 +80,7 @@ services:
       - tttn
 
   foodservice:
-    image: doctorhoai/tttn_foodservice:v1
+    image: doctorhoai/tttn_foodservice:v3
     container_name: foodservice
     ports:
       - "9002:9002"
@@ -111,7 +111,7 @@ services:
       - tttn
 
   inventoryservice:
-    image: doctorhoai/tttn_inventory:v1
+    image: doctorhoai/tttn_inventory:v3
     container_name: inventoryservice
     ports:
       - "9003:9003"
@@ -142,7 +142,7 @@ services:
       - tttn
 
   orderservice:
-    image: doctorhoai/tttn_orderservice:v1
+    image: doctorhoai/tttn_orderservice:v3
     container_name: orderservice
     ports:
       - "9004:9004"
@@ -173,7 +173,7 @@ services:
       - tttn
 
   userservice:
-    image: doctorhoai/tttn_userservice:v1
+    image: doctorhoai/tttn_userservice:v3
     container_name: userservice
     ports:
       - "9000:9000"
@@ -201,7 +201,7 @@ services:
       - tttn
 
   aiservice:
-    image: doctorhoai/tttn_aiservice:v1
+    image: doctorhoai/tttn_aiservice:v3
     container_name: aiservice
     ports:
       - "8081:8081"
@@ -236,7 +236,7 @@ services:
       - tttn
 
   auth:
-    image: doctorhoai/tttn_auth:v1
+    image: doctorhoai/tttn_auth:v3
     container_name: auth
     ports:
       - "9001:9001"
@@ -272,7 +272,7 @@ services:
       - tttn
 
   apigateway:
-    image: doctorhoai/tttn_api:v1
+    image: doctorhoai/tttn_api:v3
     container_name: apigateway
     ports:
       - "6380:6380"

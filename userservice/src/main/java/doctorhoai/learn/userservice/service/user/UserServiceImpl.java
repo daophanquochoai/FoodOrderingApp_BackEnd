@@ -126,6 +126,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public void updatePassword(UpdatePassword updatePassword, String email) {
+        User user = userRepository.findByEmailAndIsActive(email, true).orElseThrow(() -> new UserNotFound(email, "email"));
+        user.setPassword(passwordEncoder.encode(updatePassword.getPasswordNew()));
+        userRepository.save(user);
+    }
+
 
     public void checkInfoUser(UserDto userDto, User user) {
         if(

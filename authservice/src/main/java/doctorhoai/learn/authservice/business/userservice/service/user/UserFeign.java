@@ -66,4 +66,10 @@ public interface UserFeign {
             @PathVariable Integer id,
             @RequestBody @Valid UpdatePassword updatePassword
     );
+
+    @PutMapping("/forget/{email}")
+    ResponseEntity<ResponseObject> getForgetPassword(
+            @RequestBody @Valid UpdatePassword updatePassword,
+            @PathVariable String email
+    );
 }
