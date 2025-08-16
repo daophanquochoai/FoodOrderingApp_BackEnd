@@ -39,15 +39,21 @@ spec:
               value: kafka:29092
             - name: SPRING_ZIPKIN_BASE_URL
               value: http://14.225.254.190:9411/api/v2/spans
-          image: doctorhoai/tttn_orderservice:v1
+          image: doctorhoai/tttn_orderservice:v3
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9004
+            initialDelaySeconds: 10    # chờ 10s mới check lần đầu
+            periodSeconds: 5           # check mỗi 5s
+            failureThreshold: 30
           livenessProbe:
-            exec:
-              command:
-                - curl --fail --silent http://localhost:9004/actuator/health/readiness | grep UP || exit 1
-            failureThreshold: 20
-            initialDelaySeconds: 10
-            periodSeconds: 20
-            timeoutSeconds: 5
+            httpGet:
+              path: /actuator/health/liveness
+              port: 9004
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            failureThreshold: 5
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
@@ -55,6 +61,14 @@ spec:
             initialDelaySeconds: 60
             periodSeconds: 10
             timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: "500m"      # 0.5 core
+              memory: "512Mi"  # 0.5GB
+            limits:
+              cpu: "1000m"     # 1 core
+              memory: "1024Mi" # 1GB
+
           name: orderservice
           ports:
             - containerPort: 9004

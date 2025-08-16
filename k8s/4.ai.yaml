@@ -51,15 +51,14 @@ spec:
               value: kafka:29092
             - name: SPRING_ZIPKIN_BASE_URL
               value: http://14.225.254.190:9411/api/v2/spans
-          image: doctorhoai/tttn_aiservice:v1
+          image: doctorhoai/tttn_aiservice:v3
           livenessProbe:
-            exec:
-              command:
-                - curl --fail --silent http://localhost:8081/actuator/health/readiness | grep UP || exit 1
-            failureThreshold: 20
-            initialDelaySeconds: 10
-            periodSeconds: 20
-            timeoutSeconds: 5
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            failureThreshold: 5
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness

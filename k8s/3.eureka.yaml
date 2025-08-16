@@ -20,22 +20,22 @@ spec:
               value: configserver:http://configserver:8071
             - name: SPRING_ZIPKIN_BASE_URL
               value: http://14.225.254.190:9411/api/v2/spans
-          image: doctorhoai/tttn_eurekaservice:v1
+          image: doctorhoai/tttn_eurekaservice:v3
           livenessProbe:
-            exec:
-              command:
-                - curl --fail --silent http://localhost:8070/actuator/health/readiness | grep UP || exit 1
-            failureThreshold: 20
-            initialDelaySeconds: 10
-            periodSeconds: 20
-            timeoutSeconds: 5
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8070
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            failureThreshold: 5
+
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8070
-            initialDelaySeconds: 60
+            initialDelaySeconds: 45
             periodSeconds: 10
-            timeoutSeconds: 5
+            failureThreshold: 5
           name: eurekaservice
           ports:
             - containerPort: 8070
