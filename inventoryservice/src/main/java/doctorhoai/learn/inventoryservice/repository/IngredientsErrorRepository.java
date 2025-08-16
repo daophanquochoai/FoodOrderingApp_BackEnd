@@ -20,7 +20,10 @@ public interface IngredientsErrorRepository extends JpaRepository<IngredientErro
             (:units IS NULL OR ie.unit in :units) AND 
             (:minQuantity IS NULL OR ie.quantity >= :minQuantity) AND
             (:maxQuantity IS NULL OR ie.quantity <= :maxQuantity) AND 
-            (:search IS NULL OR (ie.reason LIKE concat('%',:search,'%')) OR (ie.reason LIKE concat('%', :search, '%') ))
+            (:search IS NULL OR (ie.reason LIKE concat('%',:search,'%'))
+                OR (ie.historyIngredients.ingredientsId.name LIKE concat('%', :search, '%') )
+                OR (ie.historyIngredients.history.bath_code LIKE concat('%', :search, '%') ) 
+            )
             """
     )
     Page<IngredientError> getIngredientsErrorByFilter(

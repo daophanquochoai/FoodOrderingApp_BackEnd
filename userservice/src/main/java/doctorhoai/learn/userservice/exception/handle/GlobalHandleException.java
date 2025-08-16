@@ -1,5 +1,6 @@
 package doctorhoai.learn.userservice.exception.handle;
 
+import doctorhoai.learn.basedomain.exception.BadException;
 import doctorhoai.learn.basedomain.exception.Duplicate;
 import doctorhoai.learn.basedomain.exception.NotFound;
 import doctorhoai.learn.basedomain.exception.ResponseException;
@@ -83,7 +84,17 @@ public class GlobalHandleException extends ResponseEntityExceptionHandler {
                                 .build()
                 );
     }
-
+    @ExceptionHandler(value = {BadException.class})
+    public ResponseEntity<ResponseException> handleBadException(BadException exception) {
+        log.info("**ApiExceptionHandler controller, handle BadException**");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ResponseException.builder()
+                                .message(exception.getMessage())
+                                .timestamp(LocalDateTime.now())
+                                .build()
+                );
+    }
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<Object> handleGlobalException(Exception exception) {
         log.info("**ApiExceptionHandler controller, handle exception**");
