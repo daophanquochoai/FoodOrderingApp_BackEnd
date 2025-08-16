@@ -18,7 +18,7 @@ spec:
         - env:
             - name: SPRING_ZIPKIN_BASE_URL
               value: http://14.225.254.190:9411/api/v2/spans
-          image: doctorhoai/tttn_configserver:v1
+          image: doctorhoai/tttn_configserver:v3
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
